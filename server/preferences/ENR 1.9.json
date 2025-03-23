@@ -1,0 +1,42 @@
+{
+  "selectedColumns": {
+    "section_code": false,
+    "title": false,
+    "routes": false,
+    "metadata": false,
+    "metadata.processing_timestamp": false,
+    "routes.routes": true,
+    "routes.routes_html": false,
+    "routes.topnotes": false,
+    "routes.topnotes_html": false,
+    "routes.Routes": false,
+    "routes.general_remarks": false,
+    "routes.general_remarks_html": false,
+    "routes.general_remarks_blue_html": false,
+    "routes.general_remarks_blue": false,
+    "routes.general_remarks_red_html": false,
+    "routes.general_remarks_red": false,
+    "DepartureAirport": false,
+    "DepartureAirport_html": true,
+    "destination": false,
+    "destination_html": true,
+    "route/exitpoint": false,
+    "route/exitpoint_html": true,
+    "destination_blue_html": true,
+    "destination_blue": false,
+    "destination_red_html": true,
+    "destination_red": false,
+    "route/exitpoint_blue_html": true,
+    "route/exitpoint_blue": false,
+    "route/exitpoint_red_html": true,
+    "route/exitpoint_red": false,
+    "DepartureAirport_blue_html": true,
+    "DepartureAirport_blue": false,
+    "DepartureAirport_red_html": true,
+    "DepartureAirport_red": false
+  },
+  "columnWidths": {
+    "destination_html": 373
+  },
+  "timestamp": "2025-03-20T09:24:35.940Z"
+}
