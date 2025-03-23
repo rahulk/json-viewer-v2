@@ -1,0 +1,53 @@
+{
+  "section_code": "AD 2.4",
+  "title": "Generic Table Data",
+  "items": [
+    {
+      "id": "AD 2.4",
+      "ad_2.4": "AD 2.4",
+      "1": "2",
+      "cargo-handlingfacilities": "Fuel/oiltypes",
+      "highloader35tonsavailablenil": ""
+    },
+    {
+      "id": "AD 2.4",
+      "ad_2.4": "AD 2.4",
+      "1": "3",
+      "cargo-handlingfacilities": "Fuelingfacilities/capacity",
+      "highloader35tonsavailablenil": ""
+    },
+    {
+      "id": "AD 2.4",
+      "ad_2.4": "AD 2.4",
+      "1": "4",
+      "cargo-handlingfacilities": "De-icingfacilities",
+      "highloader35tonsavailablenil": ""
+    },
+    {
+      "id": "AD 2.4",
+      "ad_2.4": "AD 2.4",
+      "1": "5",
+      "cargo-handlingfacilities": "Hangerspaceforvisitingaircraft",
+      "highloader35tonsavailablenil": ""
+    },
+    {
+      "id": "AD 2.4",
+      "ad_2.4": "AD 2.4",
+      "1": "6",
+      "cargo-handlingfacilities": "Repairfacilitiesforvisitingaircraft",
+      "highloader35tonsavailablenil": ""
+    },
+    {
+      "id": "AD 2.4",
+      "ad_2.4": "AD 2.4",
+      "1": "7",
+      "cargo-handlingfacilities": "Remarks",
+      "highloader35tonsavailablenil": ""
+    }
+  ],
+  "general_remarks": "",
+  "metadata": {
+    "source": "OOSH",
+    "processing_timestamp": "2025-03-22T18:17:00.701250"
+  }
+}

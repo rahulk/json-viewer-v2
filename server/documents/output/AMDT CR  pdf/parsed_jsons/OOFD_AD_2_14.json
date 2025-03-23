@@ -1,0 +1,39 @@
+{
+  "section_code": "AD 2.14",
+  "title": "Generic Table Data",
+  "items": [
+    {
+      "id": "AD 2.14",
+      "ad_2.14": "AD 2.14",
+      "rwydesignator": "1",
+      "apchlgttypelenintst": "2",
+      "thrlgtcolorwbar": "3",
+      "vasis(meht)papi": "4",
+      "tdzlgtlen": "5",
+      "rwycentrelinelgtlen,spacing,colorintst": "6",
+      "rwyedgelgtlen,spacingcolor,intst": "7",
+      "rwyendlgtcolorwbar": "8",
+      "swylgtlen(m)color": "9",
+      "remarks": "10"
+    },
+    {
+      "id": "AD 2.14",
+      "ad_2.14": "AD 2.14",
+      "rwydesignator": "",
+      "apchlgttypelenintst": "",
+      "thrlgtcolorwbar": "",
+      "vasis(meht)papi": "",
+      "tdzlgtlen": "",
+      "rwycentrelinelgtlen,spacing,colorintst": "",
+      "rwyedgelgtlen,spacingcolor,intst": "",
+      "rwyendlgtcolorwbar": "",
+      "swylgtlen(m)color": "",
+      "remarks": ""
+    }
+  ],
+  "general_remarks": "",
+  "metadata": {
+    "source": "OOFD",
+    "processing_timestamp": "2025-03-22T18:17:43.081298"
+  }
+}

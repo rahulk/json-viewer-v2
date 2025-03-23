@@ -1,0 +1,23 @@
+{
+  "section_code": "GEN 2.4",
+  "title": "Generic Table Data",
+  "items": [
+    {
+      "id": "GEN 2.4",
+      "gen_2.4": "GEN 2.4",
+      "1.encode": "IndicatorLocation",
+      "2.decode": "LocationIndicator"
+    },
+    {
+      "id": "GEN 2.4",
+      "gen_2.4": "GEN 2.4",
+      "1.encode": "",
+      "2.decode": ""
+    }
+  ],
+  "general_remarks": "",
+  "metadata": {
+    "source": "App-2 AIP DGCAR change request 1.2",
+    "processing_timestamp": "2025-03-22T17:24:42.924269"
+  }
+}

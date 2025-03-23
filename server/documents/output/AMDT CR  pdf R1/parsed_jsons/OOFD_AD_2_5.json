@@ -1,0 +1,61 @@
+{
+  "section_code": "AD 2.5",
+  "title": "Generic Table Data",
+  "items": [
+    {
+      "id": "AD 2.5",
+      "ad_2.5": "AD 2.5",
+      "1": "2",
+      "hotels": "Restaurants",
+      "thereisaccommodationavailableatthepdofahudcampandcontractor\u2019smotel(pac).accommodationisavailableonlybypriorarrangement.fahudhotelavailable.its5.5kmawayfromtheairport_and_its_located_in_fahud_area,_for_reservation_contact:92132401": ""
+    },
+    {
+      "id": "AD 2.5",
+      "ad_2.5": "AD 2.5",
+      "1": "3",
+      "hotels": "Transportation",
+      "thereisaccommodationavailableatthepdofahudcampandcontractor\u2019smotel(pac).accommodationisavailableonlybypriorarrangement.fahudhotelavailable.its5.5kmawayfromtheairport_and_its_located_in_fahud_area,_for_reservation_contact:92132401": ""
+    },
+    {
+      "id": "AD 2.5",
+      "ad_2.5": "AD 2.5",
+      "1": "4",
+      "hotels": "Medicalfacilities",
+      "thereisaccommodationavailableatthepdofahudcampandcontractor\u2019smotel(pac).accommodationisavailableonlybypriorarrangement.fahudhotelavailable.its5.5kmawayfromtheairport_and_its_located_in_fahud_area,_for_reservation_contact:92132401": ""
+    },
+    {
+      "id": "AD 2.5",
+      "ad_2.5": "AD 2.5",
+      "1": "5",
+      "hotels": "BankandPostOffice",
+      "thereisaccommodationavailableatthepdofahudcampandcontractor\u2019smotel(pac).accommodationisavailableonlybypriorarrangement.fahudhotelavailable.its5.5kmawayfromtheairport_and_its_located_in_fahud_area,_for_reservation_contact:92132401": ""
+    },
+    {
+      "id": "AD 2.5",
+      "ad_2.5": "AD 2.5",
+      "1": "6",
+      "hotels": "TouristOffice",
+      "thereisaccommodationavailableatthepdofahudcampandcontractor\u2019smotel(pac).accommodationisavailableonlybypriorarrangement.fahudhotelavailable.its5.5kmawayfromtheairport_and_its_located_in_fahud_area,_for_reservation_contact:92132401": ""
+    },
+    {
+      "id": "AD 2.5",
+      "ad_2.5": "AD 2.5",
+      "1": "7",
+      "hotels": "Remarks",
+      "thereisaccommodationavailableatthepdofahudcampandcontractor\u2019smotel(pac).accommodationisavailableonlybypriorarrangement.fahudhotelavailable.its5.5kmawayfromtheairport_and_its_located_in_fahud_area,_for_reservation_contact:92132401": ""
+    },
+    {
+      "ad_2.5": "4 Remarks",
+      "id": "4 Remarks"
+    },
+    {
+      "ad_2.5": "3 Remarks",
+      "id": "3 Remarks"
+    }
+  ],
+  "general_remarks": "",
+  "metadata": {
+    "source": "OOFD",
+    "processing_timestamp": "2025-03-22T18:16:57.942055"
+  }
+}

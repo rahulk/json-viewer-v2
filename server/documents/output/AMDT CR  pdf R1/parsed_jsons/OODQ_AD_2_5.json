@@ -1,0 +1,23 @@
+{
+  "section_code": "AD 2.5",
+  "title": "Generic Table Data",
+  "items": [
+    {
+      "ad_2.5": "7 Remarks",
+      "id": "7 Remarks"
+    },
+    {
+      "ad_2.5": "4 Remarks",
+      "id": "4 Remarks"
+    },
+    {
+      "ad_2.5": "3 Remarks",
+      "id": "3 Remarks"
+    }
+  ],
+  "general_remarks": "",
+  "metadata": {
+    "source": "OODQ",
+    "processing_timestamp": "2025-03-22T18:16:56.568502"
+  }
+}

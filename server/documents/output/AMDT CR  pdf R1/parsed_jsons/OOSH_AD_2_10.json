@@ -1,0 +1,39 @@
+{
+  "section_code": "AD 2.10",
+  "title": "Generic Table Data",
+  "items": [
+    {
+      "id": "AD 2.10",
+      "ad_2.10": "AD 2.10",
+      "inapproach/tkofareas": "1",
+      "incirclingareaandatad": "2",
+      "remarks": "3"
+    },
+    {
+      "id": "AD 2.10",
+      "ad_2.10": "AD 2.10",
+      "inapproach/tkofareas": "RWY/Areaaffected",
+      "incirclingareaandatad": "Obstacle typeElevation/HGTMarkings/LGT",
+      "remarks": "Coordinates"
+    },
+    {
+      "id": "AD 2.10",
+      "ad_2.10": "AD 2.10",
+      "inapproach/tkofareas": "a",
+      "incirclingareaandatad": "b",
+      "remarks": "c"
+    },
+    {
+      "id": "AD 2.10",
+      "ad_2.10": "AD 2.10",
+      "inapproach/tkofareas": "",
+      "incirclingareaandatad": "",
+      "remarks": ""
+    }
+  ],
+  "general_remarks": "",
+  "metadata": {
+    "source": "OOSH",
+    "processing_timestamp": "2025-03-22T18:17:00.804660"
+  }
+}

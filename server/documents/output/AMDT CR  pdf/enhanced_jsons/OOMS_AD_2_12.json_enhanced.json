@@ -1,0 +1,51 @@
+{
+  "section_code": "AD 2.12",
+  "title": "Generic Table Data",
+  "items": [
+    {
+      "id": "AD 2.12",
+      "ad_2.12": "AD 2.12",
+      "designationsrwy_nr": "1",
+      "truebrg": "2",
+      "dimensionsofrwy_(m)": "3",
+      "strength(pcn)andsurfaceof_rwyandswy": "4",
+      "thrcoordinatesthr_geoidundulation": "5",
+      "threlevationand_highest_elevation_of_tdz_of_precisionapprwy": "6"
+    },
+    {
+      "id": "AD 2.12",
+      "ad_2.12": "AD 2.12",
+      "designationsrwy_nr": ""
+    },
+    {
+      "id": "AD 2.12",
+      "ad_2.12": "AD 2.12",
+      "designationsrwy_nr": "Slope ofRWY-SWY",
+      "truebrg": "SWYdimensions(M)",
+      "dimensionsofrwy_(m)": "CWYdimensions(M)",
+      "strength(pcn)andsurfaceof_rwyandswy": "Stripdimensions(M)",
+      "thrcoordinatesthr_geoidundulation": "OFZ",
+      "threlevationand_highest_elevation_of_tdz_of_precisionapprwy": "Remarks"
+    },
+    {
+      "id": "AD 2.12",
+      "ad_2.12": "AD 2.12",
+      "designationsrwy_nr": "7",
+      "truebrg": "8",
+      "dimensionsofrwy_(m)": "9",
+      "strength(pcn)andsurfaceof_rwyandswy": "10",
+      "thrcoordinatesthr_geoidundulation": "11",
+      "threlevationand_highest_elevation_of_tdz_of_precisionapprwy": "12"
+    },
+    {
+      "id": "AD 2.12",
+      "ad_2.12": "AD 2.12",
+      "designationsrwy_nr": ""
+    }
+  ],
+  "general_remarks": "",
+  "metadata": {
+    "source": "OOMS",
+    "processing_timestamp": "2025-03-22T18:17:45.055855"
+  }
+}
