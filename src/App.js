@@ -54,15 +54,17 @@ function App() {
   // Use custom hooks for folder and JSON management
   const {
     folders,
-    foldersLoading,
-    foldersError,
     pdfFiles,
     activeFolder,
     activePdfFile,
-    selectedPdfUrl,
-    fetchFolders,
+    parsedJsons,
+    enhancedJsons,
     handleFolderSelect,
-    handlePdfFileSelect
+    handlePdfFileSelect,
+    foldersLoading,
+    foldersError,
+    selectedPdfUrl,
+    fetchFolders
   } = useFolderManagement();
 
   const {
@@ -144,7 +146,7 @@ function App() {
               <div className="results-container h-100">
                 <div className="d-flex justify-content-start mb-3">
                   <ul className="nav nav-tabs">
-                    {['Tab 1', 'Tab 2', 'Tab 3', 'Tab 4', 'Tab 5'].map((tab, index) => (
+                    {['Tab 1: Basic', 'Tab 2: Modified', 'Tab 3: Enhanced', 'Tab 4: Parsed JSONs', 'Tab 5: Enhanced JSONs'].map((tab, index) => (
                       <li className="nav-item" key={index}>
                         <button 
                           className={`nav-link ${selectedTab === index ? 'active' : ''}`}
@@ -157,7 +159,7 @@ function App() {
                   </ul>
                 </div>
                 
-                <TabContent
+                <TabContent 
                   selectedTab={selectedTab}
                   htmlContents={htmlContents}
                   tab4State={tab4State}
@@ -165,6 +167,10 @@ function App() {
                   handleTab4StateChange={handleTab4StateChange}
                   handleTab5StateChange={handleTab5StateChange}
                   processFiles={processFiles}
+                  folderPath={folders[activeFolder]}
+                  pdfFilename={pdfFiles[activePdfFile]}
+                  parsedJsons={parsedJsons}
+                  enhancedJsons={enhancedJsons}
                 />
               </div>
             </div>

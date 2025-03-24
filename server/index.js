@@ -11,7 +11,7 @@ app.use(cors());
 app.use(express.json());
 
 const PREFS_DIR = path.join(__dirname, 'preferences');
-const PDF_BASE_PATH = process.env.PDF_BASE_PATH || path.join(__dirname, 'documents/output');
+const PDF_BASE_PATH = path.join(__dirname, 'documents', 'output');
 const USE_ABSOLUTE_PATHS = process.env.USE_ABSOLUTE_PATHS === 'true' || false;
 
 // Ensure preferences directory exists
@@ -153,55 +153,31 @@ app.get('/api/files', async (req, res) => {
 // API endpoint to serve PDF files
 app.get('/api/pdf', async (req, res) => {
   console.log('\n\n🔍🔍🔍 PDF ENDPOINT CALLED 🔍🔍🔍');
-  console.log('Request URL:', req.url);
   console.log('Request query:', req.query);
   
   try {
     const relativePath = req.query.path || '';
-    console.log('===== PDF REQUEST DEBUGGING =====');
     console.log('Raw PDF path received:', relativePath);
-    console.log('Path character count:', relativePath.length);
-    
-    // Print each character code to debug space issues
-    console.log('Path character codes:');
-    const charCodes = [...relativePath].map(c => c.charCodeAt(0));
-    console.log(charCodes.join(', '));
     
     // Decode the URL-encoded path
     const decodedPath = decodeURIComponent(relativePath);
     console.log('Decoded PDF path:', decodedPath);
-    console.log('Decoded path character count:', decodedPath.length);
     
-    // Print decoded character codes
-    console.log('Decoded character codes:');
-    const decodedCharCodes = [...decodedPath].map(c => c.charCodeAt(0));
-    console.log(decodedCharCodes.join(', '));
+    // Extract folder name and filename
+    const pathParts = decodedPath.split('/');
+    const folderName = pathParts[0];
+    const filename = pathParts[pathParts.length - 1];
     
-    let fullPath;
+    console.log('Folder name:', folderName);
+    console.log('File name:', filename);
     
-    if (USE_ABSOLUTE_PATHS) {
-      // Use the full path directly (for testing)
-      fullPath = decodedPath.replace(/^\/documents\/output/, PDF_BASE_PATH);
-      console.log('Using absolute path mode');
-    } else {
-      // Remove the leading slash if present to prevent double slashes
-      const normalizedPath = decodedPath.startsWith('/') ? decodedPath.substring(1) : decodedPath;
-      console.log('Normalized PDF path:', normalizedPath);
-      
-      fullPath = path.join(__dirname, normalizedPath);
-    }
+    // Construct the correct path with repeated folder name
+    const normalizedPath = path.join(folderName, folderName, filename);
+    console.log('Normalized PDF path:', normalizedPath);
     
+    // PDF_BASE_PATH already includes 'documents/output'
+    const fullPath = path.join(PDF_BASE_PATH, normalizedPath);
     console.log('ABSOLUTE server file path:', fullPath);
-    console.log('Server __dirname:', __dirname);
-    console.log('PDF_BASE_PATH:', PDF_BASE_PATH);
-    
-    // Detailed log to compare with actual filesystem paths
-    console.log('\nPath structure breakdown:');
-    const pathSegments = decodedPath.split('/').filter(Boolean);
-    pathSegments.forEach((segment, i) => {
-      console.log(`  Segment ${i+1}: "${segment}" (${segment.length} chars)`);
-    });
-    console.log('===== END DEBUGGING =====');
     
     // Check if the file exists
     try {
@@ -210,7 +186,7 @@ app.get('/api/pdf', async (req, res) => {
     } catch (error) {
       console.error('❌ PDF FILE NOT FOUND:', fullPath);
       
-      // Try to list the containing directory to see what's actually there
+      // Try to list the containing directory
       try {
         const parentDir = path.dirname(fullPath);
         console.log('Checking parent directory:', parentDir);
@@ -218,11 +194,9 @@ app.get('/api/pdf', async (req, res) => {
         const files = items.filter(item => item.isFile()).map(item => item.name);
         console.log('Files in parent directory:', files);
       } catch (dirError) {
-        console.error('Parent directory does not exist or cannot be read:', dirError.message);
+        console.error('Parent directory does not exist:', dirError.message);
       }
       
-      // Explicitly set content type to JSON to prevent browser from trying to render HTML
-      res.setHeader('Content-Type', 'application/json');
       return res.status(404).json({ 
         error: 'PDF file not found',
         path: fullPath,
@@ -230,30 +204,15 @@ app.get('/api/pdf', async (req, res) => {
       });
     }
     
-    // Set appropriate headers
+    // Set appropriate headers and serve the file
     res.setHeader('Content-Type', 'application/pdf');
-    const filename = path.basename(fullPath);
     res.setHeader('Content-Disposition', `inline; filename="${encodeURIComponent(filename)}"`);
-    console.log('Serving PDF file:', filename);
     
-    // Create a read stream and pipe it to the response
     const fileStream = fsSync.createReadStream(fullPath);
-    
-    // Handle stream errors
-    fileStream.on('error', (streamError) => {
-      console.error('Stream error:', streamError);
-      if (!res.headersSent) {
-        res.setHeader('Content-Type', 'application/json');
-        res.status(500).json({ error: 'Error streaming PDF file', message: streamError.message });
-      }
-    });
-    
     fileStream.pipe(res);
     
   } catch (error) {
     console.error('Error serving PDF:', error);
-    // Explicitly set content type to JSON to prevent browser from trying to render HTML
-    res.setHeader('Content-Type', 'application/json');
     return res.status(500).json({ error: 'Failed to serve PDF', message: error.message });
   }
 });
@@ -264,6 +223,112 @@ app.get('/api/test-pdf', (req, res) => {
   
   // Redirect to a public PDF - this is a Google Chrome PDF viewer test file
   res.redirect('https://storage.googleapis.com/chrome-devrel-public/pdf/hello.pdf');
+});
+
+// API endpoint to get parsed JSON files associated with a PDF
+app.get('/api/parsed-jsons', async (req, res) => {
+  console.log('\n=== PARSED JSONS API CALL ===');
+  console.log('Query parameters:', req.query);
+  
+  try {
+    const { folderPath, pdfFilename } = req.query;
+    
+    if (!folderPath || !pdfFilename) {
+      console.log('❌ Missing required parameters');
+      return res.status(400).json({ error: 'Both folderPath and pdfFilename are required' });
+    }
+    
+    // Build the correct path to include documents directory
+    const jsonFolderPath = path.join(PDF_BASE_PATH, folderPath, 'parsed_jsons');
+    console.log('Looking in folder:', jsonFolderPath);
+    
+    // Remove file extension from PDF filename
+    const baseFilename = pdfFilename.replace(/\.pdf$/i, '');
+    console.log('Base filename:', baseFilename);
+
+    try {
+      await fs.access(jsonFolderPath);
+      console.log('✅ Directory exists:', jsonFolderPath);
+    } catch (error) {
+      console.log('📁 Creating directory:', jsonFolderPath);
+      await fs.mkdir(jsonFolderPath, { recursive: true });
+    }
+
+    const files = await fs.readdir(jsonFolderPath);
+    console.log('Files in directory:', files);
+    
+    const matchingJsonFiles = files.filter(file => {
+      const matches = file.startsWith(baseFilename + '_') && file.endsWith('.json');
+      console.log(`File: ${file}, Matches: ${matches}`);
+      return matches;
+    });
+
+    const response = {
+      pdfFilename,
+      jsonFiles: matchingJsonFiles,
+      basePath: jsonFolderPath
+    };
+    
+    console.log('Sending response:', response);
+    return res.json(response);
+    
+  } catch (error) {
+    console.error('❌ Error:', error);
+    return res.status(500).json({ error: 'Failed to get parsed JSON files', message: error.message });
+  }
+});
+
+// Similar update for enhanced-jsons endpoint
+app.get('/api/enhanced-jsons', async (req, res) => {
+  console.log('\n=== ENHANCED JSONS API CALL ===');
+  console.log('Query parameters:', req.query);
+  
+  try {
+    const { folderPath, pdfFilename } = req.query;
+    
+    if (!folderPath || !pdfFilename) {
+      console.log('❌ Missing required parameters');
+      return res.status(400).json({ error: 'Both folderPath and pdfFilename are required' });
+    }
+    
+    // Build the correct path to include documents directory
+    const jsonFolderPath = path.join(PDF_BASE_PATH, folderPath, 'enhanced_jsons');
+    console.log('Looking in folder:', jsonFolderPath);
+    
+    // Remove file extension from PDF filename
+    const baseFilename = pdfFilename.replace(/\.pdf$/i, '');
+    console.log('Base filename:', baseFilename);
+
+    try {
+      await fs.access(jsonFolderPath);
+      console.log('✅ Directory exists:', jsonFolderPath);
+    } catch (error) {
+      console.log('📁 Creating directory:', jsonFolderPath);
+      await fs.mkdir(jsonFolderPath, { recursive: true });
+    }
+
+    const files = await fs.readdir(jsonFolderPath);
+    console.log('Files in directory:', files);
+    
+    const matchingJsonFiles = files.filter(file => {
+      const matches = file.startsWith(baseFilename + '_') && file.endsWith('.json');
+      console.log(`File: ${file}, Matches: ${matches}`);
+      return matches;
+    });
+
+    const response = {
+      pdfFilename,
+      jsonFiles: matchingJsonFiles,
+      basePath: jsonFolderPath
+    };
+    
+    console.log('Sending response:', response);
+    return res.json(response);
+    
+  } catch (error) {
+    console.error('❌ Error:', error);
+    return res.status(500).json({ error: 'Failed to get enhanced JSON files', message: error.message });
+  }
 });
 
 app.listen(PORT, () => {
