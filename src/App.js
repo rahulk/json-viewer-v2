@@ -3,20 +3,119 @@ import './App.css';
 import { JsonProcessor } from './utils/JsonProcessor';
 import { SAMPLE_JSON } from './constants/sampleData';
 import { FileUploader } from './components/FileUploader';
-import { TabPanel } from './components/TabPanel';
+import { FlatDataTable } from './components/FlatDataTable';
 
 function App() {
   const [files, setFiles] = useState([]);
   const [results, setResults] = useState([]);
+  /* eslint-disable-next-line no-unused-vars */
   const [activeFile, setActiveFile] = useState(null);
-  const [activeTab, setActiveTab] = useState('results');
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState(null);
   const [folders, setFolders] = useState(['Folder 1', 'Folder 2', 'Folder 3']);
   const [pdfFiles, setPdfFiles] = useState(['File 1.pdf', 'File 2.pdf', 'File 3.pdf']);
   const [activeFolder, setActiveFolder] = useState(null);
   const [activePdfFile, setActivePdfFile] = useState(null);
-  const [selectedTab, setSelectedTab] = useState(2);
+  const [selectedTab, setSelectedTab] = useState(3);
+  
+  // Sample data for different HTML views and JSON data
+  const htmlContents = [
+    `<div>
+      <h5>HTML Content for Tab 1</h5>
+      <p>This is the HTML content specific to Tab 1.</p>
+      <ul>
+        <li>Tab 1 Item 1</li>
+        <li>Tab 1 Item 2</li>
+        <li>Tab 1 Item 3</li>
+      </ul>
+      <p>You can customize this content for each tab.</p>
+    </div>`,
+    `<div>
+      <h5>HTML Content for Tab 2</h5>
+      <p>This is the HTML content specific to Tab 2.</p>
+      <table border="1" style="width:100%">
+        <tr>
+          <th>Header 1</th>
+          <th>Header 2</th>
+        </tr>
+        <tr>
+          <td>Tab 2 Row 1, Cell 1</td>
+          <td>Tab 2 Row 1, Cell 2</td>
+        </tr>
+        <tr>
+          <td>Tab 2 Row 2, Cell 1</td>
+          <td>Tab 2 Row 2, Cell 2</td>
+        </tr>
+      </table>
+    </div>`,
+    `<div>
+      <h5>HTML Content for Tab 3</h5>
+      <p>This is the HTML content specific to Tab 3.</p>
+      <div style="background-color: #f0f0f0; padding: 10px; border-radius: 5px;">
+        <p>Tab 3 contains a styled div with custom content.</p>
+        <code>const example = "This is a code sample in Tab 3";</code>
+      </div>
+      <p>Each tab can have completely different HTML structures.</p>
+    </div>`
+  ];
+  
+  // Sample JSON data for tabs 4 and 5
+  const [jsonData4, setJsonData4] = useState([]);
+  const [jsonData5, setJsonData5] = useState([]);
+  
+  // Process sample data for each JSON tab
+  useEffect(() => {
+    // Create different sample data for tabs 4 and 5
+    const processor = new JsonProcessor();
+    
+    // Data for Tab 4
+    const sampleData4 = [
+      { 
+        id: "ID001", 
+        itemName: "Tab 4 Item 1", 
+        category: "Category A", 
+        price: 125.50,
+        inStock: true,
+        lastUpdated: "2023-05-15" 
+      },
+      { 
+        id: "ID002", 
+        itemName: "Tab 4 Item 2", 
+        category: "Category B", 
+        price: 225.75,
+        inStock: false,
+        lastUpdated: "2023-06-20" 
+      },
+      { 
+        id: "ID003", 
+        itemName: "Tab 4 Item 3", 
+        category: "Category A", 
+        price: 175.25,
+        inStock: true,
+        lastUpdated: "2023-07-10" 
+      }
+    ];
+    
+    // Data for Tab 5
+    const sampleData5 = [
+      { productId: "P001", productName: "Tab 5 Product 1", price: 29.99, inStock: true },
+      { productId: "P002", productName: "Tab 5 Product 2", price: 49.99, inStock: false },
+      { productId: "P003", productName: "Tab 5 Product 3", price: 19.99, inStock: true }
+    ];
+    
+    // Process the data
+    const processedData4 = processor.processArray(sampleData4);
+    const processedData5 = processor.processArray(sampleData5);
+    
+    setJsonData4(processedData4.results);
+    setJsonData5(processedData5.results);
+    
+    // Load sample data if needed for initial render
+    if (selectedTab >= 3 && results.length === 0) {
+      processFiles();
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
 
   useEffect(() => {
     console.log("App rendered");
@@ -98,8 +197,11 @@ function App() {
 
   // Process the selected files
   const processFiles = async () => {
+    console.log("Processing files:", files);
+    
     if (files.length === 0) {
       // If no files selected, use sample data for testing
+      console.log("No files selected, using sample data");
       const processor = new JsonProcessor();
       const processedData = processor.processArray(SAMPLE_JSON);
       setResults([{
@@ -108,21 +210,27 @@ function App() {
         rawData: SAMPLE_JSON
       }]);
       setActiveFile(0);
+      
+      // Switch to Tab 4 to show the processed data
+      setSelectedTab(3);
       return;
     }
 
     setIsLoading(true);
     setError(null);
+    console.log(`Processing ${files.length} selected files...`);
     
     try {
       const processedFiles = [];
       
       for (const file of files) {
+        console.log(`Reading file: ${file.name}`);
         const content = await readFileAsJson(file);
         const dataToProcess = Array.isArray(content) ? content : [content];
         
         const processor = new JsonProcessor();
         const processed = processor.processArray(dataToProcess);
+        console.log(`Processed data from ${file.name}:`, processed);
         
         processedFiles.push({
           name: file.name,
@@ -131,11 +239,16 @@ function App() {
         });
       }
       
+      console.log("All files processed:", processedFiles);
       setResults(processedFiles);
       if (processedFiles.length > 0) {
         setActiveFile(0);
+        
+        // Switch to Tab 4 to show the processed data
+        setSelectedTab(3);
       }
     } catch (err) {
+      console.error("Error processing files:", err);
       setError(err.message);
     } finally {
       setIsLoading(false);
@@ -164,12 +277,6 @@ function App() {
     });
   };
 
-  // Get active file data
-  const getActiveFileData = () => {
-    if (activeFile === null || results.length === 0) return null;
-    return results[activeFile];
-  };
-
   // Handle folder selection
   const handleFolderSelect = (index) => {
     setActiveFolder(index);
@@ -194,8 +301,14 @@ function App() {
 
   // Handle tab selection
   const handleTabSelect = (index) => {
-    console.log("Tab selected:", index);
+    console.log(`Tab ${index + 1} selected - ${index <= 2 ? 'HTML Viewer' : 'JSON/FlatDataTable Viewer'}`);
     setSelectedTab(index);
+    
+    // If selecting a JSON viewer tab but no data is loaded, auto-load sample data
+    if (index >= 3 && results.length === 0) {
+      console.log('Auto-loading sample data for JSON viewer');
+      processFiles();
+    }
   };
 
   return (
@@ -255,7 +368,7 @@ function App() {
           <div className="row">
             <div className="col-lg-6 mb-3">
               <div className="viewer-container h-100">
-                <div className="page-viewer mb-3">
+                <div className="page-viewer">
                   <div 
                     style={{ 
                       border: '1px solid #ccc', 
@@ -275,60 +388,136 @@ function App() {
                     </div>
                   </div>
                 </div>
-                
-                <div className="tabs-view">
-                  <ul 
-                    style={{ 
-                      listStyleType: 'disc', 
-                      paddingLeft: '20px', 
-                      marginBottom: '0'
-                    }}
-                  >
-                    {['Tab 1', 'Tab 2', 'Tab 3', 'Tab 4', 'Tab 5'].map((tab, index) => (
-                      <li 
-                        key={index} 
-                        onClick={() => handleTabSelect(index)}
-                        style={{ 
-                          color: '#00008B', 
-                          fontWeight: selectedTab === index ? 'bold' : 'normal',
-                          cursor: 'pointer'
-                        }}
-                      >
-                        {tab}
-                      </li>
-                    ))}
-                  </ul>
-                  
-                  <div 
-                    style={{ 
-                      border: '1px solid #ccc', 
-                      padding: '10px', 
-                      marginTop: '10px'
-                    }}
-                  >
-                    <span style={{ color: '#000' }}>
-                      Placeholder HTML Viewer for Tab {selectedTab + 1}
-                    </span>
-                  </div>
-                </div>
               </div>
             </div>
             
             <div className="col-lg-6 mb-3">
               <div className="results-container h-100">
-                {results.length > 0 ? (
-                  <TabPanel
-                    results={results}
-                    activeFile={activeFile}
-                    activeTab={activeTab}
-                    onFileSelect={setActiveFile}
-                    onTabSelect={setActiveTab}
-                    getActiveFileData={getActiveFileData}
-                  />
-                ) : (
-                  <div style={{ textAlign: 'center', padding: '20px' }}>
-                    <h3>No Results Available</h3>
-                    <p>Process a file to see results here</p>
+                <div className="d-flex justify-content-start mb-3">
+                  <ul className="nav nav-tabs">
+                    {['Tab 1', 'Tab 2', 'Tab 3', 'Tab 4', 'Tab 5'].map((tab, index) => (
+                      <li className="nav-item" key={index}>
+                        <button 
+                          className={`nav-link ${selectedTab === index ? 'active' : ''}`}
+                          onClick={() => handleTabSelect(index)}
+                        >
+                          {tab}
+                        </button>
+                      </li>
+                    ))}
+                  </ul>
+                </div>
+                
+                {/* Conditional rendering based on selected tab */}
+                {selectedTab === 0 && (
+                  <div className="html-viewer" style={{ border: '1px solid #ccc', padding: '10px', height: 'calc(100% - 60px)', overflow: 'auto' }}>
+                    <h4>HTML Viewer - Tab 1</h4>
+                    <div 
+                      style={{ backgroundColor: '#fff', padding: '10px', border: '1px solid #ddd', borderRadius: '4px' }}
+                      dangerouslySetInnerHTML={{ __html: htmlContents[0] }}
+                    ></div>
+                  </div>
+                )}
+                
+                {selectedTab === 1 && (
+                  <div className="html-viewer" style={{ border: '1px solid #ccc', padding: '10px', height: 'calc(100% - 60px)', overflow: 'auto' }}>
+                    <h4>HTML Viewer - Tab 2</h4>
+                    <div 
+                      style={{ backgroundColor: '#fff', padding: '10px', border: '1px solid #ddd', borderRadius: '4px' }}
+                      dangerouslySetInnerHTML={{ __html: htmlContents[1] }}
+                    ></div>
+                  </div>
+                )}
+                
+                {selectedTab === 2 && (
+                  <div className="html-viewer" style={{ border: '1px solid #ccc', padding: '10px', height: 'calc(100% - 60px)', overflow: 'auto' }}>
+                    <h4>HTML Viewer - Tab 3</h4>
+                    <div 
+                      style={{ backgroundColor: '#fff', padding: '10px', border: '1px solid #ddd', borderRadius: '4px' }}
+                      dangerouslySetInnerHTML={{ __html: htmlContents[2] }}
+                    ></div>
+                  </div>
+                )}
+                
+                {selectedTab === 3 && (
+                  <div className="json-viewer" style={{ border: '1px solid #ccc', padding: '10px', height: 'calc(100% - 60px)', overflow: 'auto' }}>
+                    <h4>JSON Viewer - Tab 4</h4>
+                    {results.length > 0 ? (
+                      <div className="table-view">
+                        <FlatDataTable 
+                          data={results[0].data.results}
+                          sectionCode="TAB4"
+                          showColumnSelection={true}
+                          allowTextWrapping={true}
+                          showColorHighlighting={true}
+                          initialColumnVisibility={{}}
+                          title={`Flat Data View (${results[0].name})`}
+                        />
+                      </div>
+                    ) : jsonData4.length > 0 ? (
+                      <div className="table-view">
+                        <FlatDataTable 
+                          data={jsonData4}
+                          sectionCode="TAB4"
+                          showColumnSelection={true}
+                          allowTextWrapping={true}
+                          showColorHighlighting={true}
+                          initialColumnVisibility={{}}
+                          title="Flat Data View (Sample Data)"
+                        />
+                      </div>
+                    ) : (
+                      <div style={{ textAlign: 'center', padding: '20px' }}>
+                        <p>No data available. Please select a file and click "Process Files".</p>
+                        <button 
+                          className="btn btn-primary"
+                          onClick={processFiles}
+                        >
+                          Load Sample Data
+                        </button>
+                      </div>
+                    )}
+                  </div>
+                )}
+                
+                {selectedTab === 4 && (
+                  <div className="json-viewer" style={{ border: '1px solid #ccc', padding: '10px', height: 'calc(100% - 60px)', overflow: 'auto' }}>
+                    <h4>JSON Viewer - Tab 5</h4>
+                    {results.length > 0 ? (
+                      <div className="table-view">
+                        <FlatDataTable 
+                          data={results[0].data.results}
+                          sectionCode="TAB5"
+                          showColumnSelection={true}
+                          allowTextWrapping={true}
+                          showColorHighlighting={true}
+                          initialColumnVisibility={{}}
+                          title={`Flat Data View (${results[0].name})`}
+                        />
+                      </div>
+                    ) : jsonData5.length > 0 ? (
+                      <div className="table-view">
+                        <FlatDataTable 
+                          data={jsonData5}
+                          sectionCode="TAB5"
+                          showColumnSelection={true}
+                          allowTextWrapping={true}
+                          showColorHighlighting={true}
+                          initialColumnVisibility={{}}
+                          title="Flat Data View (Sample Data)"
+                        />
+                      </div>
+                    ) : (
+                      <div style={{ textAlign: 'center', padding: '20px' }}>
+                        <p>No data available. Please select a file and click "Process Files".</p>
+                        <button 
+                          className="btn btn-primary"
+                          onClick={processFiles}
+                        >
+                          Load Sample Data
+                        </button>
+                      </div>
+                    )}
                   </div>
                 )}
               </div>

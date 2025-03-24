@@ -168,8 +168,8 @@ body {
 
 /* Page viewer */
 .page-viewer {
-  height: 65%;
   min-height: 400px;
+  height: 100%;
 }
 
 /* Tabs section */
@@ -621,4 +621,48 @@ body {
   margin-top: 10px;
   height: calc(100% - 100px);
   overflow: auto;
+}
+
+/* Tab navigation */
+.nav-tabs {
+  border-bottom: 1px solid #dee2e6;
+}
+
+.nav-tabs .nav-link {
+  padding: 0.5rem 1rem;
+  border: 1px solid transparent;
+  border-top-left-radius: 0.25rem;
+  border-top-right-radius: 0.25rem;
+  margin-bottom: -1px;
+  background-color: transparent;
+  color: #00008B;
+  font-size: 14px;
+}
+
+.nav-tabs .nav-link:hover {
+  border-color: #e9ecef #e9ecef #dee2e6;
+  background-color: #f8f9fa;
+}
+
+.nav-tabs .nav-link.active {
+  border-color: #dee2e6 #dee2e6 #fff;
+  background-color: #fff;
+  color: #495057;
+  font-weight: bold;
+}
+
+.tab-content-container {
+  min-height: 200px;
+}
+
+@media (min-width: 1600px) {
+  .tab-content-container {
+    min-height: 300px;
+  }
+}
+
+@media (min-width: 2000px) {
+  .tab-content-container {
+    min-height: 350px;
+  }
 }

@@ -29,7 +29,10 @@ export const FileUploader = ({ onFileChange, onProcess, isLoading, error }) => {
         <div className="me-3 mb-2">
           <button 
             className="btn btn-outline-secondary btn-sm"
-            onClick={() => onFileChange([])}
+            onClick={() => {
+              onFileChange([]);
+              setTimeout(onProcess, 100); // Process immediately after setting empty files
+            }}
           >
             sample data
           </button>
