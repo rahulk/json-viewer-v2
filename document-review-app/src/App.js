@@ -1,14 +1,14 @@
 import React from 'react';
+import Header from './components/Header';
+import Sidebar from './components/Sidebar';
+import MainContent from './components/MainContent';
 import './App.css';
-import Header from './components/Header/Header';
-import Sidebar from './components/Sidebar/Sidebar';
-import MainContent from './components/MainContent/MainContent';
 
 function App() {
   return (
     <div className="app">
       <Header />
-      <div className="app-body">
+      <div className="app-layout">
         <Sidebar />
         <MainContent />
       </div>
