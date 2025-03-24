@@ -4,6 +4,7 @@ import { JsonProcessor } from './utils/JsonProcessor';
 import { SAMPLE_JSON } from './constants/sampleData';
 import { FileUploader } from './components/FileUploader';
 import { FlatDataTable } from './components/FlatDataTable';
+import { apiService } from './services/apiService';
 
 function App() {
   const [files, setFiles] = useState([]);
@@ -12,11 +13,42 @@ function App() {
   const [activeFile, setActiveFile] = useState(null);
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState(null);
-  const [folders, setFolders] = useState(['Folder 1', 'Folder 2', 'Folder 3']);
+  const [folders, setFolders] = useState([]);
+  const [foldersLoading, setFoldersLoading] = useState(false);
+  const [foldersError, setFoldersError] = useState(null);
   const [pdfFiles, setPdfFiles] = useState(['File 1.pdf', 'File 2.pdf', 'File 3.pdf']);
   const [activeFolder, setActiveFolder] = useState(null);
   const [activePdfFile, setActivePdfFile] = useState(null);
   const [selectedTab, setSelectedTab] = useState(3);
+  
+  // Fetch folders from the /documents/output directory
+  const fetchFolders = async () => {
+    setFoldersLoading(true);
+    setFoldersError(null);
+    
+    try {
+      const folderList = await apiService.getFolders('/documents/output');
+      setFolders(folderList);
+      console.log("Folders fetched successfully:", folderList);
+      
+      // Set the first folder as active if none is selected and folders exist
+      if (activeFolder === null && folderList.length > 0) {
+        setActiveFolder(0);
+      }
+    } catch (err) {
+      console.error("Error fetching folders:", err);
+      setFoldersError("Failed to load folders. Please try again.");
+      setFolders([]);
+    } finally {
+      setFoldersLoading(false);
+    }
+  };
+  
+  // Initial folder fetch on component mount
+  useEffect(() => {
+    fetchFolders();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
   
   // Sample data for different HTML views and JSON data
   const htmlContents = [
@@ -278,8 +310,29 @@ function App() {
   };
 
   // Handle folder selection
-  const handleFolderSelect = (index) => {
+  const handleFolderSelect = async (index) => {
     setActiveFolder(index);
+    setActivePdfFile(null); // Reset active PDF file selection
+    
+    // Get the selected folder name
+    const selectedFolder = folders[index];
+    
+    try {
+      // Fetch PDF files from the selected folder
+      const folderPath = `/documents/output/${selectedFolder}`;
+      const filesList = await apiService.getFiles(folderPath);
+      
+      // Filter to only include PDF files
+      const pdfFilesList = filesList.filter(file => 
+        file.toLowerCase().endsWith('.pdf')
+      );
+      
+      console.log(`Found ${pdfFilesList.length} PDF files in folder: ${selectedFolder}`);
+      setPdfFiles(pdfFilesList);
+    } catch (err) {
+      console.error(`Error fetching files for folder ${selectedFolder}:`, err);
+      setPdfFiles([]);
+    }
   };
 
   // Handle PDF file selection
@@ -331,19 +384,59 @@ function App() {
         <div className="col-md-2 col-lg-2 col-xl-1 mb-3">
           <div className="sidebar h-100">
             <div className="mb-4">
-              <h2>PDF Folders</h2>
-              <ul className="list-unstyled">
-                {folders.map((folder, index) => (
-                  <li 
-                    key={index} 
-                    className={activeFolder === index ? 'active' : ''}
-                    onClick={() => handleFolderSelect(index)}
-                    style={{ color: '#00008B' }}
+              <div className="d-flex justify-content-between align-items-center mb-2">
+                <h2>PDF Folders</h2>
+                <button 
+                  className="btn btn-sm btn-outline-secondary" 
+                  onClick={fetchFolders}
+                  disabled={foldersLoading}
+                  title="Refresh folders"
+                >
+                  {foldersLoading ? "..." : "↻"}
+                </button>
+              </div>
+              
+              {foldersLoading ? (
+                <div className="text-center py-3">
+                  <div className="spinner-border spinner-border-sm text-primary" role="status">
+                    <span className="visually-hidden">Loading folders...</span>
+                  </div>
+                  <p className="mt-2 small text-muted">Loading folders...</p>
+                </div>
+              ) : foldersError ? (
+                <div className="alert alert-danger py-2 small">
+                  {foldersError}
+                  <button 
+                    className="btn btn-sm btn-outline-danger ms-2"
+                    onClick={fetchFolders}
                   >
-                    {folder}
-                  </li>
-                ))}
-              </ul>
+                    Retry
+                  </button>
+                </div>
+              ) : folders.length === 0 ? (
+                <p className="text-muted small">No folders found in /documents/output</p>
+              ) : (
+                <ul className="list-unstyled">
+                  {folders.map((folder, index) => (
+                    <li 
+                      key={index} 
+                      className={`folder-item ${activeFolder === index ? 'active' : ''}`}
+                      onClick={() => handleFolderSelect(index)}
+                      style={{ 
+                        color: '#00008B',
+                        padding: '6px 8px',
+                        cursor: 'pointer',
+                        borderRadius: '4px',
+                        marginBottom: '4px',
+                        backgroundColor: activeFolder === index ? '#e9ecef' : 'transparent'
+                      }}
+                    >
+                      <i className="bi bi-folder-fill me-2" style={{ color: '#FFD700' }}></i>
+                      {folder}
+                    </li>
+                  ))}
+                </ul>
+              )}
             </div>
             
             <div>
@@ -352,10 +445,18 @@ function App() {
                 {pdfFiles.map((file, index) => (
                   <li 
                     key={index} 
-                    className={activePdfFile === index ? 'active' : ''}
+                    className={`file-item ${activePdfFile === index ? 'active' : ''}`}
                     onClick={() => handlePdfFileSelect(index)}
-                    style={{ color: '#00008B' }}
+                    style={{ 
+                      color: '#00008B',
+                      padding: '6px 8px',
+                      cursor: 'pointer',
+                      borderRadius: '4px',
+                      marginBottom: '4px',
+                      backgroundColor: activePdfFile === index ? '#e9ecef' : 'transparent'
+                    }}
                   >
+                    <i className="bi bi-file-pdf-fill me-2" style={{ color: '#FF0000' }}></i>
                     {file}
                   </li>
                 ))}
