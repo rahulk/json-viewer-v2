@@ -23,6 +23,23 @@ function App() {
   const [selectedTab, setSelectedTab] = useState(3);
   const [selectedPdfUrl, setSelectedPdfUrl] = useState(null);
   
+  // Add state for each tab
+  const [tab4State, setTab4State] = useState({
+    data: [], // Initialize with empty array
+    columnVisibility: {},
+    filters: {},
+    wrapText: false,
+    filterColoredText: false
+  });
+
+  const [tab5State, setTab5State] = useState({
+    data: [], // Initialize with empty array
+    columnVisibility: {},
+    filters: {},
+    wrapText: false,
+    filterColoredText: false
+  });
+
   // Fetch folders from the /documents/output directory
   const fetchFolders = async () => {
     setFoldersLoading(true);
@@ -238,14 +255,23 @@ function App() {
       console.log("No files selected, using sample data");
       const processor = new JsonProcessor();
       const processedData = processor.processArray(SAMPLE_JSON);
+      
+      setTab4State(prevState => ({
+        ...prevState,
+        data: processedData.results || [] // Ensure we have an array
+      }));
+      
+      setTab5State(prevState => ({
+        ...prevState,
+        data: processedData.results || [] // Ensure we have an array
+      }));
+
       setResults([{
         name: 'sample-data.json',
         data: processedData,
         rawData: SAMPLE_JSON
       }]);
       setActiveFile(0);
-      
-      // Switch to Tab 4 to show the processed data
       setSelectedTab(3);
       return;
     }
@@ -256,13 +282,16 @@ function App() {
     
     try {
       const processedFiles = [];
+      const processor = new JsonProcessor();
       
       for (const file of files) {
         console.log(`Reading file: ${file.name}`);
         const content = await readFileAsJson(file);
+        console.log("File content:", content); // Debug log
+        
+        // Ensure content is an array
         const dataToProcess = Array.isArray(content) ? content : [content];
         
-        const processor = new JsonProcessor();
         const processed = processor.processArray(dataToProcess);
         console.log(`Processed data from ${file.name}:`, processed);
         
@@ -271,16 +300,30 @@ function App() {
           data: processed,
           rawData: content
         });
+
+        // Update tab states with the processed data
+        // Make sure we're using the correct data structure
+        const tableData = processed.results || processed || dataToProcess;
+        console.log("Data being set to FlatDataTable:", tableData); // Debug log
+
+        setTab4State(prevState => ({
+          ...prevState,
+          data: tableData
+        }));
+        
+        setTab5State(prevState => ({
+          ...prevState,
+          data: tableData
+        }));
       }
       
       console.log("All files processed:", processedFiles);
       setResults(processedFiles);
       if (processedFiles.length > 0) {
         setActiveFile(0);
-        
-        // Switch to Tab 4 to show the processed data
-        setSelectedTab(3);
+        setSelectedTab(3); // Switch to Tab 4 to show the processed data
       }
+      
     } catch (err) {
       console.error("Error processing files:", err);
       setError(err.message);
@@ -401,6 +444,22 @@ function App() {
       console.log('Auto-loading sample data for JSON viewer');
       processFiles();
     }
+  };
+
+  // Callback to update state for Tab 4
+  const handleTab4StateChange = (newState) => {
+    setTab4State(prevState => ({
+      ...prevState,
+      ...newState
+    }));
+  };
+
+  // Callback to update state for Tab 5
+  const handleTab5StateChange = (newState) => {
+    setTab5State(prevState => ({
+      ...prevState,
+      ...newState
+    }));
   };
 
   return (
@@ -574,31 +633,21 @@ function App() {
                   </div>
                 )}
                 
+                {/* Render JSON Viewer for Tab 4 */}
                 {selectedTab === 3 && (
                   <div className="json-viewer" style={{ border: '1px solid #ccc', padding: '10px', height: 'calc(100% - 60px)', overflow: 'auto' }}>
                     <h4>JSON Viewer - Tab 4</h4>
-                    {results.length > 0 ? (
+                    {tab4State.data && tab4State.data.length > 0 ? (
                       <div className="table-view">
                         <FlatDataTable 
-                          data={results[0].data.results}
+                          data={tab4State.data}
                           sectionCode="TAB4"
                           showColumnSelection={true}
                           allowTextWrapping={true}
                           showColorHighlighting={true}
-                          initialColumnVisibility={{}}
-                          title={`Flat Data View (${results[0].name})`}
-                        />
-                      </div>
-                    ) : jsonData4.length > 0 ? (
-                      <div className="table-view">
-                        <FlatDataTable 
-                          data={jsonData4}
-                          sectionCode="TAB4"
-                          showColumnSelection={true}
-                          allowTextWrapping={true}
-                          showColorHighlighting={true}
-                          initialColumnVisibility={{}}
-                          title="Flat Data View (Sample Data)"
+                          initialColumnVisibility={tab4State.columnVisibility}
+                          onStateChange={handleTab4StateChange}
+                          title="Flat Data View (Tab 4)"
                         />
                       </div>
                     ) : (
@@ -615,31 +664,21 @@ function App() {
                   </div>
                 )}
                 
+                {/* Render JSON Viewer for Tab 5 */}
                 {selectedTab === 4 && (
                   <div className="json-viewer" style={{ border: '1px solid #ccc', padding: '10px', height: 'calc(100% - 60px)', overflow: 'auto' }}>
                     <h4>JSON Viewer - Tab 5</h4>
-                    {results.length > 0 ? (
+                    {tab5State.data && tab5State.data.length > 0 ? (
                       <div className="table-view">
                         <FlatDataTable 
-                          data={results[0].data.results}
+                          data={tab5State.data}
                           sectionCode="TAB5"
                           showColumnSelection={true}
                           allowTextWrapping={true}
                           showColorHighlighting={true}
-                          initialColumnVisibility={{}}
-                          title={`Flat Data View (${results[0].name})`}
-                        />
-                      </div>
-                    ) : jsonData5.length > 0 ? (
-                      <div className="table-view">
-                        <FlatDataTable 
-                          data={jsonData5}
-                          sectionCode="TAB5"
-                          showColumnSelection={true}
-                          allowTextWrapping={true}
-                          showColorHighlighting={true}
-                          initialColumnVisibility={{}}
-                          title="Flat Data View (Sample Data)"
+                          initialColumnVisibility={tab5State.columnVisibility}
+                          onStateChange={handleTab5StateChange}
+                          title="Flat Data View (Tab 5)"
                         />
                       </div>
                     ) : (

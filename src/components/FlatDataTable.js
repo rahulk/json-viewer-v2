@@ -1,7 +1,17 @@
 import React, { useState, useMemo, useEffect, useRef } from 'react';
 import { flattenNestedData } from '../utils/dataUtils';
+import PropTypes from 'prop-types';
 
-export const FlatDataTable = React.forwardRef(({ data, sectionCode }, ref) => {
+export const FlatDataTable = React.forwardRef(({
+  data,
+  sectionCode,
+  initialColumnVisibility = {},
+  onStateChange,
+  showColumnSelection = true,
+  allowTextWrapping = true,
+  showColorHighlighting = true,
+  title
+}, ref) => {
   const [selectedColumns, setSelectedColumns] = useState({});
   const [showColumnSelector, setShowColumnSelector] = useState(false);
   const [searchTerm, setSearchTerm] = useState('');
@@ -87,15 +97,18 @@ export const FlatDataTable = React.forwardRef(({ data, sectionCode }, ref) => {
 
   // Initialize selected columns if no preferences were loaded
   useEffect(() => {
-    if (!isInitialized.current && processedData.keys.length > 0 && !preferencesLoaded) {
-      console.log('Initializing columns with defaults');
-      const initialSelection = Object.fromEntries(
-        processedData.keys.map(key => [key, true])
-      );
-      setSelectedColumns(initialSelection);
+    if (!isInitialized.current && processedData.keys.length > 0) {
+      if (Object.keys(initialColumnVisibility).length > 0) {
+        setSelectedColumns(initialColumnVisibility);
+      } else {
+        const initialSelection = Object.fromEntries(
+          processedData.keys.map(key => [key, true])
+        );
+        setSelectedColumns(initialSelection);
+      }
       isInitialized.current = true;
     }
-  }, [processedData.keys, preferencesLoaded]);
+  }, [processedData.keys, initialColumnVisibility]);
 
   const visibleColumns = useMemo(() => 
     processedData.keys.filter(key => selectedColumns[key]),
@@ -162,10 +175,13 @@ export const FlatDataTable = React.forwardRef(({ data, sectionCode }, ref) => {
 
   // Toggle column selection
   const toggleColumn = (column) => {
-    setSelectedColumns(prev => ({
-      ...prev,
-      [column]: !prev[column]
-    }));
+    setSelectedColumns(prev => {
+      const newState = {
+        ...prev,
+        [column]: !prev[column]
+      };
+      return newState;
+    });
   };
 
   // Select/deselect all columns
@@ -214,6 +230,19 @@ export const FlatDataTable = React.forwardRef(({ data, sectionCode }, ref) => {
     }
   }, [selectedColumns, columnWidths]);
 
+  // Add this after other useEffect hooks
+  useEffect(() => {
+    if (onStateChange) {
+      onStateChange({
+        columnVisibility: selectedColumns,
+        columnWidths,
+        filterColoredText,
+        wrapText,
+        searchTerm
+      });
+    }
+  }, [selectedColumns, columnWidths, filterColoredText, wrapText, searchTerm, onStateChange]);
+
   // Helper function to determine column background class
   const getColumnClassName = (columnName, isWrapped) => {
     const classes = [columnName];
@@ -234,35 +263,41 @@ export const FlatDataTable = React.forwardRef(({ data, sectionCode }, ref) => {
     <div className="flat-table-view">
       <div className="table-controls">
         <div className="left-controls">
-          <h3>Flat Data View ({flattenedRows.length} rows)</h3>
-          <label className="color-filter">
-            <input
-              type="checkbox"
-              checked={filterColoredText}
-              onChange={() => setFilterColoredText(!filterColoredText)}
-            />
-            Only show rows with red/blue text
-          </label>
-          <label>
-            <input
-              type="checkbox"
-              checked={wrapText}
-              onChange={() => setWrapText(!wrapText)}
-            />
-            Wrap text in cells
-          </label>
+          <h3>{title || 'Flat Data View'} ({flattenedRows.length} rows)</h3>
+          {showColorHighlighting && (
+            <label className="color-filter">
+              <input
+                type="checkbox"
+                checked={filterColoredText}
+                onChange={() => setFilterColoredText(!filterColoredText)}
+              />
+              Only show rows with red/blue text
+            </label>
+          )}
+          {allowTextWrapping && (
+            <label>
+              <input
+                type="checkbox"
+                checked={wrapText}
+                onChange={() => setWrapText(!wrapText)}
+              />
+              Wrap text in cells
+            </label>
+          )}
         </div>
-        <div className="column-controls">
-          <button 
-            className="column-selector-button"
-            onClick={() => setShowColumnSelector(!showColumnSelector)}
-          >
-            {showColumnSelector ? 'Hide Columns' : 'Select Columns'}
-          </button>
-          <span className="column-count">
-            Showing {visibleColumns.length} of {processedData.keys.length} columns
-          </span>
-        </div>
+        {showColumnSelection && (
+          <div className="column-controls">
+            <button 
+              className="column-selector-button"
+              onClick={() => setShowColumnSelector(!showColumnSelector)}
+            >
+              {showColumnSelector ? 'Hide Columns' : 'Select Columns'}
+            </button>
+            <span className="column-count">
+              Showing {visibleColumns.length} of {processedData.keys.length} columns
+            </span>
+          </div>
+        )}
       </div>
       
       {showColumnSelector && (
@@ -349,4 +384,15 @@ export const FlatDataTable = React.forwardRef(({ data, sectionCode }, ref) => {
       </div>
     </div>
   );
-}); 
+});
+
+FlatDataTable.propTypes = {
+  data: PropTypes.array.isRequired,
+  sectionCode: PropTypes.string,
+  initialColumnVisibility: PropTypes.object,
+  onStateChange: PropTypes.func,
+  showColumnSelection: PropTypes.bool,
+  allowTextWrapping: PropTypes.bool,
+  showColorHighlighting: PropTypes.bool,
+  title: PropTypes.string
+};
