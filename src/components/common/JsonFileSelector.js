@@ -17,9 +17,11 @@ export const JsonFileSelector = ({
         value={selectedFile || ''}
         onChange={(e) => onFileSelect(e.target.value)}
       >
-        <option value="">Select JSON file</option>
+        <option value="">Select Section Code</option>
         {jsonFiles.map((file, index) => (
-          <option key={index} value={file}>{file}</option>
+          <option key={index} value={file.filename}>
+            {file.sectionCode}
+          </option>
         ))}
       </select>
       
@@ -48,7 +50,10 @@ export const JsonFileSelector = ({
 };
 
 JsonFileSelector.propTypes = {
-  jsonFiles: PropTypes.arrayOf(PropTypes.string).isRequired,
+  jsonFiles: PropTypes.arrayOf(PropTypes.shape({
+    filename: PropTypes.string.isRequired,
+    sectionCode: PropTypes.string.isRequired
+  })).isRequired,
   selectedFile: PropTypes.string,
   onFileSelect: PropTypes.func.isRequired,
   sectionCode: PropTypes.string,

@@ -225,6 +225,23 @@ app.get('/api/test-pdf', (req, res) => {
   res.redirect('https://storage.googleapis.com/chrome-devrel-public/pdf/hello.pdf');
 });
 
+// Helper function to extract section code
+const extractSectionCode = (filename, isEnhanced = false) => {
+  console.log('Extracting section code from:', filename, 'isEnhanced:', isEnhanced);
+  
+  if (isEnhanced) {
+    // For enhanced JSONs: "<filename>_<sectionCode>.json_enhanced.json"
+    const match = filename.match(/_((?:ENR|AD|GEN|AMDT)_\d+(?:_\d+)?)/i);
+    console.log('Enhanced match:', match);
+    return match ? match[1] : 'Unknown';
+  } else {
+    // For parsed JSONs: "<filename>_<sectionCode>.json"
+    const match = filename.match(/_((?:ENR|AD|GEN|AMDT)_\d+(?:_\d+)?)/i);
+    console.log('Parsed match:', match);
+    return match ? match[1] : 'Unknown';
+  }
+};
+
 // API endpoint to get parsed JSON files associated with a PDF
 app.get('/api/parsed-jsons', async (req, res) => {
   console.log('\n=== PARSED JSONS API CALL ===');
@@ -257,11 +274,20 @@ app.get('/api/parsed-jsons', async (req, res) => {
     const files = await fs.readdir(jsonFolderPath);
     console.log('Files in directory:', files);
     
-    const matchingJsonFiles = files.filter(file => {
-      const matches = file.startsWith(baseFilename + '_') && file.endsWith('.json');
-      console.log(`File: ${file}, Matches: ${matches}`);
-      return matches;
-    });
+    const matchingJsonFiles = files
+      .filter(file => {
+        const matches = file.startsWith(baseFilename + '_') && file.endsWith('.json');
+        console.log(`File: ${file}, Matches: ${matches}`);
+        return matches;
+      })
+      .map(file => {
+        const sectionCode = extractSectionCode(file, false);
+        console.log(`Extracted section code for ${file}:`, sectionCode);
+        return {
+          filename: file,
+          sectionCode: sectionCode
+        };
+      });
 
     const response = {
       pdfFilename,
@@ -310,11 +336,20 @@ app.get('/api/enhanced-jsons', async (req, res) => {
     const files = await fs.readdir(jsonFolderPath);
     console.log('Files in directory:', files);
     
-    const matchingJsonFiles = files.filter(file => {
-      const matches = file.startsWith(baseFilename + '_') && file.endsWith('.json');
-      console.log(`File: ${file}, Matches: ${matches}`);
-      return matches;
-    });
+    const matchingJsonFiles = files
+      .filter(file => {
+        const matches = file.startsWith(baseFilename + '_') && file.endsWith('_enhanced.json');
+        console.log(`File: ${file}, Matches: ${matches}`);
+        return matches;
+      })
+      .map(file => {
+        const sectionCode = extractSectionCode(file, true);
+        console.log(`Extracted section code for ${file}:`, sectionCode);
+        return {
+          filename: file,
+          sectionCode: sectionCode
+        };
+      });
 
     const response = {
       pdfFilename,
