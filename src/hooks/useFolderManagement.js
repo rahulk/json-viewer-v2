@@ -11,6 +11,7 @@ export const useFolderManagement = () => {
   const [selectedPdfUrl, setSelectedPdfUrl] = useState(null);
   const [parsedJsons, setParsedJsons] = useState([]);
   const [enhancedJsons, setEnhancedJsons] = useState([]);
+  const [basicHtmlContent, setBasicHtmlContent] = useState('');
 
   // Function to update PDF URL
   const updatePdfUrl = (folderPath, pdfFilename) => {
@@ -75,12 +76,25 @@ export const useFolderManagement = () => {
       const folderPath = folders[activeFolder];
       const pdfFilename = pdfFiles[index];
       
-      console.log('Fetching JSONs for:', {
+      console.log('Loading content for:', {
         folderPath,
         pdfFilename
       });
 
       try {
+        // Fetch basic HTML content
+        const htmlResponse = await fetch(
+          `http://localhost:3001/api/basic-html?folderPath=${encodeURIComponent(folderPath)}&filename=${encodeURIComponent(pdfFilename)}`
+        );
+        
+        if (htmlResponse.ok) {
+          const htmlData = await htmlResponse.json();
+          setBasicHtmlContent(htmlData.content);
+        } else {
+          console.error('Failed to load basic HTML');
+          setBasicHtmlContent('');
+        }
+
         // Fetch parsed JSONs
         const parsedResponse = await fetch(
           `http://localhost:3001/api/parsed-jsons?folderPath=${encodeURIComponent(folderPath)}&pdfFilename=${encodeURIComponent(pdfFilename)}`
@@ -112,7 +126,8 @@ export const useFolderManagement = () => {
         }
 
       } catch (error) {
-        console.error('Error fetching JSON files:', error);
+        console.error('Error loading content:', error);
+        setBasicHtmlContent('');
         setParsedJsons([]);
         setEnhancedJsons([]);
       }
@@ -136,6 +151,7 @@ export const useFolderManagement = () => {
     selectedPdfUrl,
     parsedJsons,
     enhancedJsons,
+    basicHtmlContent,
     fetchFolders,
     handleFolderSelect,
     handlePdfFileSelect

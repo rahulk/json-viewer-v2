@@ -454,6 +454,44 @@ app.get('/api/process-json', async (req, res) => {
   }
 });
 
+// Add new endpoint to get basic HTML content
+app.get('/api/basic-html', async (req, res) => {
+  console.log('\n=== 📄 BASIC HTML API CALL ===');
+  console.log('Query parameters:', req.query);
+  
+  try {
+    const { folderPath, filename } = req.query;
+    
+    if (!folderPath || !filename) {
+      console.log('❌ Missing required parameters');
+      return res.status(400).json({ error: 'Both folderPath and filename are required' });
+    }
+
+    // Remove .pdf extension and build the HTML path
+    const baseFilename = filename.replace(/\.pdf$/i, '');
+    const htmlPath = path.join(PDF_BASE_PATH, folderPath, 'basic_html', `${baseFilename}.html`);
+    console.log('📂 Looking for HTML file at:', htmlPath);
+
+    try {
+      const htmlContent = await fs.readFile(htmlPath, 'utf-8');
+      console.log('✅ HTML file loaded successfully');
+      return res.json({ 
+        success: true, 
+        content: htmlContent 
+      });
+    } catch (error) {
+      console.error('❌ Error reading HTML file:', error);
+      return res.status(404).json({ 
+        error: 'HTML file not found',
+        path: htmlPath
+      });
+    }
+  } catch (error) {
+    console.error('❌ Server error:', error);
+    return res.status(500).json({ error: 'Failed to get HTML content' });
+  }
+});
+
 app.listen(PORT, () => {
   console.log(`Server running on port ${PORT}`);
   

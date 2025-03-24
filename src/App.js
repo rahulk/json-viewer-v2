@@ -10,47 +10,6 @@ import { useJsonProcessing } from './hooks/useJsonProcessing';
 function App() {
   const [selectedTab, setSelectedTab] = useState(3);
   
-  // Sample data for different HTML views
-  const htmlContents = [
-    `<div>
-      <h5>HTML Content for Tab 1</h5>
-      <p>This is the HTML content specific to Tab 1.</p>
-      <ul>
-        <li>Tab 1 Item 1</li>
-        <li>Tab 1 Item 2</li>
-        <li>Tab 1 Item 3</li>
-      </ul>
-      <p>You can customize this content for each tab.</p>
-    </div>`,
-    `<div>
-      <h5>HTML Content for Tab 2</h5>
-      <p>This is the HTML content specific to Tab 2.</p>
-      <table border="1" style="width:100%">
-        <tr>
-          <th>Header 1</th>
-          <th>Header 2</th>
-        </tr>
-        <tr>
-          <td>Tab 2 Row 1, Cell 1</td>
-          <td>Tab 2 Row 1, Cell 2</td>
-        </tr>
-        <tr>
-          <td>Tab 2 Row 2, Cell 1</td>
-          <td>Tab 2 Row 2, Cell 2</td>
-        </tr>
-      </table>
-    </div>`,
-    `<div>
-      <h5>HTML Content for Tab 3</h5>
-      <p>This is the HTML content specific to Tab 3.</p>
-      <div style="background-color: #f0f0f0; padding: 10px; border-radius: 5px;">
-        <p>Tab 3 contains a styled div with custom content.</p>
-        <code>const example = "This is a code sample in Tab 3";</code>
-      </div>
-      <p>Each tab can have completely different HTML structures.</p>
-    </div>`
-  ];
-
   // Use custom hooks for folder and JSON management
   const {
     folders,
@@ -59,6 +18,7 @@ function App() {
     activePdfFile,
     parsedJsons,
     enhancedJsons,
+    basicHtmlContent, // This contains the HTML content for Tab 1
     handleFolderSelect,
     handlePdfFileSelect,
     foldersLoading,
@@ -143,7 +103,7 @@ function App() {
             </div>
             
             <div className="col-lg-6 mb-3">
-              <div className="results-container h-100">
+              <div className="results-container" style={{ height: '100%', display: 'flex', flexDirection: 'column' }}>
                 <div className="d-flex justify-content-start mb-3">
                   <ul className="nav nav-tabs">
                     {['Tab 1: Basic', 'Tab 2: Modified', 'Tab 3: Enhanced', 'Tab 4: Parsed JSONs', 'Tab 5: Enhanced JSONs'].map((tab, index) => (
@@ -159,19 +119,21 @@ function App() {
                   </ul>
                 </div>
                 
-                <TabContent 
-                  selectedTab={selectedTab}
-                  htmlContents={htmlContents}
-                  tab4State={tab4State}
-                  tab5State={tab5State}
-                  handleTab4StateChange={handleTab4StateChange}
-                  handleTab5StateChange={handleTab5StateChange}
-                  processFiles={processFiles}
-                  folderPath={folders[activeFolder]}
-                  pdfFilename={pdfFiles[activePdfFile]}
-                  parsedJsons={parsedJsons}
-                  enhancedJsons={enhancedJsons}
-                />
+                <div style={{ flex: 1, minHeight: 0 }}> {/* This ensures proper scrolling */}
+                  <TabContent 
+                    selectedTab={selectedTab}
+                    htmlContents={[basicHtmlContent]}
+                    tab4State={tab4State}
+                    tab5State={tab5State}
+                    handleTab4StateChange={handleTab4StateChange}
+                    handleTab5StateChange={handleTab5StateChange}
+                    processFiles={processFiles}
+                    folderPath={folders[activeFolder]}
+                    pdfFilename={pdfFiles[activePdfFile]}
+                    parsedJsons={parsedJsons}
+                    enhancedJsons={enhancedJsons}
+                  />
+                </div>
               </div>
             </div>
           </div>

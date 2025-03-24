@@ -666,3 +666,17 @@ body {
     min-height: 350px;
   }
 }
+
+.html-viewer-container {
+  height: calc(100vh - 200px); /* Adjust 200px based on your header/nav heights */
+  overflow-y: auto;
+  border: 1px solid #ccc;
+  padding: 15px;
+  background-color: white;
+  box-shadow: inset 0 0 5px rgba(0,0,0,0.1);
+}
+
+.html-viewer-content {
+  min-height: 100%;
+  padding: 10px;
+}

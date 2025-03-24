@@ -124,13 +124,20 @@ export const TabContent = ({
     }
   };
 
-  const renderHtmlContent = (content, title) => (
-    <div className="html-viewer" style={{ border: '1px solid #ccc', padding: '10px', height: 'calc(100% - 60px)', overflow: 'auto' }}>
-      <h4>{title}</h4>
-      <div 
-        style={{ backgroundColor: '#fff', padding: '10px', border: '1px solid #ddd', borderRadius: '4px' }}
-        dangerouslySetInnerHTML={{ __html: content }}
-      ></div>
+  const renderHtmlContent = (index) => (
+    <div className="html-viewer-container">
+      <div className="html-viewer-content"
+        dangerouslySetInnerHTML={{ 
+          __html: htmlContents[index] || '<p>No content available</p>' 
+        }}
+      />
+    </div>
+  );
+
+  const renderTab1Content = () => (
+    <div style={{ height: '100%' }}>
+      <h4>Basic HTML View</h4>
+      {renderHtmlContent(0)}
     </div>
   );
 
@@ -215,11 +222,11 @@ export const TabContent = ({
   // Use separate render functions for each tab to ensure complete separation
   switch (selectedTab) {
     case 0:
-      return renderHtmlContent(htmlContents[0], 'HTML Viewer - Tab 1');
+      return renderTab1Content();
     case 1:
-      return renderHtmlContent(htmlContents[1], 'HTML Viewer - Tab 2');
+      return renderHtmlContent(1);
     case 2:
-      return renderHtmlContent(htmlContents[2], 'HTML Viewer - Tab 3');
+      return renderHtmlContent(2);
     case 3:
       return renderTab4Content();
     case 4:
