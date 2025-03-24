@@ -1,75 +1,16 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState } from 'react';
 import './App.css';
-import { JsonProcessor } from './utils/JsonProcessor';
-import { SAMPLE_JSON } from './constants/sampleData';
 import { FileUploader } from './components/FileUploader';
-import { FlatDataTable } from './components/FlatDataTable';
-import { apiService } from './services/apiService';
 import { PdfViewer } from './components/PdfViewer';
+import { Sidebar } from './components/Sidebar';
+import { TabContent } from './components/TabContent';
+import { useFolderManagement } from './hooks/useFolderManagement';
+import { useJsonProcessing } from './hooks/useJsonProcessing';
 
 function App() {
-  const [files, setFiles] = useState([]);
-  const [results, setResults] = useState([]);
-  /* eslint-disable-next-line no-unused-vars */
-  const [activeFile, setActiveFile] = useState(null);
-  const [isLoading, setIsLoading] = useState(false);
-  const [error, setError] = useState(null);
-  const [folders, setFolders] = useState([]);
-  const [foldersLoading, setFoldersLoading] = useState(false);
-  const [foldersError, setFoldersError] = useState(null);
-  const [pdfFiles, setPdfFiles] = useState(['File 1.pdf', 'File 2.pdf', 'File 3.pdf']);
-  const [activeFolder, setActiveFolder] = useState(null);
-  const [activePdfFile, setActivePdfFile] = useState(null);
   const [selectedTab, setSelectedTab] = useState(3);
-  const [selectedPdfUrl, setSelectedPdfUrl] = useState(null);
   
-  // Add state for each tab
-  const [tab4State, setTab4State] = useState({
-    data: [], // Initialize with empty array
-    columnVisibility: {},
-    filters: {},
-    wrapText: false,
-    filterColoredText: false
-  });
-
-  const [tab5State, setTab5State] = useState({
-    data: [], // Initialize with empty array
-    columnVisibility: {},
-    filters: {},
-    wrapText: false,
-    filterColoredText: false
-  });
-
-  // Fetch folders from the /documents/output directory
-  const fetchFolders = async () => {
-    setFoldersLoading(true);
-    setFoldersError(null);
-    
-    try {
-      const folderList = await apiService.getFolders('/documents/output');
-      setFolders(folderList);
-      console.log("Folders fetched successfully:", folderList);
-      
-      // Set the first folder as active if none is selected and folders exist
-      if (activeFolder === null && folderList.length > 0) {
-        setActiveFolder(0);
-      }
-    } catch (err) {
-      console.error("Error fetching folders:", err);
-      setFoldersError("Failed to load folders. Please try again.");
-      setFolders([]);
-    } finally {
-      setFoldersLoading(false);
-    }
-  };
-  
-  // Initial folder fetch on component mount
-  useEffect(() => {
-    fetchFolders();
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []);
-  
-  // Sample data for different HTML views and JSON data
+  // Sample data for different HTML views
   const htmlContents = [
     `<div>
       <h5>HTML Content for Tab 1</h5>
@@ -109,341 +50,41 @@ function App() {
       <p>Each tab can have completely different HTML structures.</p>
     </div>`
   ];
-  
-  // Process sample data for each JSON tab
-  useEffect(() => {
-    // Create different sample data for tabs 4 and 5
-    const processor = new JsonProcessor();
-    
-    // Data for Tab 4
-    const sampleData4 = [
-      { 
-        id: "ID001", 
-        itemName: "Tab 4 Item 1", 
-        category: "Category A", 
-        price: 125.50,
-        inStock: true,
-        lastUpdated: "2023-05-15" 
-      }
-      // ... other sample data
-    ];
-    
-    // Data for Tab 5
-    const sampleData5 = [
-      { productId: "P001", productName: "Tab 5 Product 1", price: 29.99, inStock: true }
-      // ... other sample data
-    ];
-    
-    // Process the data and update tab states directly
-    const processedData4 = processor.processArray(sampleData4);
-    const processedData5 = processor.processArray(sampleData5);
-    
-    // Update tab states directly
-    setTab4State(prevState => ({
-      ...prevState,
-      data: processedData4.results || []
-    }));
-    
-    setTab5State(prevState => ({
-      ...prevState,
-      data: processedData5.results || []
-    }));
-  }, []);
 
-  useEffect(() => {
-    console.log("App rendered");
-    console.log("Current layout structure:", {
-      sidebar: document.querySelector('.sidebar')?.getBoundingClientRect(),
-      mainContent: document.querySelector('.main-content')?.getBoundingClientRect(),
-      pageViewer: document.querySelector('.page-viewer')?.getBoundingClientRect(),
-      tabsView: document.querySelector('.tabs-view')?.getBoundingClientRect(),
-      resultsContainer: document.querySelector('.results-container')?.getBoundingClientRect()
-    });
-    
-    // Check applied styles
-    const sidebarEl = document.querySelector('.sidebar');
-    const mainContentEl = document.querySelector('.main-content');
-    const pageViewerEl = document.querySelector('.page-viewer');
-    const tabsViewEl = document.querySelector('.tabs-view');
-    const resultsContainerEl = document.querySelector('.results-container');
-    
-    if (sidebarEl) {
-      console.log("Sidebar computed styles:", 
-        window.getComputedStyle(sidebarEl).width,
-        window.getComputedStyle(sidebarEl).backgroundColor);
-    }
-    
-    if (mainContentEl) {
-      console.log("Main content computed styles:", 
-        window.getComputedStyle(mainContentEl).display,
-        window.getComputedStyle(mainContentEl).flexDirection);
-    }
-    
-    if (pageViewerEl) {
-      console.log("Page viewer computed styles:", 
-        window.getComputedStyle(pageViewerEl).flex,
-        window.getComputedStyle(pageViewerEl).height);
-    }
-    
-    if (tabsViewEl) {
-      console.log("Tabs view computed styles:", 
-        window.getComputedStyle(tabsViewEl).flex,
-        window.getComputedStyle(tabsViewEl).height);
-    }
-    
-    if (resultsContainerEl) {
-      console.log("Results container computed styles:", 
-        window.getComputedStyle(resultsContainerEl).width,
-        window.getComputedStyle(resultsContainerEl).display);
-    }
-    
-    console.log("Side-by-side layout enabled - debugging flex layout");
-    
-    // Debug header content
-    document.title = "Document Review Application v1";
-    console.log("Document title set to:", document.title);
-    
-    // Debug the tab selection
-    console.log("Selected tab index:", selectedTab);
-    console.log("Tab content element:", document.querySelector('.tab-content'));
-    
-    console.log("Initial tab content rendering for tab:", selectedTab + 1);
-  }, [selectedTab]);
-  
-  // Log each time the component renders with current state
-  console.log("Rendering with state:", { 
-    folders, 
-    pdfFiles, 
-    activeFolder, 
-    activePdfFile 
-  });
-  
-  // Reference the functions to avoid ESLint warnings
-  useEffect(() => {
-    // This is a dummy effect to reference the functions and avoid warnings
-    console.log("Functions available for folder/file management:", {
-      addFolder, 
-      addPdfFile
-    });
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []);
+  // Use custom hooks for folder and JSON management
+  const {
+    folders,
+    foldersLoading,
+    foldersError,
+    pdfFiles,
+    activeFolder,
+    activePdfFile,
+    selectedPdfUrl,
+    fetchFolders,
+    handleFolderSelect,
+    handlePdfFileSelect
+  } = useFolderManagement();
 
-  // Process the selected files
-  const processFiles = async () => {
-    console.log("Processing files:", files);
-    
-    if (files.length === 0) {
-      console.log("No files selected, using sample data");
-      const processor = new JsonProcessor();
-      const processedData = processor.processArray(SAMPLE_JSON);
-      
-      // Make sure we have valid data before updating state
-      if (processedData && processedData.results) {
-        setTab4State(prevState => ({
-          ...prevState,
-          data: processedData.results
-        }));
-        
-        setTab5State(prevState => ({
-          ...prevState,
-          data: processedData.results
-        }));
-
-        setResults([{
-          name: 'sample-data.json',
-          data: processedData,
-          rawData: SAMPLE_JSON
-        }]);
-        setActiveFile(0);
-        setSelectedTab(3);
-      } else {
-        console.error("Invalid processed data structure:", processedData);
-        setError("Error processing sample data");
-      }
-      return;
-    }
-
-    setIsLoading(true);
-    setError(null);
-    
-    try {
-      const processedFiles = [];
-      const processor = new JsonProcessor();
-      
-      for (const file of files) {
-        console.log(`Processing file: ${file.name}`);
-        const content = await readFileAsJson(file);
-        
-        // Ensure content is an array
-        const dataToProcess = Array.isArray(content) ? content : [content];
-        
-        const processed = processor.processArray(dataToProcess);
-        console.log(`Processed data:`, processed);
-        
-        if (processed && processed.results) {
-          processedFiles.push({
-            name: file.name,
-            data: processed,
-            rawData: content
-          });
-
-          // Update tab states with processed data
-          setTab4State(prevState => ({
-            ...prevState,
-            data: processed.results
-          }));
-          
-          setTab5State(prevState => ({
-            ...prevState,
-            data: processed.results
-          }));
-        } else {
-          throw new Error(`Invalid processed data structure for file: ${file.name}`);
-        }
-      }
-      
-      setResults(processedFiles);
-      if (processedFiles.length > 0) {
-        setActiveFile(0);
-        setSelectedTab(3);
-      }
-      
-    } catch (err) {
-      console.error("Error processing files:", err);
-      setError(err.message);
-    } finally {
-      setIsLoading(false);
-    }
-  };
-
-  // Helper to read file as JSON
-  const readFileAsJson = (file) => {
-    return new Promise((resolve, reject) => {
-      const reader = new FileReader();
-      
-      reader.onload = (event) => {
-        try {
-          const json = JSON.parse(event.target.result);
-          resolve(json);
-        } catch (err) {
-          reject(new Error(`Invalid JSON in file ${file.name}`));
-        }
-      };
-      
-      reader.onerror = () => {
-        reject(new Error(`Error reading file ${file.name}`));
-      };
-      
-      reader.readAsText(file);
-    });
-  };
-
-  // Handle folder selection
-  const handleFolderSelect = async (index) => {
-    setActiveFolder(index);
-    setActivePdfFile(null); // Reset active PDF file selection
-    
-    // Get the selected folder name
-    const selectedFolder = folders[index];
-    
-    try {
-      // Preserve exact folder name with proper encoding
-      const encodedFolder = encodeURIComponent(selectedFolder);
-      const folderPath = `/documents/output/${encodedFolder}/${encodedFolder}`;
-      console.log(`Original folder name: "${selectedFolder}" (${selectedFolder.length} chars)`);
-      console.log(`Fetching files from path: ${folderPath}`);
-      
-      const filesList = await apiService.getFiles(folderPath);
-      
-      // Filter to only include PDF files
-      const pdfFilesList = filesList.filter(file => 
-        file.toLowerCase().endsWith('.pdf')
-      );
-      
-      console.log(`Found ${pdfFilesList.length} PDF files in folder: ${selectedFolder}`);
-      setPdfFiles(pdfFilesList);
-      
-      // If files exist, automatically select the first one
-      if (pdfFilesList.length > 0) {
-        setActivePdfFile(0);
-      }
-    } catch (err) {
-      console.error(`Error fetching files for folder ${selectedFolder}:`, err);
-      setPdfFiles([]);
-    }
-  };
-
-  // Handle PDF file selection
-  const handlePdfFileSelect = (index) => {
-    setActivePdfFile(index);
-    
-    if (index !== null && activeFolder !== null) {
-      const selectedFolder = folders[activeFolder];
-      const selectedFile = pdfFiles[index];
-      
-      // Build the path with proper structure and preserve exact spacing
-      const encodedFolder = encodeURIComponent(selectedFolder);
-      const encodedFile = encodeURIComponent(selectedFile);
-      // Use the correct port (3001) for the API server
-      const pdfUrl = `http://localhost:3001/api/pdf?path=/documents/output/${encodedFolder}/${encodedFolder}/${encodedFile}`;
-      
-      console.log('Original folder name:', selectedFolder);
-      console.log('Folder name length:', selectedFolder.length);
-      console.log('Encoded folder name:', encodedFolder);
-      console.log('Setting PDF URL:', pdfUrl);
-      
-      // Show file path information in an alert for debugging
-      const serverPath = `SERVER_DIR/documents/output/${selectedFolder}/${selectedFolder}/${selectedFile}`;
-      alert(`PDF Path Information:\n\nClient request: ${pdfUrl}\n\nServer file path: ${serverPath}\n\nFolder name length: ${selectedFolder.length} chars\nCheck server logs for the actual resolved file path.`);
-      
-      setSelectedPdfUrl(pdfUrl);
-      
-      // Add visual feedback that PDF is loading
-      setIsLoading(true);
-      setTimeout(() => setIsLoading(false), 2000); // Reset after 2 seconds
-    } else {
-      setSelectedPdfUrl(null);
-    }
-  };
-
-  // Add folder
-  /* eslint-disable-next-line no-unused-vars */
-  const addFolder = (folderName) => {
-    setFolders(prevFolders => [...prevFolders, folderName]);
-  };
-  
-  // Add PDF file
-  /* eslint-disable-next-line no-unused-vars */
-  const addPdfFile = (fileName) => {
-    setPdfFiles(prevFiles => [...prevFiles, fileName]);
-  };
+  const {
+    setFiles,
+    isLoading,
+    error,
+    tab4State,
+    tab5State,
+    processFiles,
+    handleTab4StateChange,
+    handleTab5StateChange
+  } = useJsonProcessing();
 
   // Handle tab selection
   const handleTabSelect = (index) => {
-    console.log(`Tab ${index + 1} selected - ${index <= 2 ? 'HTML Viewer' : 'JSON/FlatDataTable Viewer'}`);
     setSelectedTab(index);
     
-    // If selecting a JSON viewer tab but no data is loaded, auto-load sample data
-    if (index >= 3 && results.length === 0) {
-      console.log('Auto-loading sample data for JSON viewer');
+    // If selecting a JSON viewer tab (tab 4 or 5) but no data is loaded, auto-load sample data
+    if ((index === 3 && (!tab4State.data || tab4State.data.length === 0)) || 
+        (index === 4 && (!tab5State.data || tab5State.data.length === 0))) {
       processFiles();
     }
-  };
-
-  // Callback to update state for Tab 4
-  const handleTab4StateChange = (newState) => {
-    setTab4State(prevState => ({
-      ...prevState,
-      ...newState
-    }));
-  };
-
-  // Callback to update state for Tab 5
-  const handleTab5StateChange = (newState) => {
-    setTab5State(prevState => ({
-      ...prevState,
-      ...newState
-    }));
   };
 
   return (
@@ -464,87 +105,17 @@ function App() {
       
       <div className="row">
         <div className="col-md-2 col-lg-2 col-xl-1 mb-3">
-          <div className="sidebar h-100">
-            <div className="mb-4">
-              <div className="d-flex justify-content-between align-items-center mb-2">
-                <h2>PDF Folders</h2>
-                <button 
-                  className="btn btn-sm btn-outline-secondary" 
-                  onClick={fetchFolders}
-                  disabled={foldersLoading}
-                  title="Refresh folders"
-                >
-                  {foldersLoading ? "..." : "↻"}
-                </button>
-              </div>
-              
-              {foldersLoading ? (
-                <div className="text-center py-3">
-                  <div className="spinner-border spinner-border-sm text-primary" role="status">
-                    <span className="visually-hidden">Loading folders...</span>
-                  </div>
-                  <p className="mt-2 small text-muted">Loading folders...</p>
-                </div>
-              ) : foldersError ? (
-                <div className="alert alert-danger py-2 small">
-                  {foldersError}
-                  <button 
-                    className="btn btn-sm btn-outline-danger ms-2"
-                    onClick={fetchFolders}
-                  >
-                    Retry
-                  </button>
-                </div>
-              ) : folders.length === 0 ? (
-                <p className="text-muted small">No folders found in /documents/output</p>
-              ) : (
-                <ul className="list-unstyled">
-                  {folders.map((folder, index) => (
-                    <li 
-                      key={index} 
-                      className={`folder-item ${activeFolder === index ? 'active' : ''}`}
-                      onClick={() => handleFolderSelect(index)}
-                      style={{ 
-                        color: '#00008B',
-                        padding: '6px 8px',
-                        cursor: 'pointer',
-                        borderRadius: '4px',
-                        marginBottom: '4px',
-                        backgroundColor: activeFolder === index ? '#e9ecef' : 'transparent'
-                      }}
-                    >
-                      <i className="bi bi-folder-fill me-2" style={{ color: '#FFD700' }}></i>
-                      {folder}
-                    </li>
-                  ))}
-                </ul>
-              )}
-            </div>
-            
-            <div>
-              <h2>PDF Files</h2>
-              <ul className="list-unstyled">
-                {pdfFiles.map((file, index) => (
-                  <li 
-                    key={index} 
-                    className={`file-item ${activePdfFile === index ? 'active' : ''}`}
-                    onClick={() => handlePdfFileSelect(index)}
-                    style={{ 
-                      color: '#00008B',
-                      padding: '6px 8px',
-                      cursor: 'pointer',
-                      borderRadius: '4px',
-                      marginBottom: '4px',
-                      backgroundColor: activePdfFile === index ? '#e9ecef' : 'transparent'
-                    }}
-                  >
-                    <i className="bi bi-file-pdf-fill me-2" style={{ color: '#FF0000' }}></i>
-                    {file}
-                  </li>
-                ))}
-              </ul>
-            </div>
-          </div>
+          <Sidebar
+            folders={folders}
+            foldersLoading={foldersLoading}
+            foldersError={foldersError}
+            pdfFiles={pdfFiles}
+            activeFolder={activeFolder}
+            activePdfFile={activePdfFile}
+            fetchFolders={fetchFolders}
+            handleFolderSelect={handleFolderSelect}
+            handlePdfFileSelect={handlePdfFileSelect}
+          />
         </div>
         
         <div className="col-md-10 col-lg-10 col-xl-11">
@@ -586,98 +157,15 @@ function App() {
                   </ul>
                 </div>
                 
-                {/* Conditional rendering based on selected tab */}
-                {selectedTab === 0 && (
-                  <div className="html-viewer" style={{ border: '1px solid #ccc', padding: '10px', height: 'calc(100% - 60px)', overflow: 'auto' }}>
-                    <h4>HTML Viewer - Tab 1</h4>
-                    <div 
-                      style={{ backgroundColor: '#fff', padding: '10px', border: '1px solid #ddd', borderRadius: '4px' }}
-                      dangerouslySetInnerHTML={{ __html: htmlContents[0] }}
-                    ></div>
-                  </div>
-                )}
-                
-                {selectedTab === 1 && (
-                  <div className="html-viewer" style={{ border: '1px solid #ccc', padding: '10px', height: 'calc(100% - 60px)', overflow: 'auto' }}>
-                    <h4>HTML Viewer - Tab 2</h4>
-                    <div 
-                      style={{ backgroundColor: '#fff', padding: '10px', border: '1px solid #ddd', borderRadius: '4px' }}
-                      dangerouslySetInnerHTML={{ __html: htmlContents[1] }}
-                    ></div>
-                  </div>
-                )}
-                
-                {selectedTab === 2 && (
-                  <div className="html-viewer" style={{ border: '1px solid #ccc', padding: '10px', height: 'calc(100% - 60px)', overflow: 'auto' }}>
-                    <h4>HTML Viewer - Tab 3</h4>
-                    <div 
-                      style={{ backgroundColor: '#fff', padding: '10px', border: '1px solid #ddd', borderRadius: '4px' }}
-                      dangerouslySetInnerHTML={{ __html: htmlContents[2] }}
-                    ></div>
-                  </div>
-                )}
-                
-                {/* Render JSON Viewer for Tab 4 */}
-                {selectedTab === 3 && (
-                  <div className="json-viewer" style={{ border: '1px solid #ccc', padding: '10px', height: 'calc(100% - 60px)', overflow: 'auto' }}>
-                    <h4>JSON Viewer - Tab 4</h4>
-                    {tab4State.data && tab4State.data.length > 0 ? (
-                      <div className="table-view">
-                        <FlatDataTable 
-                          data={tab4State.data}
-                          sectionCode="TAB4"
-                          showColumnSelection={true}
-                          allowTextWrapping={true}
-                          showColorHighlighting={true}
-                          initialColumnVisibility={tab4State.columnVisibility}
-                          onStateChange={handleTab4StateChange}
-                          title="Flat Data View (Tab 4)"
-                        />
-                      </div>
-                    ) : (
-                      <div style={{ textAlign: 'center', padding: '20px' }}>
-                        <p>No data available. Please select a file and click "Process Files".</p>
-                        <button 
-                          className="btn btn-primary"
-                          onClick={processFiles}
-                        >
-                          Load Sample Data
-                        </button>
-                      </div>
-                    )}
-                  </div>
-                )}
-                
-                {/* Render JSON Viewer for Tab 5 */}
-                {selectedTab === 4 && (
-                  <div className="json-viewer" style={{ border: '1px solid #ccc', padding: '10px', height: 'calc(100% - 60px)', overflow: 'auto' }}>
-                    <h4>JSON Viewer - Tab 5</h4>
-                    {tab5State.data && tab5State.data.length > 0 ? (
-                      <div className="table-view">
-                        <FlatDataTable 
-                          data={tab5State.data}
-                          sectionCode="TAB5"
-                          showColumnSelection={true}
-                          allowTextWrapping={true}
-                          showColorHighlighting={true}
-                          initialColumnVisibility={tab5State.columnVisibility}
-                          onStateChange={handleTab5StateChange}
-                          title="Flat Data View (Tab 5)"
-                        />
-                      </div>
-                    ) : (
-                      <div style={{ textAlign: 'center', padding: '20px' }}>
-                        <p>No data available. Please select a file and click "Process Files".</p>
-                        <button 
-                          className="btn btn-primary"
-                          onClick={processFiles}
-                        >
-                          Load Sample Data
-                        </button>
-                      </div>
-                    )}
-                  </div>
-                )}
+                <TabContent
+                  selectedTab={selectedTab}
+                  htmlContents={htmlContents}
+                  tab4State={tab4State}
+                  tab5State={tab5State}
+                  handleTab4StateChange={handleTab4StateChange}
+                  handleTab5StateChange={handleTab5StateChange}
+                  processFiles={processFiles}
+                />
               </div>
             </div>
           </div>
