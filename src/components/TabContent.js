@@ -15,7 +15,6 @@ export const TabContent = ({
   parsedJsons,
   enhancedJsons
 }) => {
-  // Remove unused state variables
   const [selectedParsedFile, setSelectedParsedFile] = useState('');
   const [selectedEnhancedFile, setSelectedEnhancedFile] = useState('');
   const [isLoadingParsed, setIsLoadingParsed] = useState(false);
@@ -50,6 +49,81 @@ export const TabContent = ({
     });
   }, [parsedJsons, enhancedJsons, folderPath, pdfFilename]);
 
+  const handleProcessParsedJson = async () => {
+    if (!selectedParsedFile || !folderPath) {
+      console.log('❌ Missing required data:', { selectedParsedFile, folderPath });
+      return;
+    }
+
+    setIsLoadingParsed(true);
+    try {
+      // Build the complete path for the JSON file
+      const jsonPath = `${folderPath}/parsed_jsons/${selectedParsedFile}`;
+      console.log('📤 Making API call to process JSON:', {
+        endpoint: '/api/process-json',
+        path: jsonPath
+      });
+
+      const response = await fetch(
+        `http://localhost:3001/api/process-json?filePath=${encodeURIComponent(jsonPath)}`
+      );
+
+      if (!response.ok) {
+        const errorData = await response.json();
+        console.error('❌ API error:', errorData);
+        throw new Error(`Failed to process JSON: ${errorData.message || response.statusText}`);
+      }
+
+      const data = await response.json();
+      console.log('📥 Received JSON data:', {
+        records: Array.isArray(data.results) ? data.results.length : 'Not an array',
+        success: data.success
+      });
+
+      // Update the table state with the new data
+      handleTab4StateChange({ 
+        ...tab4State,
+        data: data.results || []
+      });
+    } catch (error) {
+      console.error('❌ Error processing JSON:', error);
+    } finally {
+      setIsLoadingParsed(false);
+    }
+  };
+
+  const handleProcessEnhancedJson = async () => {
+    if (!selectedEnhancedFile || !folderPath) {
+      console.log('❌ Missing required data for enhanced JSON:', { selectedEnhancedFile, folderPath });
+      return;
+    }
+
+    setIsLoadingEnhanced(true);
+    try {
+      const jsonPath = `${folderPath}/enhanced_jsons/${selectedEnhancedFile}`;
+      console.log('📤 Processing enhanced JSON:', jsonPath);
+
+      const response = await fetch(
+        `http://localhost:3001/api/process-json?filePath=${encodeURIComponent(jsonPath)}`
+      );
+
+      if (!response.ok) {
+        const errorData = await response.json();
+        throw new Error(`Failed to process enhanced JSON: ${errorData.message || response.statusText}`);
+      }
+
+      const data = await response.json();
+      handleTab5StateChange({ 
+        ...tab5State,
+        data: data.results || []
+      });
+    } catch (error) {
+      console.error('❌ Error processing enhanced JSON:', error);
+    } finally {
+      setIsLoadingEnhanced(false);
+    }
+  };
+
   const renderHtmlContent = (content, title) => (
     <div className="html-viewer" style={{ border: '1px solid #ccc', padding: '10px', height: 'calc(100% - 60px)', overflow: 'auto' }}>
       <h4>{title}</h4>
@@ -68,20 +142,7 @@ export const TabContent = ({
         selectedFile={selectedParsedFile}
         onFileSelect={setSelectedParsedFile}
         sectionCode={parsedSectionCode}
-        onProcessFile={async () => {
-          setIsLoadingParsed(true);
-          try {
-            const response = await fetch(
-              `http://localhost:3001/api/process-json?filePath=${encodeURIComponent(folderPath)}&fileName=${encodeURIComponent(selectedParsedFile)}`
-            );
-            const data = await response.json();
-            handleTab4StateChange({ data: data.results || [] });
-          } catch (error) {
-            console.error('Error processing JSON file:', error);
-          } finally {
-            setIsLoadingParsed(false);
-          }
-        }}
+        onProcessFile={handleProcessParsedJson}
         isLoading={isLoadingParsed}
       />
       {tab4State.data && tab4State.data.length > 0 ? (
@@ -120,20 +181,7 @@ export const TabContent = ({
         selectedFile={selectedEnhancedFile}
         onFileSelect={setSelectedEnhancedFile}
         sectionCode={enhancedSectionCode}
-        onProcessFile={async () => {
-          setIsLoadingEnhanced(true);
-          try {
-            const response = await fetch(
-              `http://localhost:3001/api/process-json?filePath=${encodeURIComponent(folderPath)}&fileName=${encodeURIComponent(selectedEnhancedFile)}`
-            );
-            const data = await response.json();
-            handleTab5StateChange({ data: data.results || [] });
-          } catch (error) {
-            console.error('Error processing JSON file:', error);
-          } finally {
-            setIsLoadingEnhanced(false);
-          }
-        }}
+        onProcessFile={handleProcessEnhancedJson}
         isLoading={isLoadingEnhanced}
       />
       {tab5State.data && tab5State.data.length > 0 ? (

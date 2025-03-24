@@ -366,6 +366,94 @@ app.get('/api/enhanced-jsons', async (req, res) => {
   }
 });
 
+// Add this endpoint to process JSON files
+app.get('/api/process-json', async (req, res) => {
+  console.log('\n=== 🔄 PROCESS JSON API CALL ===');
+  console.log('⏰ Timestamp:', new Date().toISOString());
+  console.log('📝 Query parameters:', req.query);
+
+  try {
+    const { filePath } = req.query;
+    
+    if (!filePath) {
+      console.log('❌ Missing filePath parameter');
+      return res.status(400).json({ error: 'filePath parameter is required' });
+    }
+
+    // Build the absolute path to the JSON file
+    const fullPath = path.join(PDF_BASE_PATH, filePath);
+    console.log('📂 Looking for JSON file at:', fullPath);
+
+    try {
+      await fs.access(fullPath);
+      console.log('✅ File exists');
+
+      console.log('📖 Reading file contents...');
+      const fileContent = await fs.readFile(fullPath, 'utf-8');
+      
+      console.log('🔄 Parsing JSON...');
+      let jsonData = JSON.parse(fileContent);
+      
+      // Ensure the data is an array
+      if (!Array.isArray(jsonData)) {
+        console.log('⚠️ Data is not an array, checking structure...');
+        
+        // Check if data is in a nested property
+        if (jsonData.data && Array.isArray(jsonData.data)) {
+          console.log('✅ Found array data in .data property');
+          jsonData = jsonData.data;
+        } else if (jsonData.results && Array.isArray(jsonData.results)) {
+          console.log('✅ Found array data in .results property');
+          jsonData = jsonData.results;
+        } else {
+          // Convert object to array if needed
+          console.log('⚠️ Converting to array format');
+          jsonData = [jsonData];
+        }
+      }
+
+      const recordCount = jsonData.length;
+      console.log('✅ Successfully processed JSON file');
+      console.log('📊 Number of records:', recordCount);
+      console.log('🔍 Data structure:', {
+        isArray: Array.isArray(jsonData),
+        length: recordCount,
+        sampleKeys: recordCount > 0 ? Object.keys(jsonData[0]).slice(0, 5) : []
+      });
+
+      const response = {
+        success: true,
+        results: jsonData,
+        metadata: {
+          processedAt: new Date().toISOString(),
+          recordCount: recordCount
+        }
+      };
+
+      console.log('📤 Sending response');
+      console.log('=== END PROCESS JSON API CALL ===\n');
+      return res.json(response);
+
+    } catch (error) {
+      console.error('❌ Error reading/parsing JSON file:', {
+        error: error.message,
+        stack: error.stack
+      });
+      return res.status(500).json({ 
+        error: 'Failed to process JSON file',
+        message: error.message,
+        path: fullPath
+      });
+    }
+  } catch (error) {
+    console.error('❌ Server error:', error);
+    return res.status(500).json({ 
+      error: 'Server error while processing JSON',
+      message: error.message
+    });
+  }
+});
+
 app.listen(PORT, () => {
   console.log(`Server running on port ${PORT}`);
   
