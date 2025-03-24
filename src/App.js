@@ -110,10 +110,6 @@ function App() {
     </div>`
   ];
   
-  // Sample JSON data for tabs 4 and 5
-  const [jsonData4, setJsonData4] = useState([]);
-  const [jsonData5, setJsonData5] = useState([]);
-  
   // Process sample data for each JSON tab
   useEffect(() => {
     // Create different sample data for tabs 4 and 5
@@ -128,44 +124,30 @@ function App() {
         price: 125.50,
         inStock: true,
         lastUpdated: "2023-05-15" 
-      },
-      { 
-        id: "ID002", 
-        itemName: "Tab 4 Item 2", 
-        category: "Category B", 
-        price: 225.75,
-        inStock: false,
-        lastUpdated: "2023-06-20" 
-      },
-      { 
-        id: "ID003", 
-        itemName: "Tab 4 Item 3", 
-        category: "Category A", 
-        price: 175.25,
-        inStock: true,
-        lastUpdated: "2023-07-10" 
       }
+      // ... other sample data
     ];
     
     // Data for Tab 5
     const sampleData5 = [
-      { productId: "P001", productName: "Tab 5 Product 1", price: 29.99, inStock: true },
-      { productId: "P002", productName: "Tab 5 Product 2", price: 49.99, inStock: false },
-      { productId: "P003", productName: "Tab 5 Product 3", price: 19.99, inStock: true }
+      { productId: "P001", productName: "Tab 5 Product 1", price: 29.99, inStock: true }
+      // ... other sample data
     ];
     
-    // Process the data
+    // Process the data and update tab states directly
     const processedData4 = processor.processArray(sampleData4);
     const processedData5 = processor.processArray(sampleData5);
     
-    setJsonData4(processedData4.results);
-    setJsonData5(processedData5.results);
+    // Update tab states directly
+    setTab4State(prevState => ({
+      ...prevState,
+      data: processedData4.results || []
+    }));
     
-    // Load sample data if needed for initial render
-    if (selectedTab >= 3 && results.length === 0) {
-      processFiles();
-    }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
+    setTab5State(prevState => ({
+      ...prevState,
+      data: processedData5.results || []
+    }));
   }, []);
 
   useEffect(() => {
@@ -251,77 +233,79 @@ function App() {
     console.log("Processing files:", files);
     
     if (files.length === 0) {
-      // If no files selected, use sample data for testing
       console.log("No files selected, using sample data");
       const processor = new JsonProcessor();
       const processedData = processor.processArray(SAMPLE_JSON);
       
-      setTab4State(prevState => ({
-        ...prevState,
-        data: processedData.results || [] // Ensure we have an array
-      }));
-      
-      setTab5State(prevState => ({
-        ...prevState,
-        data: processedData.results || [] // Ensure we have an array
-      }));
+      // Make sure we have valid data before updating state
+      if (processedData && processedData.results) {
+        setTab4State(prevState => ({
+          ...prevState,
+          data: processedData.results
+        }));
+        
+        setTab5State(prevState => ({
+          ...prevState,
+          data: processedData.results
+        }));
 
-      setResults([{
-        name: 'sample-data.json',
-        data: processedData,
-        rawData: SAMPLE_JSON
-      }]);
-      setActiveFile(0);
-      setSelectedTab(3);
+        setResults([{
+          name: 'sample-data.json',
+          data: processedData,
+          rawData: SAMPLE_JSON
+        }]);
+        setActiveFile(0);
+        setSelectedTab(3);
+      } else {
+        console.error("Invalid processed data structure:", processedData);
+        setError("Error processing sample data");
+      }
       return;
     }
 
     setIsLoading(true);
     setError(null);
-    console.log(`Processing ${files.length} selected files...`);
     
     try {
       const processedFiles = [];
       const processor = new JsonProcessor();
       
       for (const file of files) {
-        console.log(`Reading file: ${file.name}`);
+        console.log(`Processing file: ${file.name}`);
         const content = await readFileAsJson(file);
-        console.log("File content:", content); // Debug log
         
         // Ensure content is an array
         const dataToProcess = Array.isArray(content) ? content : [content];
         
         const processed = processor.processArray(dataToProcess);
-        console.log(`Processed data from ${file.name}:`, processed);
+        console.log(`Processed data:`, processed);
         
-        processedFiles.push({
-          name: file.name,
-          data: processed,
-          rawData: content
-        });
+        if (processed && processed.results) {
+          processedFiles.push({
+            name: file.name,
+            data: processed,
+            rawData: content
+          });
 
-        // Update tab states with the processed data
-        // Make sure we're using the correct data structure
-        const tableData = processed.results || processed || dataToProcess;
-        console.log("Data being set to FlatDataTable:", tableData); // Debug log
-
-        setTab4State(prevState => ({
-          ...prevState,
-          data: tableData
-        }));
-        
-        setTab5State(prevState => ({
-          ...prevState,
-          data: tableData
-        }));
+          // Update tab states with processed data
+          setTab4State(prevState => ({
+            ...prevState,
+            data: processed.results
+          }));
+          
+          setTab5State(prevState => ({
+            ...prevState,
+            data: processed.results
+          }));
+        } else {
+          throw new Error(`Invalid processed data structure for file: ${file.name}`);
+        }
       }
       
-      console.log("All files processed:", processedFiles);
       setResults(processedFiles);
       if (processedFiles.length > 0) {
         setActiveFile(0);
-        setSelectedTab(3); // Switch to Tab 4 to show the processed data
+        setSelectedTab(3);
       }
       
     } catch (err) {

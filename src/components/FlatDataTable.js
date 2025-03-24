@@ -18,7 +18,6 @@ export const FlatDataTable = React.forwardRef(({
   const [filterColoredText, setFilterColoredText] = useState(false);
   const [wrapText, setWrapText] = useState(false);
   const [columnWidths, setColumnWidths] = useState({});
-  const [preferencesLoaded, setPreferencesLoaded] = useState(false);
   const isInitialized = useRef(false);
 
   // Expose methods through ref
@@ -80,20 +79,15 @@ export const FlatDataTable = React.forwardRef(({
       } catch (error) {
         if (!isMounted) return;
         console.error('Error loading display preferences:', error);
-      } finally {
-        if (isMounted) {
-          setPreferencesLoaded(true);
-        }
       }
     };
 
-    setPreferencesLoaded(false);
     loadPreferences();
 
     return () => {
       isMounted = false;
     };
-  }, [sectionCode]); // We don't need preferencesLoaded in deps as we're managing it within the effect
+  }, [sectionCode]);
 
   // Initialize selected columns if no preferences were loaded
   useEffect(() => {
