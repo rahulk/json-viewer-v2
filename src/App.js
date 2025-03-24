@@ -5,6 +5,7 @@ import { SAMPLE_JSON } from './constants/sampleData';
 import { FileUploader } from './components/FileUploader';
 import { FlatDataTable } from './components/FlatDataTable';
 import { apiService } from './services/apiService';
+import { PdfViewer } from './components/PdfViewer';
 
 function App() {
   const [files, setFiles] = useState([]);
@@ -20,6 +21,7 @@ function App() {
   const [activeFolder, setActiveFolder] = useState(null);
   const [activePdfFile, setActivePdfFile] = useState(null);
   const [selectedTab, setSelectedTab] = useState(3);
+  const [selectedPdfUrl, setSelectedPdfUrl] = useState(null);
   
   // Fetch folders from the /documents/output directory
   const fetchFolders = async () => {
@@ -318,8 +320,10 @@ function App() {
     const selectedFolder = folders[index];
     
     try {
-      // Fetch PDF files from the nested folder structure (folderName/folderName)
-      const folderPath = `/documents/output/${selectedFolder}/${selectedFolder}`;
+      // Preserve exact folder name with proper encoding
+      const encodedFolder = encodeURIComponent(selectedFolder);
+      const folderPath = `/documents/output/${encodedFolder}/${encodedFolder}`;
+      console.log(`Original folder name: "${selectedFolder}" (${selectedFolder.length} chars)`);
       console.log(`Fetching files from path: ${folderPath}`);
       
       const filesList = await apiService.getFiles(folderPath);
@@ -345,6 +349,34 @@ function App() {
   // Handle PDF file selection
   const handlePdfFileSelect = (index) => {
     setActivePdfFile(index);
+    
+    if (index !== null && activeFolder !== null) {
+      const selectedFolder = folders[activeFolder];
+      const selectedFile = pdfFiles[index];
+      
+      // Build the path with proper structure and preserve exact spacing
+      const encodedFolder = encodeURIComponent(selectedFolder);
+      const encodedFile = encodeURIComponent(selectedFile);
+      // Use the correct port (3001) for the API server
+      const pdfUrl = `http://localhost:3001/api/pdf?path=/documents/output/${encodedFolder}/${encodedFolder}/${encodedFile}`;
+      
+      console.log('Original folder name:', selectedFolder);
+      console.log('Folder name length:', selectedFolder.length);
+      console.log('Encoded folder name:', encodedFolder);
+      console.log('Setting PDF URL:', pdfUrl);
+      
+      // Show file path information in an alert for debugging
+      const serverPath = `SERVER_DIR/documents/output/${selectedFolder}/${selectedFolder}/${selectedFile}`;
+      alert(`PDF Path Information:\n\nClient request: ${pdfUrl}\n\nServer file path: ${serverPath}\n\nFolder name length: ${selectedFolder.length} chars\nCheck server logs for the actual resolved file path.`);
+      
+      setSelectedPdfUrl(pdfUrl);
+      
+      // Add visual feedback that PDF is loading
+      setIsLoading(true);
+      setTimeout(() => setIsLoading(false), 2000); // Reset after 2 seconds
+    } else {
+      setSelectedPdfUrl(null);
+    }
   };
 
   // Add folder
@@ -485,15 +517,10 @@ function App() {
                       margin: '0'
                     }}
                   >
-                    <div 
-                      style={{ 
-                        border: '1px solid #ccc', 
-                        padding: '10px'
-                      }}
-                    >
-                      <h2 style={{ margin: '0', color: '#000' }}>Placeholder for Page Viewer</h2>
-                      <p style={{ color: '#8B4513', marginTop: '5px', marginBottom: '0' }}>This is where the content will be displayed.</p>
-                    </div>
+                    <PdfViewer 
+                      pdfUrl={selectedPdfUrl} 
+                      fileName={activePdfFile !== null ? pdfFiles[activePdfFile] : null} 
+                    />
                   </div>
                 </div>
               </div>

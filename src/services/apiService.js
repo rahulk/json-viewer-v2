@@ -1,7 +1,7 @@
 /**
  * Service for handling API requests to the backend
  */
-const API_BASE_URL = process.env.REACT_APP_API_BASE_URL || 'http://localhost:3001/api';
+const API_BASE_URL = 'http://localhost:3001/api';
 
 export const apiService = {
   /**
@@ -11,7 +11,8 @@ export const apiService = {
    */
   async getFolders(directoryPath = '/documents/output') {
     try {
-      const response = await fetch(`${API_BASE_URL}/folders?path=${encodeURIComponent(directoryPath)}`);
+      const encodedPath = encodeURIComponent(directoryPath);
+      const response = await fetch(`${API_BASE_URL}/folders?path=${encodedPath}`);
       if (!response.ok) throw new Error(`Failed to fetch folders: ${response.statusText}`);
       const data = await response.json();
       return data.folders || [];
@@ -28,7 +29,8 @@ export const apiService = {
    */
   async getFiles(folderPath) {
     try {
-      const response = await fetch(`${API_BASE_URL}/files?path=${encodeURIComponent(folderPath)}`);
+      const encodedPath = encodeURIComponent(folderPath);
+      const response = await fetch(`${API_BASE_URL}/files?path=${encodedPath}`);
       if (!response.ok) throw new Error(`Failed to fetch files: ${response.statusText}`);
       const data = await response.json();
       return data.files || [];
