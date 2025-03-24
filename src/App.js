@@ -318,8 +318,10 @@ function App() {
     const selectedFolder = folders[index];
     
     try {
-      // Fetch PDF files from the selected folder
-      const folderPath = `/documents/output/${selectedFolder}`;
+      // Fetch PDF files from the nested folder structure (folderName/folderName)
+      const folderPath = `/documents/output/${selectedFolder}/${selectedFolder}`;
+      console.log(`Fetching files from path: ${folderPath}`);
+      
       const filesList = await apiService.getFiles(folderPath);
       
       // Filter to only include PDF files
@@ -329,6 +331,11 @@ function App() {
       
       console.log(`Found ${pdfFilesList.length} PDF files in folder: ${selectedFolder}`);
       setPdfFiles(pdfFilesList);
+      
+      // If files exist, automatically select the first one
+      if (pdfFilesList.length > 0) {
+        setActivePdfFile(0);
+      }
     } catch (err) {
       console.error(`Error fetching files for folder ${selectedFolder}:`, err);
       setPdfFiles([]);
