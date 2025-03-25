@@ -19,6 +19,7 @@ function App() {
   
   // Create the ref at component top level - NOT inside useEffect
   const prevPdfFileRef = useRef(null);
+  const prevFolderRef = useRef(null); // Add tracking of previous folder
   
   // Use custom hooks for folder and JSON management
   const {
@@ -145,6 +146,12 @@ function App() {
         case 2: // Modified HTML (Tab 3)
           loadHtmlContent('modified');
           break;
+        case 3: // If switching to Parsed JSONs tab, ensure state is fresh
+          // No need to reset selectedParsedFile as that's handled by the TabContent component
+          break;
+        case 4: // If switching to Enhanced JSONs tab, ensure state is fresh
+          // No need to reset selectedEnhancedFile as that's handled by the TabContent component
+          break;
         default:
           break;
       }
@@ -182,7 +189,7 @@ function App() {
 
   // Add this useEffect after your other useEffects
   useEffect(() => {
-    // If the PDF file selection has changed and it's not the initial selection
+    // Handle PDF file changes
     if (activePdfFile !== null && prevPdfFileRef.current !== null && activePdfFile !== prevPdfFileRef.current) {
       console.log('PDF file changed, resetting tab data states');
       resetTabStates();
@@ -192,9 +199,20 @@ function App() {
       setSelectedEnhancedFile('');
     }
     
-    // Update the ref with current value for next comparison
+    // Handle folder changes
+    if (activeFolder !== null && prevFolderRef.current !== null && activeFolder !== prevFolderRef.current) {
+      console.log('Folder changed, resetting tab data states');
+      resetTabStates();
+      
+      // Also reset the selected parsed/enhanced files in TabContent
+      setSelectedParsedFile('');
+      setSelectedEnhancedFile('');
+    }
+    
+    // Update the refs with current values for next comparison
     prevPdfFileRef.current = activePdfFile;
-  }, [activePdfFile, resetTabStates]);
+    prevFolderRef.current = activeFolder;
+  }, [activePdfFile, activeFolder, resetTabStates]);
 
   return (
     <div className="App container-fluid px-2 px-sm-3 px-md-4" style={{ height: '100vh', display: 'flex', flexDirection: 'column', overflow: 'hidden' }}>

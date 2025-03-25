@@ -211,7 +211,9 @@ export const useJsonProcessing = () => {
 
   const resetTabStates = useCallback(() => {
     // Completely reset tab states to initial values
-    setTab4State({
+    console.log('Completely resetting tab states to initial values');
+    
+    const initialState = {
       data: [],
       columnVisibility: {},
       filters: {},
@@ -219,19 +221,12 @@ export const useJsonProcessing = () => {
       filterColoredText: false,
       columnWidths: {},
       columnOrder: []
-    });
+    };
     
-    setTab5State({
-      data: [],
-      columnVisibility: {},
-      filters: {},
-      wrapText: false,
-      filterColoredText: false,
-      columnWidths: {},
-      columnOrder: []
-    });
+    setTab4State(initialState);
+    setTab5State(initialState);
     
-    console.log('Tab states completely reset');
+    console.log('Tab states have been reset to:', initialState);
   }, []);
   
   return {

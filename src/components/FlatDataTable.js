@@ -65,7 +65,7 @@ export const FlatDataTable = React.forwardRef(({
   useEffect(() => {
     if (sectionCode !== previousSectionCode.current && sectionCode) {
       console.log('Section code changed from', previousSectionCode.current, 'to', sectionCode);
-      console.log('Completely resetting FlatDataTable internal state');
+      console.log('Completely resetting FlatDataTable internal state for component', componentId);
       
       // Reset all state to initial values
       setSelectedColumns({});
@@ -84,10 +84,23 @@ export const FlatDataTable = React.forwardRef(({
       
       // Force re-render to ensure processedData is recalculated
       if (onStateChange) {
-        onStateChange({ forceUpdate: Date.now() });
+        onStateChange({ 
+          forceUpdate: Date.now(),
+          reset: true,
+          newSectionCode: sectionCode,
+          oldSectionCode: previousSectionCode.current
+        });
       }
     }
-  }, [sectionCode, onStateChange]);
+  }, [sectionCode, onStateChange, componentId]);
+
+  // Detect data changes
+  useEffect(() => {
+    // Only log if data changed from something to something else (both non-empty)
+    if (data && data.length > 0) {
+      console.log(`Data updated for FlatDataTable ${componentId}, rows:`, data.length);
+    }
+  }, [data, componentId]);
 
   // Expose methods to parent component through ref
   React.useImperativeHandle(ref, () => ({

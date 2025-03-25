@@ -25,6 +25,7 @@ export const TabContent = ({
   const tab5Ref = useRef(null);
   const previousParsedSectionCode = useRef(null);
   const previousEnhancedSectionCode = useRef(null);
+  const prevPdfFilenameRef = useRef(pdfFilename);
 
   // Add state to track mounting keys, but make them fixed for each table to preserve state
   const tab4Key = useMemo(() => `tab4-fixed-instance`, []);
@@ -66,8 +67,15 @@ export const TabContent = ({
 
   // Custom handler for parsed file selection to ONLY reset state on section code change
   const handleParsedFileSelect = useCallback((filename) => {
+    if (!filename) {
+      console.log('No parsed file selected, ignoring');
+      return;
+    }
+    
     const newSectionCode = extractSectionCode(filename);
     const currentSectionCode = previousParsedSectionCode.current;
+    
+    console.log(`Parsed file selected: ${filename}, section code: ${newSectionCode}`);
     
     if (newSectionCode !== currentSectionCode) {
       console.log(`Section code changed from ${currentSectionCode} to ${newSectionCode}, completely resetting Tab 4 state`);
@@ -91,8 +99,15 @@ export const TabContent = ({
   
   // Custom handler for enhanced file selection to ONLY reset state on section code change
   const handleEnhancedFileSelect = useCallback((filename) => {
+    if (!filename) {
+      console.log('No enhanced file selected, ignoring');
+      return;
+    }
+    
     const newSectionCode = extractSectionCode(filename);
     const currentSectionCode = previousEnhancedSectionCode.current;
+    
+    console.log(`Enhanced file selected: ${filename}, section code: ${newSectionCode}`);
     
     if (newSectionCode !== currentSectionCode) {
       console.log(`Section code changed from ${currentSectionCode} to ${newSectionCode}, completely resetting Tab 5 state`);
@@ -373,6 +388,48 @@ export const TabContent = ({
       pdfFilename
     });
   }, [parsedJsons, enhancedJsons, folderPath, pdfFilename]);
+
+  // Track folder path changes to reset selection state
+  const prevFolderPathRef = useRef(folderPath);
+  useEffect(() => {
+    if (folderPath !== prevFolderPathRef.current) {
+      console.log('Folder path changed from', prevFolderPathRef.current, 'to', folderPath);
+      
+      // Clear section code references 
+      previousParsedSectionCode.current = null;
+      previousEnhancedSectionCode.current = null;
+      
+      // Reset selected files
+      setSelectedParsedFile('');
+      setSelectedEnhancedFile('');
+      
+      // Update reference
+      prevFolderPathRef.current = folderPath;
+    }
+  }, [folderPath]);
+
+  // Reset section code references when PDF filename changes
+  useEffect(() => {
+    if (pdfFilename !== prevPdfFilenameRef.current) {
+      console.log('PDF filename changed from', prevPdfFilenameRef.current, 'to', pdfFilename);
+      
+      // Reset section code references
+      previousParsedSectionCode.current = null;
+      previousEnhancedSectionCode.current = null;
+      
+      // Reset selected files if they were previously set
+      if (selectedParsedFile) {
+        setSelectedParsedFile('');
+      }
+      
+      if (selectedEnhancedFile) {
+        setSelectedEnhancedFile('');
+      }
+      
+      // Update the reference
+      prevPdfFilenameRef.current = pdfFilename;
+    }
+  }, [pdfFilename, selectedParsedFile, selectedEnhancedFile]);
 
   // Update the renderHtmlContent function to show a more informative message
   const renderHtmlContent = (content) => {
