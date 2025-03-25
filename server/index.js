@@ -492,6 +492,46 @@ app.get('/api/basic-html', async (req, res) => {
   }
 });
 
+// Fix for the HTML endpoint - replace lines 494-512 with this code:
+app.get('/api/html', (req, res) => {
+  console.log('\n=== 📄 HTML API CALL ===');
+  console.log('Query parameters:', req.query);
+  
+  const { folder, subFolder, file } = req.query;
+  
+  if (!folder || !subFolder || !file) {
+    console.log('❌ Missing required parameters');
+    return res.status(400).json({ 
+      error: 'folder, subFolder, and file parameters are all required' 
+    });
+  }
+  
+  // Use PDF_BASE_PATH instead of undefined basePath
+  const filePath = path.join(PDF_BASE_PATH, folder, subFolder, file);
+  console.log('📂 Looking for HTML file at:', filePath);
+  
+  // Use async fs instead of sync for better performance
+  if (fsSync.existsSync(filePath)) {
+    fsSync.readFile(filePath, 'utf8', (err, data) => {
+      if (err) {
+        console.error('❌ Error reading HTML file:', err);
+        return res.status(500).json({
+          error: 'Error reading HTML file',
+          message: err.message
+        });
+      }
+      console.log('✅ HTML file loaded successfully, size:', data.length);
+      res.send(data);
+    });
+  } else {
+    console.error('❌ HTML file not found:', filePath);
+    res.status(404).json({
+      error: 'HTML file not found',
+      path: filePath
+    });
+  }
+});
+
 app.listen(PORT, () => {
   console.log(`Server running on port ${PORT}`);
   

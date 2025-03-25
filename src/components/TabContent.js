@@ -124,20 +124,36 @@ export const TabContent = ({
     }
   };
 
-  const renderHtmlContent = (index) => (
-    <div className="html-viewer-container">
-      <div className="html-viewer-content"
-        dangerouslySetInnerHTML={{ 
-          __html: htmlContents[index] || '<p>No content available</p>' 
+  // Update the renderHtmlContent function to show a more informative message
+  const renderHtmlContent = (content) => {
+    if (!content) {
+      return (
+        <div className="alert alert-info text-center">
+          <p>No content available</p>
+          <small className="d-block mt-2">Select a PDF file to view its HTML content</small>
+        </div>
+      );
+    }
+    
+    return (
+      <div 
+        className="html-content"
+        style={{ 
+          height: '100%', 
+          overflow: 'auto',
+          padding: '10px',
+          border: '1px solid #ddd',
+          borderRadius: '4px'
         }}
+        dangerouslySetInnerHTML={{ __html: content }} 
       />
-    </div>
-  );
+    );
+  };
 
   const renderTab1Content = () => (
     <div style={{ height: '100%' }}>
       <h4>Basic HTML View</h4>
-      {renderHtmlContent(0)}
+      {renderHtmlContent(htmlContents[0])}
     </div>
   );
 
@@ -224,9 +240,9 @@ export const TabContent = ({
     case 0:
       return renderTab1Content();
     case 1:
-      return renderHtmlContent(1);
+      return renderHtmlContent(htmlContents[1]);
     case 2:
-      return renderHtmlContent(2);
+      return renderHtmlContent(htmlContents[2]);
     case 3:
       return renderTab4Content();
     case 4:
