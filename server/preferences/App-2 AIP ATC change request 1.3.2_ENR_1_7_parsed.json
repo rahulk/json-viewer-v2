@@ -1,0 +1,14 @@
+{
+  "selectedColumns": {
+    "section_code": true,
+    "title": true,
+    "items": true,
+    "general_remarks": true,
+    "metadata": true,
+    "metadata.source": true,
+    "metadata.processing_timestamp": true,
+    "items.enr_1.7": true,
+    "items.id": true
+  },
+  "columnWidths": {}
+}

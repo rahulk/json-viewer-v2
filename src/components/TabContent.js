@@ -19,6 +19,10 @@ export const TabContent = ({
   const [selectedEnhancedFile, setSelectedEnhancedFile] = useState('');
   const [isLoadingParsed, setIsLoadingParsed] = useState(false);
   const [isLoadingEnhanced, setIsLoadingEnhanced] = useState(false);
+  const [preferencesLoaded, setPreferencesLoaded] = useState({
+    parsed: false,
+    enhanced: false
+  });
   
   // Use useRef instead of useState for refs
   const tab4Ref = useRef(null);
@@ -28,18 +32,16 @@ export const TabContent = ({
   const handleTab4Change = useCallback((newState) => {
     handleTab4StateChange(prevState => ({
       ...prevState,
-      columnVisibility: newState.columnVisibility || prevState.columnVisibility,
-      columnWidths: newState.columnWidths || prevState.columnWidths,
-      data: prevState.data // Preserve data
+      ...newState,
+      data: prevState.data // Always preserve existing data
     }));
   }, [handleTab4StateChange]);
 
   const handleTab5Change = useCallback((newState) => {
     handleTab5StateChange(prevState => ({
       ...prevState,
-      columnVisibility: newState.columnVisibility || prevState.columnVisibility,
-      columnWidths: newState.columnWidths || prevState.columnWidths,
-      data: prevState.data // Preserve data
+      ...newState,
+      data: prevState.data // Always preserve existing data
     }));
   }, [handleTab5StateChange]);
 
@@ -178,38 +180,47 @@ export const TabContent = ({
   // Load preferences for Tab 4 when PDF file or section code changes
   useEffect(() => {
     const loadPrefs = async () => {
-      if (selectedParsedFile) {
+      if (selectedParsedFile && !preferencesLoaded.parsed) {
         const sectionCode = extractSectionCode(selectedParsedFile);
-        const prefs = await loadDisplayPreferences('parsed', sectionCode);
-        if (prefs) {
-          handleTab4StateChange({
-            ...tab4State,
-            columnVisibility: prefs.selectedColumns,
-            columnWidths: prefs.columnWidths
-          });
+        if (sectionCode) {
+          const prefs = await loadDisplayPreferences('parsed', sectionCode);
+          if (prefs) {
+            handleTab4StateChange({
+              columnVisibility: prefs.selectedColumns,
+              columnWidths: prefs.columnWidths
+            });
+            setPreferencesLoaded(prev => ({ ...prev, parsed: true }));
+          }
         }
       }
     };
     loadPrefs();
-  }, [selectedParsedFile, pdfFilename, extractSectionCode, loadDisplayPreferences, handleTab4StateChange, tab4State]);
+  }, [selectedParsedFile, extractSectionCode, loadDisplayPreferences, handleTab4StateChange, preferencesLoaded.parsed]);
 
   // Load preferences for Tab 5 when PDF file or section code changes
   useEffect(() => {
     const loadPrefs = async () => {
-      if (selectedEnhancedFile) {
+      if (selectedEnhancedFile && !preferencesLoaded.enhanced) {
         const sectionCode = extractSectionCode(selectedEnhancedFile);
-        const prefs = await loadDisplayPreferences('enhanced', sectionCode);
-        if (prefs) {
-          handleTab5StateChange({
-            ...tab5State,
-            columnVisibility: prefs.selectedColumns,
-            columnWidths: prefs.columnWidths
-          });
+        if (sectionCode) {
+          const prefs = await loadDisplayPreferences('enhanced', sectionCode);
+          if (prefs) {
+            handleTab5StateChange({
+              columnVisibility: prefs.selectedColumns,
+              columnWidths: prefs.columnWidths
+            });
+            setPreferencesLoaded(prev => ({ ...prev, enhanced: true }));
+          }
         }
       }
     };
     loadPrefs();
-  }, [selectedEnhancedFile, pdfFilename, extractSectionCode, loadDisplayPreferences, handleTab5StateChange, tab5State]);
+  }, [selectedEnhancedFile, extractSectionCode, loadDisplayPreferences, handleTab5StateChange, preferencesLoaded.enhanced]);
+
+  // Reset preferences loaded state when files change
+  useEffect(() => {
+    setPreferencesLoaded({ parsed: false, enhanced: false });
+  }, [selectedParsedFile, selectedEnhancedFile]);
 
   // Debug logging
   useEffect(() => {
@@ -251,8 +262,8 @@ export const TabContent = ({
         success: data.success
       });
 
-      handleTab4StateChange({ 
-        ...tab4State,
+      // Update only the data while preserving other state
+      handleTab4StateChange({
         data: data.results || []
       });
     } catch (error) {
@@ -260,7 +271,7 @@ export const TabContent = ({
     } finally {
       setIsLoadingParsed(false);
     }
-  }, [selectedParsedFile, folderPath, handleTab4StateChange, tab4State]);
+  }, [selectedParsedFile, folderPath, handleTab4StateChange]);
 
   const handleProcessEnhancedJson = useCallback(async () => {
     if (!selectedEnhancedFile || !folderPath) {
@@ -283,8 +294,8 @@ export const TabContent = ({
       }
 
       const data = await response.json();
-      handleTab5StateChange({ 
-        ...tab5State,
+      // Update only the data while preserving other state
+      handleTab5StateChange({
         data: data.results || []
       });
     } catch (error) {
@@ -292,7 +303,7 @@ export const TabContent = ({
     } finally {
       setIsLoadingEnhanced(false);
     }
-  }, [selectedEnhancedFile, folderPath, handleTab5StateChange, tab5State]);
+  }, [selectedEnhancedFile, folderPath, handleTab5StateChange]);
 
   // Update the renderHtmlContent function to show a more informative message
   const renderHtmlContent = (content) => {

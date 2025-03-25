@@ -25,11 +25,22 @@ async function ensurePrefsDir() {
 
 // Save display preferences
 app.post('/api/save-display-preferences', async (req, res) => {
+  console.log('\n=== 💾 SAVE DISPLAY PREFERENCES ===');
+  console.log('⏰ Timestamp:', new Date().toISOString());
+  
   try {
     await ensurePrefsDir();
     const { sectionCode, pdfFilename, tabType, ...preferences } = req.body;
     
+    console.log('📝 Request Details:', {
+      sectionCode,
+      pdfFilename,
+      tabType,
+      preferencesKeys: Object.keys(preferences)
+    });
+    
     if (!sectionCode || !pdfFilename || !tabType) {
+      console.log('❌ Missing required parameters');
       return res.status(400).json({ 
         error: 'Section code, PDF filename, and tab type are required' 
       });
@@ -42,12 +53,24 @@ app.post('/api/save-display-preferences', async (req, res) => {
     const prefsFilename = `${baseFilename}_${sectionCode}_${tabType}.json`;
     const filePath = path.join(PREFS_DIR, prefsFilename);
     
-    console.log('Saving preferences to:', filePath);
+    console.log('💾 Saving preferences to:');
+    console.log('📂 Absolute path:', filePath);
+    console.log('📄 Filename:', prefsFilename);
+    
+    // Log the preferences being saved
+    console.log('🔍 Preferences content:', {
+      selectedColumns: preferences.selectedColumns?.length || 0,
+      columnWidths: Object.keys(preferences.columnWidths || {}).length || 0
+    });
+    
     await fs.writeFile(filePath, JSON.stringify(preferences, null, 2));
+    console.log('✅ Successfully saved preferences file');
     
     res.json({ success: true, filename: prefsFilename });
+    console.log('=== END SAVE DISPLAY PREFERENCES ===\n');
   } catch (error) {
-    console.error('Error saving preferences:', error);
+    console.error('❌ Error saving preferences:', error);
+    console.error('Stack trace:', error.stack);
     res.status(500).json({ error: 'Failed to save preferences' });
   }
 });
