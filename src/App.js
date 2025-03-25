@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useCallback, useRef } from 'react';
 import './App.css';
-import { FileUploader } from './components/FileUploader';
+// import { FileUploader } from './components/FileUploader'; // Commented out since not used
 import { PdfViewer } from './components/PdfViewer';
 import { Sidebar } from './components/Sidebar';
 import { TabContent } from './components/TabContent';
@@ -37,9 +37,9 @@ function App() {
   } = useFolderManagement();
 
   const {
-    setFiles,
-    isLoading,
-    error,
+    // setFiles,        // Commented out since not used
+    // isLoading,       // Commented out since not used
+    // error,           // Commented out since not used
     tab4State,
     tab5State,
     processFiles,
@@ -206,6 +206,7 @@ function App() {
         <p>Process multiple document files with different structures</p>
       </header>
       
+      {/* Commented out FileUploader
       <div className="mb-3">
         <FileUploader
           onFileChange={setFiles}
@@ -214,6 +215,7 @@ function App() {
           error={error}
         />
       </div>
+      */}
       
       <div className="row">
         <div className="col-md-2 col-lg-2 col-xl-1 mb-3">
