@@ -1,4 +1,4 @@
-import React, { useState, useMemo, useEffect, useRef } from 'react';
+import React, { useState, useMemo, useEffect, useRef, useCallback } from 'react';
 import { flattenNestedData } from '../utils/dataUtils';
 import PropTypes from 'prop-types';
 
@@ -19,17 +19,14 @@ export const FlatDataTable = React.forwardRef(({
   const [wrapText, setWrapText] = useState(false);
   const [columnWidths, setColumnWidths] = useState({});
   const isInitialized = useRef(false);
+  const previousStateRef = useRef(null);
 
   // Expose methods through ref
   React.useImperativeHandle(ref, () => ({
-    getSelectedColumns: () => {
-      console.log('Getting selected columns:', selectedColumns);
-      return selectedColumns;
-    },
-    getColumnWidths: () => {
-      console.log('Getting column widths:', columnWidths);
-      return columnWidths;
-    }
+    getSelectedColumns: () => selectedColumns,
+    getColumnWidths: () => columnWidths,
+    setSelectedColumns: (columns) => setSelectedColumns(columns),
+    setColumnWidths: (widths) => setColumnWidths(widths)
   }), [selectedColumns, columnWidths]);
 
   // Process data and get keys
@@ -92,17 +89,40 @@ export const FlatDataTable = React.forwardRef(({
   // Initialize selected columns if no preferences were loaded
   useEffect(() => {
     if (!isInitialized.current && processedData.keys.length > 0) {
-      if (Object.keys(initialColumnVisibility).length > 0) {
-        setSelectedColumns(initialColumnVisibility);
-      } else {
-        const initialSelection = Object.fromEntries(
-          processedData.keys.map(key => [key, true])
-        );
-        setSelectedColumns(initialSelection);
-      }
+      const initialSelection = Object.keys(initialColumnVisibility).length > 0
+        ? initialColumnVisibility
+        : Object.fromEntries(processedData.keys.map(key => [key, true]));
+      
+      setSelectedColumns(initialSelection);
       isInitialized.current = true;
     }
   }, [processedData.keys, initialColumnVisibility]);
+
+  // Update state when initialColumnVisibility changes
+  useEffect(() => {
+    if (Object.keys(initialColumnVisibility).length > 0) {
+      setSelectedColumns(initialColumnVisibility);
+    }
+  }, [initialColumnVisibility]);
+
+  // Notify parent of state changes, but only when they actually change
+  useEffect(() => {
+    const currentState = {
+      columnVisibility: selectedColumns,
+      columnWidths,
+      filterColoredText,
+      wrapText,
+      searchTerm
+    };
+
+    // Only notify if the state has actually changed
+    if (JSON.stringify(currentState) !== JSON.stringify(previousStateRef.current)) {
+      previousStateRef.current = currentState;
+      if (onStateChange) {
+        onStateChange(currentState);
+      }
+    }
+  }, [selectedColumns, columnWidths, filterColoredText, wrapText, searchTerm, onStateChange]);
 
   const visibleColumns = useMemo(() => 
     processedData.keys.filter(key => selectedColumns[key]),
@@ -168,27 +188,22 @@ export const FlatDataTable = React.forwardRef(({
   };
 
   // Toggle column selection
-  const toggleColumn = (column) => {
-    setSelectedColumns(prev => {
-      const newState = {
-        ...prev,
-        [column]: !prev[column]
-      };
-      return newState;
-    });
-  };
+  const toggleColumn = useCallback((column) => {
+    setSelectedColumns(prev => ({
+      ...prev,
+      [column]: !prev[column]
+    }));
+  }, []);
 
   // Select/deselect all columns
-  const selectAllColumns = (selected) => {
-    const newSelection = {};
-    processedData.keys.forEach(key => {
-      newSelection[key] = selected;
-    });
-    setSelectedColumns(newSelection);
-  };
+  const selectAllColumns = useCallback((selected) => {
+    setSelectedColumns(
+      Object.fromEntries(processedData.keys.map(key => [key, selected]))
+    );
+  }, [processedData.keys]);
 
-  // Handle column resize
-  const handleResizeStart = (e, column) => {
+  // Handle column resize with debounce
+  const handleResizeStart = useCallback((e, column) => {
     e.preventDefault();
     e.stopPropagation();
     
@@ -196,23 +211,34 @@ export const FlatDataTable = React.forwardRef(({
     const headerCell = e.target.parentElement;
     const startWidth = headerCell.offsetWidth;
     
+    let resizeTimeout;
+    
     const handleMouseMove = (moveEvent) => {
       moveEvent.preventDefault();
-      const newWidth = Math.max(50, startWidth + (moveEvent.clientX - startX));
-      setColumnWidths(prev => ({
-        ...prev,
-        [column]: newWidth
-      }));
+      if (resizeTimeout) {
+        clearTimeout(resizeTimeout);
+      }
+      
+      resizeTimeout = setTimeout(() => {
+        const newWidth = Math.max(50, startWidth + (moveEvent.clientX - startX));
+        setColumnWidths(prev => ({
+          ...prev,
+          [column]: newWidth
+        }));
+      }, 16); // Throttle to ~60fps
     };
     
     const handleMouseUp = () => {
       document.removeEventListener('mousemove', handleMouseMove);
       document.removeEventListener('mouseup', handleMouseUp);
+      if (resizeTimeout) {
+        clearTimeout(resizeTimeout);
+      }
     };
     
     document.addEventListener('mousemove', handleMouseMove);
     document.addEventListener('mouseup', handleMouseUp);
-  };
+  }, []);
 
   // Expose current display preferences to parent
   useEffect(() => {
@@ -223,19 +249,6 @@ export const FlatDataTable = React.forwardRef(({
       };
     }
   }, [selectedColumns, columnWidths]);
-
-  // Add this after other useEffect hooks
-  useEffect(() => {
-    if (onStateChange) {
-      onStateChange({
-        columnVisibility: selectedColumns,
-        columnWidths,
-        filterColoredText,
-        wrapText,
-        searchTerm
-      });
-    }
-  }, [selectedColumns, columnWidths, filterColoredText, wrapText, searchTerm, onStateChange]);
 
   // Helper function to determine column background class
   const getColumnClassName = (columnName, isWrapped) => {

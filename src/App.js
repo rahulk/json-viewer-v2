@@ -8,7 +8,7 @@ import { useFolderManagement } from './hooks/useFolderManagement';
 import { useJsonProcessing } from './hooks/useJsonProcessing';
 
 function App() {
-  const [selectedTab, setSelectedTab] = useState(3);
+  const [selectedTab, setSelectedTab] = useState(0);
   const [enhancedHtmlContent, setEnhancedHtmlContent] = useState('');
   const [modifiedHtmlContent, setModifiedHtmlContent] = useState('');
   

@@ -27,16 +27,25 @@ async function ensurePrefsDir() {
 app.post('/api/save-display-preferences', async (req, res) => {
   try {
     await ensurePrefsDir();
-    const { sectionCode, ...preferences } = req.body;
+    const { sectionCode, pdfFilename, tabType, ...preferences } = req.body;
     
-    if (!sectionCode) {
-      return res.status(400).json({ error: 'Section code is required' });
+    if (!sectionCode || !pdfFilename || !tabType) {
+      return res.status(400).json({ 
+        error: 'Section code, PDF filename, and tab type are required' 
+      });
     }
 
-    const filePath = path.join(PREFS_DIR, `${sectionCode}.json`);
+    // Remove .pdf extension if present
+    const baseFilename = pdfFilename.replace(/\.pdf$/, '');
+    
+    // Create filename based on the format: PDFFileName_SectionCode_type
+    const prefsFilename = `${baseFilename}_${sectionCode}_${tabType}.json`;
+    const filePath = path.join(PREFS_DIR, prefsFilename);
+    
+    console.log('Saving preferences to:', filePath);
     await fs.writeFile(filePath, JSON.stringify(preferences, null, 2));
     
-    res.json({ success: true });
+    res.json({ success: true, filename: prefsFilename });
   } catch (error) {
     console.error('Error saving preferences:', error);
     res.status(500).json({ error: 'Failed to save preferences' });
@@ -44,11 +53,25 @@ app.post('/api/save-display-preferences', async (req, res) => {
 });
 
 // Load display preferences
-app.get('/api/display-preferences/:sectionCode', async (req, res) => {
+app.get('/api/display-preferences', async (req, res) => {
   try {
     await ensurePrefsDir();
-    const { sectionCode } = req.params;
-    const filePath = path.join(PREFS_DIR, `${sectionCode}.json`);
+    const { pdfFilename, sectionCode, tabType } = req.query;
+    
+    if (!pdfFilename || !sectionCode || !tabType) {
+      return res.status(400).json({ 
+        error: 'PDF filename, section code, and tab type are required' 
+      });
+    }
+
+    // Remove .pdf extension if present
+    const baseFilename = pdfFilename.replace(/\.pdf$/, '');
+    
+    // Create filename based on the format: PDFFileName_SectionCode_type
+    const prefsFilename = `${baseFilename}_${sectionCode}_${tabType}.json`;
+    const filePath = path.join(PREFS_DIR, prefsFilename);
+    
+    console.log('Loading preferences from:', filePath);
     
     try {
       const data = await fs.readFile(filePath, 'utf8');

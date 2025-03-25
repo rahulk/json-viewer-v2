@@ -1,0 +1,31 @@
+{
+  "pdfFilename": "App-2 AIP ATC change request 1.3.2.pdf",
+  "tabType": "enhanced",
+  "selectedColumns": {
+    "section_code": false,
+    "title": false,
+    "routes": false,
+    "metadata": false,
+    "metadata.processing_timestamp": false,
+    "routes.routes": true,
+    "routes.routes_html": false,
+    "routes.topnotes": true,
+    "routes.topnotes_html": false,
+    "routes.Routes": false,
+    "routes.general_remarks": false,
+    "routes.general_remarks_html": false,
+    "DepartureAirport": false,
+    "DepartureAirport_html": true,
+    "destination": false,
+    "destination_html": true,
+    "route/exitpoint": false,
+    "route/exitpoint_html": true,
+    "destination_blue_html": true,
+    "destination_red_html": true,
+    "route/exitpoint_blue_html": true,
+    "route/exitpoint_red_html": true,
+    "DepartureAirport_blue_html": true,
+    "DepartureAirport_red_html": true
+  },
+  "columnWidths": {}
+}
