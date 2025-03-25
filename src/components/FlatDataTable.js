@@ -445,28 +445,35 @@ export const FlatDataTable = React.forwardRef(({
       )}
       
       <div className="table-container">
-        <table className="data-table">
-          <thead>
+        <table 
+          className="data-table"
+          style={{ 
+            tableLayout: 'auto',
+            width: 'auto',
+            minWidth: 'max-content'
+          }}
+        >
+          <thead style={{ position: 'sticky', top: 0, zIndex: 20 }}>
             <tr>
               {visibleColumns
                 .filter((column) => selectedColumns[column])
                 .map((column) => (
-                  <th
+                <th 
                     key={column}
-                    style={{ 
+                  style={{ 
                       width: columnWidths[column] ? `${columnWidths[column]}px` : '200px',
                       minWidth: columnWidths[column] ? `${columnWidths[column]}px` : '200px'
-                    }}
-                  >
+                  }}
+                >
                     <div className="header-content">
                       {column}
-                      <div 
+                  <div 
                         className="resize-handle"
                         onMouseDown={(e) => handleResizeStart(e, column)}
-                      />
+                  />
                     </div>
-                  </th>
-                ))}
+                </th>
+              ))}
             </tr>
           </thead>
           <tbody>

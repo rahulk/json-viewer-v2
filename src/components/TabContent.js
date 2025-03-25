@@ -324,6 +324,8 @@ export const TabContent = ({
         style={{ 
           height: '100%',
           overflow: 'auto',
+          overflowY: 'auto',
+          overflowX: 'visible', /* Allow horizontal overflow */
           padding: '15px',
           border: '1px solid #ddd',
           borderRadius: '4px',
@@ -337,8 +339,29 @@ export const TabContent = ({
   };
 
   const renderTab1Content = () => (
-    <div style={{ height: '100%', overflow: 'hidden' }}>
+    <div style={{ 
+      height: '100%', 
+      overflow: 'visible'
+    }}>
       {renderHtmlContent(htmlContents[0])}
+    </div>
+  );
+
+  const renderTab2Content = () => (
+    <div style={{ 
+      height: '100%', 
+      overflow: 'visible'
+    }}>
+      {renderHtmlContent(htmlContents[1])}
+    </div>
+  );
+
+  const renderTab3Content = () => (
+    <div style={{ 
+      height: '100%', 
+      overflow: 'visible'
+    }}>
+      {renderHtmlContent(htmlContents[2])}
     </div>
   );
 
@@ -347,7 +370,7 @@ export const TabContent = ({
       height: '100%',
       display: 'flex',
       flexDirection: 'column',
-      overflow: 'hidden'
+      overflow: 'visible'
     }}>
       <div style={{ 
         marginBottom: '8px', 
@@ -383,11 +406,13 @@ export const TabContent = ({
           display: 'flex',
           flexDirection: 'column',
           height: 'calc(100vh - 200px)',
-          overflow: 'hidden',
+          overflow: 'visible',
           position: 'relative',
           backgroundColor: '#fff',
           borderRadius: '4px',
-          border: '1px solid #ddd'
+          border: '1px solid #ddd',
+          minHeight: '0',
+          minWidth: '0'
         }}>
           <FlatDataTable 
             ref={tab4Ref}
@@ -421,7 +446,7 @@ export const TabContent = ({
       height: '100%',
       display: 'flex',
       flexDirection: 'column',
-      overflow: 'hidden'
+      overflow: 'visible'
     }}>
       <div style={{ 
         marginBottom: '8px', 
@@ -457,11 +482,13 @@ export const TabContent = ({
           display: 'flex',
           flexDirection: 'column',
           height: 'calc(100vh - 200px)',
-          overflow: 'hidden',
+          overflow: 'visible',
           position: 'relative',
           backgroundColor: '#fff',
           borderRadius: '4px',
-          border: '1px solid #ddd'
+          border: '1px solid #ddd',
+          minHeight: '0',
+          minWidth: '0'
         }}>
           <FlatDataTable 
             ref={tab5Ref}
@@ -495,9 +522,9 @@ export const TabContent = ({
     case 0:
       return renderTab1Content();
     case 1:
-      return renderHtmlContent(htmlContents[1]);
+      return renderTab2Content();
     case 2:
-      return renderHtmlContent(htmlContents[2]);
+      return renderTab3Content();
     case 3:
       return renderTab4Content();
     case 4:
