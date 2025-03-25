@@ -4,7 +4,7 @@
   height: 100%;
   width: 100%;
   padding: 16px;
-  overflow: hidden; /* Changed from overflow-x: visible */
+  overflow: hidden;
 }
 
 .table-controls {
@@ -64,32 +64,10 @@
   white-space: nowrap;
 }
 
-/* AG Grid Theme Customization */
-.ag-theme-alpine {
-  --ag-header-height: 40px;
-  --ag-header-foreground-color: #000;
-  --ag-header-background-color: #f5f5f5;
-  --ag-row-hover-color: rgba(33, 150, 243, 0.1);
-  --ag-selected-row-background-color: rgba(33, 150, 243, 0.2);
-  font-family: inherit;
-}
-
-.ag-theme-alpine .ag-header-cell {
-  font-weight: 600;
-}
-
-.ag-theme-alpine .ag-cell {
-  padding: 8px;
-}
-
 /* Style for HTML content cells */
 .html-content {
-  max-height: none;
-  overflow-y: auto;
-  overflow-x: visible; /* Allow horizontal overflow */
   height: 100%;
-  min-height: 0;
-  min-width: 0; /* This is crucial - prevents flex items from expanding beyond parent */
+  overflow: hidden; /* Prevent scrollbars in columns */
 }
 
 /* Style for image cells */
@@ -171,48 +149,13 @@
   color: black;
 }
 
-/* Custom scrollbar for HTML content */
-.html-content::-webkit-scrollbar {
-  width: 14px;
-  height: 14px;
-  background-color: #f5f5f5;
-}
-
-.html-content::-webkit-scrollbar-track {
-  background: #f1f1f1;
-  border-radius: 6px;
-  box-shadow: inset 0 0 6px rgba(0,0,0,0.1);
-}
-
-.html-content::-webkit-scrollbar-thumb {
-  background: #888;
-  border-radius: 6px;
-  border: 3px solid #f1f1f1;
-  min-width: 50px;
-  min-height: 50px;
-}
-
-.html-content::-webkit-scrollbar-thumb:hover {
-  background: #666;
-}
-
-.html-content::-webkit-scrollbar-corner {
-  background: #f1f1f1;
-}
-
-/* Firefox scrollbar styling for HTML content */
-.html-content {
-  scrollbar-width: auto;
-  scrollbar-color: #888 #f1f1f1;
-}
-
 /* Table container styles */
 .flat-data-table-wrapper {
   display: flex;
   flex-direction: column;
   height: 100%;
   width: 100%;
-  overflow: hidden; /* Changed from overflow-x: visible */
+  overflow: hidden;
   position: relative;
   background: #fff;
   min-height: 0;
@@ -221,32 +164,23 @@
 /* Update the table container for proper scrolling */
 .table-container {
   flex: 1 1 auto;
-  overflow: auto !important; /* Force overflow auto */
+  overflow: auto !important; /* Only the table container should scroll */
   height: 100%;
   width: 100%;
-  min-height: 0;
-  min-width: 100%; /* Changed from min-width: 0 */
   border: 1px solid #ddd;
   background: #fff;
-  position: relative;
-  padding-bottom: 16px; /* More space for scrollbar */
-  /* Ensure the horizontal scrollbar is visible */
   margin-bottom: 5px;
-  /* Better container for sticky headers */
-  contain: content; /* Changed from strict to be more compatible */
-  isolation: isolate; /* Create stacking context for z-index */
 }
 
-/* Ensure the table expands to fit its content */
+/* Configure the table to allow for column resizing */
 .data-table {
-  border-collapse: separate; /* Changed from collapse to ensure cell borders don't overlap */
-  border-spacing: 0; /* No gaps between cells */
+  border-collapse: collapse;
+  border-spacing: 0;
   background: #fff;
   margin-bottom: 0;
-  /* Natural table sizing */
-  width: auto !important;        /* allow natural width */
-  min-width: max-content !important; /* ensure table expands to fit content */
-  table-layout: auto !important;     /* let columns adjust based on content */
+  width: auto;
+  min-width: max-content;
+  table-layout: auto;
 }
 
 /* Custom styling for zebra striping to help with row visibility */
@@ -263,37 +197,35 @@
   background-color: #f0f7ff;
 }
 
-/* Ensure table cells have proper padding and overflow handling */
+/* Ensure table cells have proper padding and NO overflow scrollbars */
 .data-table th,
 .data-table td {
   padding: 8px;
   border: 1px solid #ddd;
-  min-width: 150px;
-  overflow: hidden;
+  overflow: hidden; /* Hide overflow without scrollbars */
   text-overflow: ellipsis;
   background: #fff;
 }
 
-/* Create a reliable sticky header that prevents content from showing through */
+/* Header styling */
 .data-table thead,
 .data-table thead tr,
 .data-table th {
   position: sticky !important;
   top: 0 !important;
-  z-index: 50 !important; /* Much higher z-index to ensure it stays on top */
+  z-index: 50 !important;
   background-color: #f5f5f5 !important;
 }
 
-/* Add a solid background and strong shadow to header cells */
 .data-table th {
   background-color: #f5f5f5 !important;
   border: 1px solid #ddd !important;
   border-bottom: 2px solid #aaa !important;
   box-shadow: 0 4px 6px rgba(0,0,0,0.25) !important;
   white-space: nowrap;
+  position: relative !important;
 }
 
-/* Make header content stand out more */
 .data-table th .header-content {
   background-color: #f5f5f5 !important;
   z-index: 51 !important;
@@ -305,28 +237,32 @@
   align-items: center;
 }
 
+/* Resize handle - critical for column resizing to work */
 .resize-handle {
   position: absolute;
   right: 0;
   top: 0;
   bottom: 0;
-  width: 4px;
-  background: transparent;
-  cursor: col-resize;
-  z-index: 3;
+  width: 10px;
+  background-color: transparent;
+  cursor: col-resize !important;
+  z-index: 100;
 }
 
-.resize-handle:hover,
+.resize-handle:hover {
+  background-color: rgba(33, 150, 243, 0.5);
+}
+
 .resize-handle:active {
-  background: #2196f3;
+  background-color: rgba(33, 150, 243, 0.7);
 }
 
-/* Enhanced scrollbar visibility */
+/* Enhanced scrollbar visibility - ONLY for the table container */
 .table-container::-webkit-scrollbar {
   width: 14px;
   height: 14px;
   background-color: #f5f5f5;
-  display: block !important; /* Force display of scrollbar */
+  display: block !important;
 }
 
 .table-container::-webkit-scrollbar-track {
@@ -355,6 +291,16 @@
 .table-container {
   scrollbar-width: auto;
   scrollbar-color: #888 #f1f1f1;
+}
+
+/* Global style for resizing operations */
+.column-resizing {
+  cursor: col-resize !important;
+  user-select: none !important;
+}
+
+.column-resizing * {
+  cursor: col-resize !important;
 }
 
 /* Column Selector Modal Styles */
@@ -454,4 +400,40 @@
 .column-item input[type="checkbox"] {
   margin: 0;
   cursor: pointer;
+}
+
+/* Cursor styles for draggable headers */
+.data-table th {
+  cursor: grab;
+  user-select: none;
+}
+
+.data-table th:active {
+  cursor: grabbing;
+}
+
+/* Style for when dragging */
+.column-dragging {
+  cursor: grabbing !important;
+}
+
+.column-dragging * {
+  cursor: grabbing !important;
+}
+
+/* Drag handle icon */
+.drag-handle {
+  display: inline-block;
+  margin-right: 8px;
+  font-size: 14px;
+  color: #888;
+  cursor: grab;
+  opacity: 0.6;
+  width: 10px;
+  vertical-align: middle;
+}
+
+.drag-handle:hover {
+  color: #555;
+  opacity: 1;
 }

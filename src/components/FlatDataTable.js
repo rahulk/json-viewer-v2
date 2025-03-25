@@ -24,6 +24,8 @@ export const FlatDataTable = React.forwardRef(({
   data,
   sectionCode,
   initialColumnVisibility = {},
+  initialColumnWidths = {}, 
+  initialColumnOrder = [], 
   onStateChange,
   showColumnSelection = true,
   allowTextWrapping = true,
@@ -35,15 +37,21 @@ export const FlatDataTable = React.forwardRef(({
   const [searchTerm, setSearchTerm] = useState('');
   const [filterColoredText, setFilterColoredText] = useState(false);
   const [wrapText, setWrapText] = useState(false);
-  const [columnWidths, setColumnWidths] = useState({});
+  const [columnWidths, setColumnWidths] = useState(initialColumnWidths);
   const [enlargedImage, setEnlargedImage] = useState(null);
   const isInitialized = useRef(false);
   const previousStateRef = useRef(null);
+  
+  // New state for column ordering
+  const [columnOrder, setColumnOrder] = useState(initialColumnOrder.length > 0 ? initialColumnOrder : []);
+  const [draggedColumn, setDraggedColumn] = useState(null);
+  const [dragOverColumn, setDragOverColumn] = useState(null);
 
   // Expose methods to parent component through ref
   React.useImperativeHandle(ref, () => ({
     getSelectedColumns: () => selectedColumns,
-    getColumnWidths: () => columnWidths
+    getColumnWidths: () => columnWidths,
+    getColumnOrder: () => columnOrder
   }));
 
   // Add getHighlightColor function
@@ -87,6 +95,13 @@ export const FlatDataTable = React.forwardRef(({
     };
   }, [data]);
 
+  // Initialize column order when data changes
+  useEffect(() => {
+    if (processedData.keys.length > 0 && columnOrder.length === 0) {
+      setColumnOrder([...processedData.keys]);
+    }
+  }, [processedData.keys, columnOrder.length]);
+
   // Load display preferences when section code changes
   useEffect(() => {
     let isMounted = true;
@@ -108,6 +123,9 @@ export const FlatDataTable = React.forwardRef(({
           }
           if (prefs.columnWidths) {
             setColumnWidths(prefs.columnWidths);
+          }
+          if (prefs.columnOrder && prefs.columnOrder.length > 0) {
+            setColumnOrder(prefs.columnOrder);
           }
         } else {
           console.log('No saved preferences found for section:', sectionCode);
@@ -144,6 +162,20 @@ export const FlatDataTable = React.forwardRef(({
     }
   }, [initialColumnVisibility]);
 
+  // Update state when initialColumnWidths changes
+  useEffect(() => {
+    if (Object.keys(initialColumnWidths).length > 0) {
+      setColumnWidths(initialColumnWidths);
+    }
+  }, [initialColumnWidths]);
+
+  // Update state when initialColumnOrder changes
+  useEffect(() => {
+    if (initialColumnOrder && initialColumnOrder.length > 0) {
+      setColumnOrder(initialColumnOrder);
+    }
+  }, [initialColumnOrder]);
+
   // Notify parent of state changes, but only when they actually change
   useEffect(() => {
     const currentState = {
@@ -151,6 +183,7 @@ export const FlatDataTable = React.forwardRef(({
       columnWidths,
       filterColoredText,
       wrapText,
+      columnOrder
     };
 
     // Only notify if the state has actually changed
@@ -160,12 +193,26 @@ export const FlatDataTable = React.forwardRef(({
         onStateChange(currentState);
       }
     }
-  }, [selectedColumns, columnWidths, filterColoredText, wrapText, onStateChange]);
+  }, [selectedColumns, columnWidths, filterColoredText, wrapText, columnOrder, onStateChange]);
 
-  const visibleColumns = useMemo(() => 
-    processedData.keys.filter(key => selectedColumns[key]),
-    [processedData.keys, selectedColumns]
-  );
+  // Get visible columns in proper order
+  const visibleColumns = useMemo(() => {
+    // First ensure all keys are in columnOrder (in case new columns were added)
+    const currentOrder = [...columnOrder];
+    processedData.keys.forEach(key => {
+      if (!currentOrder.includes(key)) {
+        currentOrder.push(key);
+      }
+    });
+    
+    // Use the updated order
+    if (currentOrder.length !== columnOrder.length) {
+      setColumnOrder(currentOrder);
+    }
+    
+    // Return only visible columns in the correct order
+    return currentOrder.filter(key => selectedColumns[key]);
+  }, [processedData.keys, selectedColumns, columnOrder]);
 
   const flattenedRows = useMemo(() => {
     if (!filterColoredText) return processedData.flattenedRows;
@@ -297,18 +344,23 @@ export const FlatDataTable = React.forwardRef(({
     );
   }, [processedData.keys]);
 
-  // Handle column resize with debounce
+  // Simplified and fixed column resize handler
   const handleResizeStart = useCallback((e, column) => {
     e.preventDefault();
     e.stopPropagation();
     
     const startX = e.clientX;
-    const headerCell = e.target.closest('th');
-    const startWidth = headerCell.offsetWidth;
+    const startWidth = columnWidths[column] || 200;
+    
+    // Add a class to body to ensure proper cursor throughout document
+    document.body.classList.add('column-resizing');
     
     const handleMouseMove = (moveEvent) => {
       moveEvent.preventDefault();
-      const newWidth = Math.max(100, startWidth + (moveEvent.clientX - startX));
+      const deltaX = moveEvent.clientX - startX;
+      const newWidth = Math.max(100, startWidth + deltaX);
+      
+      // Update columnWidths state
       setColumnWidths(prev => ({
         ...prev,
         [column]: newWidth
@@ -318,10 +370,66 @@ export const FlatDataTable = React.forwardRef(({
     const handleMouseUp = () => {
       document.removeEventListener('mousemove', handleMouseMove);
       document.removeEventListener('mouseup', handleMouseUp);
+      document.body.classList.remove('column-resizing');
     };
     
     document.addEventListener('mousemove', handleMouseMove);
     document.addEventListener('mouseup', handleMouseUp);
+  }, [columnWidths]);
+
+  // New drag and drop handlers for column reordering
+  const handleDragStart = useCallback((e, column) => {
+    setDraggedColumn(column);
+    e.dataTransfer.effectAllowed = 'move';
+    // Add a custom class to change the cursor
+    document.body.classList.add('column-dragging');
+    // Using a transparent placeholder image for better drag appearance
+    const dragImg = document.createElement('img');
+    dragImg.src = 'data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7';
+    dragImg.width = 0;
+    dragImg.height = 0;
+    e.dataTransfer.setDragImage(dragImg, 0, 0);
+  }, []);
+
+  const handleDragOver = useCallback((e, column) => {
+    e.preventDefault();
+    if (column !== draggedColumn) {
+      setDragOverColumn(column);
+    }
+  }, [draggedColumn]);
+
+  const handleDragLeave = useCallback(() => {
+    setDragOverColumn(null);
+  }, []);
+
+  const handleDrop = useCallback((e, targetColumn) => {
+    e.preventDefault();
+    
+    if (draggedColumn && targetColumn && draggedColumn !== targetColumn) {
+      // Create new column order with dragged column moved to new position
+      const newOrder = [...columnOrder];
+      const draggedIdx = newOrder.indexOf(draggedColumn);
+      const targetIdx = newOrder.indexOf(targetColumn);
+      
+      // Remove dragged column
+      newOrder.splice(draggedIdx, 1);
+      // Insert it at target position
+      newOrder.splice(targetIdx, 0, draggedColumn);
+      
+      // Update state
+      setColumnOrder(newOrder);
+    }
+    
+    // Reset drag state
+    setDraggedColumn(null);
+    setDragOverColumn(null);
+    document.body.classList.remove('column-dragging');
+  }, [draggedColumn, columnOrder]);
+
+  const handleDragEnd = useCallback(() => {
+    setDraggedColumn(null);
+    setDragOverColumn(null);
+    document.body.classList.remove('column-dragging');
   }, []);
 
   // Expose current display preferences to parent
@@ -329,10 +437,11 @@ export const FlatDataTable = React.forwardRef(({
     if (window.displayPreferences) {
       window.displayPreferences.current = {
         selectedColumns,
-        columnWidths
+        columnWidths,
+        columnOrder
       };
     }
-  }, [selectedColumns, columnWidths]);
+  }, [selectedColumns, columnWidths, columnOrder]);
 
   // Filter columns based on search term
   const filteredKeys = useMemo(() => 
@@ -359,7 +468,7 @@ export const FlatDataTable = React.forwardRef(({
       height: '100%',
       width: '100%',
       position: 'relative',
-      overflow: 'hidden' // Changed from overflow-x: visible to prevent overflow conflicts
+      overflow: 'hidden'
     }}>
       <div className="table-controls">
         <div className="left-controls">
@@ -451,42 +560,38 @@ export const FlatDataTable = React.forwardRef(({
         </div>
       )}
       
-      <div className="table-container" style={{
-        flex: '1 1 auto',
-        overflow: 'auto !important',
-        position: 'relative',
-        width: '100%',
-        minWidth: '100%', // Changed from min-width: 0
-        height: '100%',
-        minHeight: '0',
-      }}>
-        <table 
-          className="data-table"
-          style={{ 
-            tableLayout: 'auto',
-            width: 'auto',
-            minWidth: 'max-content' // Ensures table expands to fit all columns
-          }}
-        >
-          <thead style={{ position: 'sticky', top: 0, zIndex: 20 }}>
+      <div className="table-container">
+        <table className="data-table">
+          <thead>
             <tr>
               {visibleColumns
                 .filter((column) => selectedColumns[column])
                 .map((column) => (
                 <th 
-                    key={column}
+                  key={column}
                   style={{ 
-                      width: columnWidths[column] ? `${columnWidths[column]}px` : '200px',
-                      minWidth: columnWidths[column] ? `${columnWidths[column]}px` : '200px'
+                    width: columnWidths[column] ? `${columnWidths[column]}px` : '200px',
+                    backgroundColor: draggedColumn === column ? '#e0e0e0' : 
+                                    dragOverColumn === column ? '#f0f7ff' : '#f5f5f5',
+                    cursor: 'grab',
+                    borderLeft: dragOverColumn === column ? '2px solid #2196F3' : '1px solid #ddd',
+                    position: 'relative'
                   }}
+                  draggable="true"
+                  onDragStart={(e) => handleDragStart(e, column)}
+                  onDragOver={(e) => handleDragOver(e, column)}
+                  onDragLeave={handleDragLeave}
+                  onDrop={(e) => handleDrop(e, column)}
+                  onDragEnd={handleDragEnd}
                 >
-                    <div className="header-content">
-                      {column}
+                  <div className="header-content">
+                    <div className="drag-handle" title="Drag to reorder column">::</div>
+                    {column}
+                  </div>
                   <div 
-                        className="resize-handle"
-                        onMouseDown={(e) => handleResizeStart(e, column)}
+                    className="resize-handle"
+                    onMouseDown={(e) => handleResizeStart(e, column)}
                   />
-                    </div>
                 </th>
               ))}
             </tr>
@@ -501,9 +606,9 @@ export const FlatDataTable = React.forwardRef(({
                       key={column}
                       style={{
                         width: columnWidths[column] ? `${columnWidths[column]}px` : '200px',
-                        minWidth: columnWidths[column] ? `${columnWidths[column]}px` : '200px',
                         whiteSpace: wrapText ? 'normal' : 'nowrap',
                         backgroundColor: getHighlightColor(row[column], column),
+                        overflow: 'hidden'
                       }}
                       className={isImageValue(row[column], column) ? 'image-cell' : ''}
                     >
@@ -531,6 +636,8 @@ FlatDataTable.propTypes = {
   data: PropTypes.array.isRequired,
   sectionCode: PropTypes.string,
   initialColumnVisibility: PropTypes.object,
+  initialColumnWidths: PropTypes.object,
+  initialColumnOrder: PropTypes.array,
   onStateChange: PropTypes.func,
   showColumnSelection: PropTypes.bool,
   allowTextWrapping: PropTypes.bool,

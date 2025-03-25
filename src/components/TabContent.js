@@ -94,7 +94,7 @@ export const TabContent = ({
     }, 5000);
   }, []);
 
-  // Function to save display preferences
+  // Function to save display preferences - UPDATED to include columnOrder and columnWidths
   const saveDisplayPreferences = useCallback(async (tabType, ref, sectionCode) => {
     if (!pdfFilename || !sectionCode) {
       showNotification('❌ Cannot save preferences: Missing PDF filename or section code', true);
@@ -104,6 +104,7 @@ export const TabContent = ({
     try {
       const selectedColumns = ref.current?.getSelectedColumns();
       const columnWidths = ref.current?.getColumnWidths();
+      const columnOrder = ref.current?.getColumnOrder();
 
       if (!selectedColumns || !columnWidths) {
         showNotification('❌ Cannot save preferences: Missing table state', true);
@@ -120,7 +121,8 @@ export const TabContent = ({
           sectionCode,
           tabType,
           selectedColumns,
-          columnWidths
+          columnWidths,
+          columnOrder
         }),
       });
 
@@ -187,7 +189,8 @@ export const TabContent = ({
           if (prefs) {
             handleTab4StateChange({
               columnVisibility: prefs.selectedColumns,
-              columnWidths: prefs.columnWidths
+              columnWidths: prefs.columnWidths,
+              columnOrder: prefs.columnOrder
             });
             setPreferencesLoaded(prev => ({ ...prev, parsed: true }));
           }
@@ -207,7 +210,8 @@ export const TabContent = ({
           if (prefs) {
             handleTab5StateChange({
               columnVisibility: prefs.selectedColumns,
-              columnWidths: prefs.columnWidths
+              columnWidths: prefs.columnWidths,
+              columnOrder: prefs.columnOrder
             });
             setPreferencesLoaded(prev => ({ ...prev, enhanced: true }));
           }
@@ -423,6 +427,8 @@ export const TabContent = ({
             allowTextWrapping={true}
             showColorHighlighting={false}
             initialColumnVisibility={tab4State.columnVisibility}
+            initialColumnWidths={tab4State.columnWidths}
+            initialColumnOrder={tab4State.columnOrder}
             onStateChange={handleTab4Change}
             title=""
           />
@@ -499,6 +505,8 @@ export const TabContent = ({
             allowTextWrapping={true}
             showColorHighlighting={true}
             initialColumnVisibility={tab5State.columnVisibility}
+            initialColumnWidths={tab5State.columnWidths}
+            initialColumnOrder={tab5State.columnOrder}
             onStateChange={handleTab5Change}
             title=""
           />
