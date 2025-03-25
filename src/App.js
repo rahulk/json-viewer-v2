@@ -6,6 +6,7 @@ import { Sidebar } from './components/Sidebar';
 import { TabContent } from './components/TabContent';
 import { useFolderManagement } from './hooks/useFolderManagement';
 import { useJsonProcessing } from './hooks/useJsonProcessing';
+import { Nav } from 'react-bootstrap';
 
 function App() {
   const [selectedTab, setSelectedTab] = useState(0);
@@ -125,7 +126,7 @@ function App() {
     console.log(`🔄 Changing to tab ${index}`);
     setSelectedTab(index);
     
-    // Load HTML content when selecting tabs 2 or 3
+    // Only load HTML content if we have an active folder and PDF file
     if (activeFolder !== null && activePdfFile !== null) {
       const folderName = folders[activeFolder];
       const pdfFileName = pdfFiles[activePdfFile];
@@ -136,24 +137,20 @@ function App() {
         pdf: pdfFileName
       });
       
-      // Use setTimeout to ensure state updates have propagated
-      setTimeout(() => {
-        switch (index) {
-          case 1: // Enhanced HTML (Tab 2)
-            loadHtmlContent('enhanced');
-            break;
-          case 2: // Modified HTML (Tab 3)
-            loadHtmlContent('modified');
-            break;
-          default:
-            break;
-        }
-      }, 100);
+      // Load appropriate content based on tab index
+      switch (index) {
+        case 1: // Enhanced HTML (Tab 2)
+          loadHtmlContent('enhanced');
+          break;
+        case 2: // Modified HTML (Tab 3)
+          loadHtmlContent('modified');
+          break;
+        default:
+          break;
+      }
     } else {
       console.log(`❌ Cannot load HTML for tab ${index}: No active folder or PDF file selected`);
     }
-    
-    // Auto-load sample data for JSON viewer tabs - keep this part
   }, [activeFolder, activePdfFile, loadHtmlContent, folders, pdfFiles]);
 
   // Update the useEffect to check for activeFolder and activePdfFile before attempting to load content
@@ -253,24 +250,48 @@ function App() {
                 }}
               >
                 <div className="nav-tabs-wrapper">
-                  <ul className="nav nav-tabs">
-                    {[
-                      'Tab 1: Basic', 
-                      'Tab 2: Enhanced',
-                      'Tab 3: Modified',
-                      'Tab 4: Parsed JSONs', 
-                      'Tab 5: Enhanced JSONs'
-                    ].map((tab, index) => (
-                      <li className="nav-item" key={index}>
-                        <button 
-                          className={`nav-link ${selectedTab === index ? 'active' : ''}`}
-                          onClick={() => handleTabSelect(index)}
-                        >
-                          {tab}
-                        </button>
-                      </li>
-                    ))}
-                  </ul>
+                  <Nav variant="tabs" className="nav-tabs">
+                    <Nav.Item>
+                      <Nav.Link
+                        className={`nav-link ${selectedTab === 0 ? 'active' : ''}`}
+                        onClick={() => handleTabSelect(0)}
+                      >
+                        Basic
+                      </Nav.Link>
+                    </Nav.Item>
+                    <Nav.Item>
+                      <Nav.Link
+                        className={`nav-link ${selectedTab === 1 ? 'active' : ''}`}
+                        onClick={() => handleTabSelect(1)}
+                      >
+                        Enhanced
+                      </Nav.Link>
+                    </Nav.Item>
+                    <Nav.Item>
+                      <Nav.Link
+                        className={`nav-link ${selectedTab === 2 ? 'active' : ''}`}
+                        onClick={() => handleTabSelect(2)}
+                      >
+                        Modified
+                      </Nav.Link>
+                    </Nav.Item>
+                    <Nav.Item>
+                      <Nav.Link
+                        className={`nav-link ${selectedTab === 3 ? 'active' : ''}`}
+                        onClick={() => handleTabSelect(3)}
+                      >
+                        Parsed JSONs
+                      </Nav.Link>
+                    </Nav.Item>
+                    <Nav.Item>
+                      <Nav.Link
+                        className={`nav-link ${selectedTab === 4 ? 'active' : ''}`}
+                        onClick={() => handleTabSelect(4)}
+                      >
+                        Enhanced JSONs
+                      </Nav.Link>
+                    </Nav.Item>
+                  </Nav>
                 </div>
                 
                 <div style={{ 
