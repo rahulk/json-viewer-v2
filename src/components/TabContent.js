@@ -146,7 +146,7 @@ export const TabContent = ({
   const renderTab4Content = () => (
     <div className="json-viewer" style={{ border: '1px solid #ccc', padding: '10px', height: 'calc(100% - 60px)', overflow: 'auto' }}>
       <div className="d-flex justify-content-between align-items-center mb-3">
-        <h4>JSON Viewer - Tab 4 (Parsed JSON)</h4>
+        <h4>Parsed JSONs</h4>
         <button 
           className="save-display-button"
           onClick={() => console.log('Save preferences for section:', 'TAB4')}
@@ -192,7 +192,7 @@ export const TabContent = ({
   const renderTab5Content = () => (
     <div className="json-viewer" style={{ border: '1px solid #ccc', padding: '10px', height: 'calc(100% - 60px)', overflow: 'auto' }}>
       <div className="d-flex justify-content-between align-items-center mb-3">
-        <h4>JSON Viewer - Tab 5 (Enhanced JSON)</h4>
+        <h4>Enhanced JSONs</h4>
         <button 
           className="save-display-button"
           onClick={() => console.log('Save preferences for section:', 'TAB5')}
