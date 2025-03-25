@@ -297,6 +297,9 @@ function App() {
                 <div style={{ 
                   flex: 1,
                   minHeight: 0,
+                  display: 'flex',
+                  flexDirection: 'column',
+                  position: 'relative',
                   overflow: 'hidden'
                 }}>
                   <TabContent 

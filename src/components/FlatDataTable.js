@@ -39,25 +39,34 @@ export const FlatDataTable = React.forwardRef(({
   const [enlargedImage, setEnlargedImage] = useState(null);
   const isInitialized = useRef(false);
   const previousStateRef = useRef(null);
-  const headerRefs = useRef({});
 
-  // Add getHighlightColor function
-  const getHighlightColor = useCallback((value) => {
-    if (!value || typeof value !== 'string') return 'inherit';
-    
-    const columnName = value.toLowerCase();
-    if (columnName.includes('_blue')) return 'rgba(0, 0, 255, 0.1)';
-    if (columnName.includes('_red')) return 'rgba(255, 0, 0, 0.1)';
-    return 'inherit';
-  }, []);
-
-  // Expose methods through ref
+  // Expose methods to parent component through ref
   React.useImperativeHandle(ref, () => ({
     getSelectedColumns: () => selectedColumns,
-    getColumnWidths: () => columnWidths,
-    setSelectedColumns: (columns) => setSelectedColumns(columns),
-    setColumnWidths: (widths) => setColumnWidths(widths)
-  }), [selectedColumns, columnWidths]);
+    getColumnWidths: () => columnWidths
+  }));
+
+  // Add getHighlightColor function
+  const getHighlightColor = useCallback((value, columnName) => {
+    // If showing color highlighting is disabled, return inherit
+    if (!showColorHighlighting) return 'inherit';
+    
+    // Check if the column name indicates coloring
+    if (columnName && typeof columnName === 'string') {
+      const column = columnName.toLowerCase();
+      if (column.includes('_blue')) return 'rgba(0, 0, 255, 0.1)';
+      if (column.includes('_red')) return 'rgba(255, 0, 0, 0.1)';
+    }
+    
+    // For backward compatibility, also check values
+    if (value && typeof value === 'string') {
+      const cellValue = value.toLowerCase();
+      if (cellValue.includes('_blue')) return 'rgba(0, 0, 255, 0.1)';
+      if (cellValue.includes('_red')) return 'rgba(255, 0, 0, 0.1)';
+    }
+    
+    return 'inherit';
+  }, [showColorHighlighting]);
 
   // Process data and get keys
   const processedData = useMemo(() => {
@@ -294,32 +303,21 @@ export const FlatDataTable = React.forwardRef(({
     e.stopPropagation();
     
     const startX = e.clientX;
-    const headerCell = e.target.parentElement;
+    const headerCell = e.target.closest('th');
     const startWidth = headerCell.offsetWidth;
-    
-    let resizeTimeout;
     
     const handleMouseMove = (moveEvent) => {
       moveEvent.preventDefault();
-      if (resizeTimeout) {
-        clearTimeout(resizeTimeout);
-      }
-      
-      resizeTimeout = setTimeout(() => {
-        const newWidth = Math.max(50, startWidth + (moveEvent.clientX - startX));
-        setColumnWidths(prev => ({
-          ...prev,
-          [column]: newWidth
-        }));
-      }, 16); // Throttle to ~60fps
+      const newWidth = Math.max(100, startWidth + (moveEvent.clientX - startX));
+      setColumnWidths(prev => ({
+        ...prev,
+        [column]: newWidth
+      }));
     };
     
     const handleMouseUp = () => {
       document.removeEventListener('mousemove', handleMouseMove);
       document.removeEventListener('mouseup', handleMouseUp);
-      if (resizeTimeout) {
-        clearTimeout(resizeTimeout);
-      }
     };
     
     document.addEventListener('mousemove', handleMouseMove);
@@ -455,15 +453,17 @@ export const FlatDataTable = React.forwardRef(({
                 .map((column) => (
                   <th
                     key={column}
-                    style={{ width: columnWidths[column] || 'auto' }}
-                    ref={(el) => (headerRefs.current[column] = el)}
+                    style={{ 
+                      width: columnWidths[column] ? `${columnWidths[column]}px` : '200px',
+                      minWidth: columnWidths[column] ? `${columnWidths[column]}px` : '200px'
+                    }}
                   >
-                    <div
-                      className="header-content"
-                      onMouseDown={(e) => handleResizeStart(e, column)}
-                    >
+                    <div className="header-content">
                       {column}
-                      <div className="resize-handle" />
+                      <div 
+                        className="resize-handle"
+                        onMouseDown={(e) => handleResizeStart(e, column)}
+                      />
                     </div>
                   </th>
                 ))}
@@ -478,11 +478,10 @@ export const FlatDataTable = React.forwardRef(({
                     <td
                       key={column}
                       style={{
-                        width: columnWidths[column] || 'auto',
-                        whiteSpace: allowTextWrapping ? 'normal' : 'nowrap',
-                        backgroundColor: showColorHighlighting
-                          ? getHighlightColor(row[column])
-                          : 'inherit',
+                        width: columnWidths[column] ? `${columnWidths[column]}px` : '200px',
+                        minWidth: columnWidths[column] ? `${columnWidths[column]}px` : '200px',
+                        whiteSpace: wrapText ? 'normal' : 'nowrap',
+                        backgroundColor: getHighlightColor(row[column], column),
                       }}
                       className={isImageValue(row[column], column) ? 'image-cell' : ''}
                     >

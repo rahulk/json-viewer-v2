@@ -343,36 +343,51 @@ export const TabContent = ({
   );
 
   const renderTab4Content = () => (
-    <div className="json-viewer" style={{ height: '100%', display: 'flex', flexDirection: 'column', overflow: 'hidden' }}>
-      <div className="d-flex justify-content-between align-items-center mb-3">
-        <h4>Parsed JSONs</h4>
-        <button 
-          className="btn btn-success"
-          onClick={() => {
-            const sectionCode = selectedParsedFile ? extractSectionCode(selectedParsedFile) : null;
-            if (sectionCode) {
-              saveDisplayPreferences('parsed', tab4Ref, sectionCode);
-            }
-          }}
-          disabled={!selectedParsedFile}
-        >
-          Save Display
-        </button>
+    <div style={{ 
+      height: '100%',
+      display: 'flex',
+      flexDirection: 'column',
+      overflow: 'hidden'
+    }}>
+      <div style={{ 
+        marginBottom: '8px', 
+        flexShrink: 0,
+        display: 'flex',
+        flexWrap: 'wrap',
+        alignItems: 'center',
+        gap: '8px'
+      }}>
+        <div style={{ display: 'flex', alignItems: 'center', flexGrow: 1, maxWidth: '100%' }}>
+          <div style={{ flexGrow: 1, maxWidth: '300px' }}>
+            <JsonFileSelector
+              jsonFiles={parsedJsons}
+              selectedFile={selectedParsedFile}
+              onFileSelect={setSelectedParsedFile}
+              isLoading={isLoadingParsed}
+              onProcessFile={handleProcessParsedJson}
+            />
+          </div>
+          <button
+            className="btn btn-outline-secondary ms-2"
+            onClick={() => saveDisplayPreferences('parsed', tab4Ref, extractSectionCode(selectedParsedFile))}
+            disabled={!selectedParsedFile}
+            style={{ whiteSpace: 'nowrap' }}
+          >
+            Save Display Settings
+          </button>
+        </div>
       </div>
-      <JsonFileSelector 
-        jsonFiles={parsedJsons}
-        selectedFile={selectedParsedFile}
-        onFileSelect={setSelectedParsedFile}
-        onProcessFile={handleProcessParsedJson}
-        isLoading={isLoadingParsed}
-      />
+
       {tab4State.data && tab4State.data.length > 0 ? (
-        <div className="table-view" style={{ 
-          flex: 1, 
-          display: 'flex', 
+        <div style={{ 
+          display: 'flex',
           flexDirection: 'column',
-          minHeight: 0, // Important for flex child scrolling
-          overflow: 'hidden'
+          height: 'calc(100vh - 200px)',
+          overflow: 'hidden',
+          position: 'relative',
+          backgroundColor: '#fff',
+          borderRadius: '4px',
+          border: '1px solid #ddd'
         }}>
           <FlatDataTable 
             ref={tab4Ref}
@@ -402,36 +417,51 @@ export const TabContent = ({
   );
 
   const renderTab5Content = () => (
-    <div className="json-viewer" style={{ height: '100%', display: 'flex', flexDirection: 'column', overflow: 'hidden' }}>
-      <div className="d-flex justify-content-between align-items-center mb-3">
-        <h4>Enhanced JSONs</h4>
-        <button 
-          className="btn btn-success"
-          onClick={() => {
-            const sectionCode = selectedEnhancedFile ? extractSectionCode(selectedEnhancedFile) : null;
-            if (sectionCode) {
-              saveDisplayPreferences('enhanced', tab5Ref, sectionCode);
-            }
-          }}
-          disabled={!selectedEnhancedFile}
-        >
-          Save Display
-        </button>
+    <div style={{ 
+      height: '100%',
+      display: 'flex',
+      flexDirection: 'column',
+      overflow: 'hidden'
+    }}>
+      <div style={{ 
+        marginBottom: '8px', 
+        flexShrink: 0,
+        display: 'flex',
+        flexWrap: 'wrap',
+        alignItems: 'center',
+        gap: '8px'
+      }}>
+        <div style={{ display: 'flex', alignItems: 'center', flexGrow: 1, maxWidth: '100%' }}>
+          <div style={{ flexGrow: 1, maxWidth: '300px' }}>
+            <JsonFileSelector
+              jsonFiles={enhancedJsons}
+              selectedFile={selectedEnhancedFile}
+              onFileSelect={setSelectedEnhancedFile}
+              isLoading={isLoadingEnhanced}
+              onProcessFile={handleProcessEnhancedJson}
+            />
+          </div>
+          <button
+            className="btn btn-outline-secondary ms-2"
+            onClick={() => saveDisplayPreferences('enhanced', tab5Ref, extractSectionCode(selectedEnhancedFile))}
+            disabled={!selectedEnhancedFile}
+            style={{ whiteSpace: 'nowrap' }}
+          >
+            Save Display Settings
+          </button>
+        </div>
       </div>
-      <JsonFileSelector 
-        jsonFiles={enhancedJsons}
-        selectedFile={selectedEnhancedFile}
-        onFileSelect={setSelectedEnhancedFile}
-        onProcessFile={handleProcessEnhancedJson}
-        isLoading={isLoadingEnhanced}
-      />
+
       {tab5State.data && tab5State.data.length > 0 ? (
-        <div className="table-view" style={{ 
-          flex: 1, 
-          display: 'flex', 
+        <div style={{ 
+          display: 'flex',
           flexDirection: 'column',
-          minHeight: 0, // Important for flex child scrolling
-          overflow: 'hidden'
+          height: 'calc(100vh - 200px)',
+          overflow: 'hidden',
+          position: 'relative',
+          backgroundColor: '#fff',
+          borderRadius: '4px',
+          border: '1px solid #ddd'
         }}>
           <FlatDataTable 
             ref={tab5Ref}

@@ -2,39 +2,37 @@ import React from 'react';
 import PropTypes from 'prop-types';
 
 export const JsonFileSelector = ({
-  jsonFiles,
+  jsonFiles = [],
   selectedFile,
   onFileSelect,
-  sectionCode,  // we'll keep this prop but won't display it
   onProcessFile,
   isLoading
 }) => {
   return (
-    <div className="d-flex align-items-center gap-3 mb-3">
+    <div className="d-flex align-items-center" style={{ gap: '8px' }}>
       <select 
-        className="form-select" 
-        style={{ maxWidth: '300px' }}
+        className="form-select form-select-sm" 
+        style={{ width: '100%', maxWidth: '240px' }}
         value={selectedFile || ''}
         onChange={(e) => onFileSelect(e.target.value)}
       >
         <option value="">Select Section Code</option>
-        {jsonFiles.map((file, index) => (
+        {(jsonFiles || []).map((file, index) => (
           <option key={index} value={file.filename}>
             {file.sectionCode}
           </option>
         ))}
       </select>
       
-      {/* Removed the section-code div that was here */}
-      
       <button 
-        className="btn btn-primary"
+        className="btn btn-primary btn-sm"
         onClick={onProcessFile}
         disabled={!selectedFile || isLoading}
+        style={{ whiteSpace: 'nowrap' }}
       >
         {isLoading ? (
           <>
-            <span className="spinner-border spinner-border-sm me-2" />
+            <span className="spinner-border spinner-border-sm me-1" />
             Processing...
           </>
         ) : (
@@ -49,10 +47,15 @@ JsonFileSelector.propTypes = {
   jsonFiles: PropTypes.arrayOf(PropTypes.shape({
     filename: PropTypes.string.isRequired,
     sectionCode: PropTypes.string.isRequired
-  })).isRequired,
+  })),
   selectedFile: PropTypes.string,
   onFileSelect: PropTypes.func.isRequired,
-  sectionCode: PropTypes.string,
   onProcessFile: PropTypes.func.isRequired,
   isLoading: PropTypes.bool
+};
+
+JsonFileSelector.defaultProps = {
+  jsonFiles: [],
+  selectedFile: '',
+  isLoading: false
 };
