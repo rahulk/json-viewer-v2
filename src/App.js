@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useCallback } from 'react';
+import React, { useState, useEffect, useCallback, useRef } from 'react';
 import './App.css';
 import { FileUploader } from './components/FileUploader';
 import { PdfViewer } from './components/PdfViewer';
@@ -11,6 +11,13 @@ function App() {
   const [selectedTab, setSelectedTab] = useState(3);
   const [enhancedHtmlContent, setEnhancedHtmlContent] = useState('');
   const [modifiedHtmlContent, setModifiedHtmlContent] = useState('');
+  
+  // Add these two state variables
+  const [selectedParsedFile, setSelectedParsedFile] = useState('');
+  const [selectedEnhancedFile, setSelectedEnhancedFile] = useState('');
+  
+  // Create the ref at component top level - NOT inside useEffect
+  const prevPdfFileRef = useRef(null);
   
   // Use custom hooks for folder and JSON management
   const {
@@ -37,7 +44,8 @@ function App() {
     tab5State,
     processFiles,
     handleTab4StateChange,
-    handleTab5StateChange
+    handleTab5StateChange,
+    resetTabStates  // Add this
   } = useJsonProcessing();
 
   // Update the loadHtmlContent function to better handle null checks
@@ -175,6 +183,22 @@ function App() {
     }
   }, [activePdfFile, activeFolder, selectedTab, loadHtmlContent, folders, pdfFiles]);
 
+  // Add this useEffect after your other useEffects
+  useEffect(() => {
+    // If the PDF file selection has changed and it's not the initial selection
+    if (activePdfFile !== null && prevPdfFileRef.current !== null && activePdfFile !== prevPdfFileRef.current) {
+      console.log('PDF file changed, resetting tab data states');
+      resetTabStates();
+      
+      // Also reset the selected parsed/enhanced files in TabContent
+      setSelectedParsedFile('');
+      setSelectedEnhancedFile('');
+    }
+    
+    // Update the ref with current value for next comparison
+    prevPdfFileRef.current = activePdfFile;
+  }, [activePdfFile, resetTabStates]);
+
   return (
     <div className="App container-fluid px-2 px-sm-3 px-md-4">
       <header className="App-header mb-3">
@@ -281,6 +305,10 @@ function App() {
                     pdfFilename={pdfFiles[activePdfFile]}
                     parsedJsons={parsedJsons}
                     enhancedJsons={enhancedJsons}
+                    selectedParsedFile={selectedParsedFile}
+                    setSelectedParsedFile={setSelectedParsedFile}
+                    selectedEnhancedFile={selectedEnhancedFile}
+                    setSelectedEnhancedFile={setSelectedEnhancedFile}
                   />
                 </div>
               </div>

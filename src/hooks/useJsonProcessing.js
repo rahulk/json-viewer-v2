@@ -191,6 +191,17 @@ export const useJsonProcessing = () => {
     });
   }, []);
 
+  const resetTabStates = useCallback(() => {
+    setTab4State(prevState => ({
+      ...prevState,
+      data: []
+    }));
+    setTab5State(prevState => ({
+      ...prevState,
+      data: []
+    }));
+  }, []);
+  
   return {
     files,
     setFiles,
@@ -202,6 +213,7 @@ export const useJsonProcessing = () => {
     tab5State,
     processFiles,
     handleTab4StateChange,
-    handleTab5StateChange
+    handleTab5StateChange,
+    resetTabStates
   };
-}; 
+};
