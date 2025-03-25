@@ -338,7 +338,6 @@ export const TabContent = ({
 
   const renderTab1Content = () => (
     <div style={{ height: '100%', overflow: 'hidden' }}>
-      <h4>Basic HTML View</h4>
       {renderHtmlContent(htmlContents[0])}
     </div>
   );
