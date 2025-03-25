@@ -5,7 +5,7 @@ export const JsonFileSelector = ({
   jsonFiles,
   selectedFile,
   onFileSelect,
-  sectionCode,
+  sectionCode,  // we'll keep this prop but won't display it
   onProcessFile,
   isLoading
 }) => {
@@ -25,11 +25,7 @@ export const JsonFileSelector = ({
         ))}
       </select>
       
-      <div className="section-code">
-        <span className="badge bg-secondary">
-          Section Code: {sectionCode || 'Not detected'}
-        </span>
-      </div>
+      {/* Removed the section-code div that was here */}
       
       <button 
         className="btn btn-primary"

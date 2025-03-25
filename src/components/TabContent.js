@@ -19,25 +19,8 @@ export const TabContent = ({
   const [selectedEnhancedFile, setSelectedEnhancedFile] = useState('');
   const [isLoadingParsed, setIsLoadingParsed] = useState(false);
   const [isLoadingEnhanced, setIsLoadingEnhanced] = useState(false);
-  const [parsedSectionCode, setParsedSectionCode] = useState('');
-  const [enhancedSectionCode, setEnhancedSectionCode] = useState('');
 
   // Remove the useEffect that fetches JSON files since we now get them from props
-
-  // Extract section code from filename
-  useEffect(() => {
-    if (selectedParsedFile) {
-      const match = selectedParsedFile.match(/_([A-Z]+\d+)_/);
-      setParsedSectionCode(match ? match[1] : '');
-    }
-  }, [selectedParsedFile]);
-
-  useEffect(() => {
-    if (selectedEnhancedFile) {
-      const match = selectedEnhancedFile.match(/_([A-Z]+\d+)_/);
-      setEnhancedSectionCode(match ? match[1] : '');
-    }
-  }, [selectedEnhancedFile]);
 
   // Add debug logging
   useEffect(() => {
@@ -175,7 +158,6 @@ export const TabContent = ({
         jsonFiles={parsedJsons}
         selectedFile={selectedParsedFile}
         onFileSelect={setSelectedParsedFile}
-        sectionCode={parsedSectionCode}
         onProcessFile={handleProcessParsedJson}
         isLoading={isLoadingParsed}
       />
@@ -222,7 +204,6 @@ export const TabContent = ({
         jsonFiles={enhancedJsons}
         selectedFile={selectedEnhancedFile}
         onFileSelect={setSelectedEnhancedFile}
-        sectionCode={enhancedSectionCode}
         onProcessFile={handleProcessEnhancedJson}
         isLoading={isLoadingEnhanced}
       />
