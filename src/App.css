@@ -8,6 +8,126 @@ body {
   max-width: 100%;
 }
 
+/* Standard button styles */
+.btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: 8px 16px;
+  font-size: 14px;
+  font-weight: 500;
+  line-height: 1.5;
+  text-align: center;
+  white-space: nowrap;
+  vertical-align: middle;
+  cursor: pointer;
+  user-select: none;
+  border: 1px solid transparent;
+  border-radius: 4px;
+  transition: all 0.2s ease-in-out;
+  min-height: 36px;
+  gap: 8px;
+}
+
+.btn:disabled {
+  opacity: 0.65;
+  cursor: not-allowed;
+}
+
+/* Primary button */
+.btn-primary {
+  background-color: #0d6efd;
+  color: white;
+  border-color: #0d6efd;
+}
+
+.btn-primary:hover:not(:disabled) {
+  background-color: #0b5ed7;
+  border-color: #0a58ca;
+}
+
+/* Secondary button */
+.btn-secondary {
+  background-color: #6c757d;
+  color: white;
+  border-color: #6c757d;
+}
+
+.btn-secondary:hover:not(:disabled) {
+  background-color: #5c636a;
+  border-color: #565e64;
+}
+
+/* Success button */
+.btn-success {
+  background-color: #198754;
+  color: white;
+  border-color: #198754;
+}
+
+.btn-success:hover:not(:disabled) {
+  background-color: #157347;
+  border-color: #146c43;
+}
+
+/* Outline buttons */
+.btn-outline-primary {
+  color: #0d6efd;
+  border-color: #0d6efd;
+  background-color: transparent;
+}
+
+.btn-outline-primary:hover:not(:disabled) {
+  color: white;
+  background-color: #0d6efd;
+}
+
+.btn-outline-secondary {
+  color: #6c757d;
+  border-color: #6c757d;
+  background-color: transparent;
+}
+
+.btn-outline-secondary:hover:not(:disabled) {
+  color: white;
+  background-color: #6c757d;
+}
+
+.btn-outline-success {
+  color: #198754;
+  border-color: #198754;
+  background-color: transparent;
+}
+
+.btn-outline-success:hover:not(:disabled) {
+  color: white;
+  background-color: #198754;
+}
+
+/* Small button */
+.btn-sm {
+  padding: 4px 8px;
+  font-size: 12px;
+  min-height: 28px;
+}
+
+/* Button with icon */
+.btn .icon {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 16px;
+  height: 16px;
+  margin-right: 4px;
+}
+
+/* Loading spinner for buttons */
+.btn .spinner-border {
+  width: 16px;
+  height: 16px;
+  border-width: 2px;
+}
+
 .filter-options {
   display: flex;
   gap: 10px;
@@ -30,13 +150,8 @@ body {
 }
 
 .html-only-button {
-  padding: 5px 10px;
-  background-color: #4CAF50;
-  color: white;
-  border: none;
-  border-radius: 4px;
-  cursor: pointer;
-  font-size: 13px;
+  @extend .btn;
+  @extend .btn-success;
 }
 
 .App {
@@ -102,16 +217,8 @@ body {
 }
 
 .process-button {
-  background-color: #4CAF50;
-  color: white;
-  border: none;
-  padding: 8px 12px;
-  text-align: center;
-  text-decoration: none;
-  display: inline-block;
-  font-size: 14px;
-  cursor: pointer;
-  border-radius: 4px;
+  @extend .btn;
+  @extend .btn-primary;
 }
 
 .process-button:disabled {
@@ -284,13 +391,8 @@ body {
 }
 
 .file-tab {
-  padding: 6px 12px;
-  background-color: #f0f0f0;
-  border: 1px solid #ddd;
-  border-radius: 4px;
-  cursor: pointer;
-  white-space: nowrap;
-  font-size: 14px;
+  @extend .btn;
+  @extend .btn-outline-secondary;
 }
 
 .file-tab.active {
@@ -341,21 +443,8 @@ body {
 }
 
 .save-display-button {
-  background-color: #4CAF50;
-  color: white;
-  border: none;
-  padding: 8px 12px;
-  text-align: center;
-  text-decoration: none;
-  display: inline-block;
-  font-size: 14px;
-  cursor: pointer;
-  border-radius: 4px;
-  white-space: nowrap;
-}
-
-.save-display-button:hover {
-  background-color: #45a049;
+  @extend .btn;
+  @extend .btn-success;
 }
 
 .save-display-button:disabled {
@@ -828,4 +917,35 @@ body {
 .nav-tabs .nav-item:hover {
   background-color: rgba(0, 123, 255, 0.1);
   border-radius: 4px 4px 0 0;
+}
+
+/* Update existing button styles to use new standard classes */
+.process-button {
+  @extend .btn;
+  @extend .btn-primary;
+}
+
+.save-display-button {
+  @extend .btn;
+  @extend .btn-success;
+}
+
+.html-only-button {
+  @extend .btn;
+  @extend .btn-success;
+}
+
+.file-tab {
+  @extend .btn;
+  @extend .btn-outline-secondary;
+}
+
+.tab-button {
+  @extend .btn;
+  @extend .btn-outline-secondary;
+}
+
+.column-selector-button {
+  @extend .btn;
+  @extend .btn-outline-primary;
 }

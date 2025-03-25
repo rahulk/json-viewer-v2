@@ -85,7 +85,7 @@ export const PdfViewer = ({ pdfUrl, fileName }) => {
         </svg>
         <p className="mt-3 text-muted">Select a PDF file to view</p>
         <button 
-          className="btn btn-sm btn-outline-primary mt-3"
+          className="btn btn-outline-primary btn-sm mt-3"
           onClick={testPdf}
         >
           Test PDF Viewer
@@ -132,17 +132,17 @@ export const PdfViewer = ({ pdfUrl, fileName }) => {
           <div className="mt-3">
             <button
               onClick={testPdf}
-              className="btn btn-sm btn-success me-2"
+              className="btn btn-outline-success btn-sm me-2"
             >
-              Test PDF Viewer
+              Test PDF
             </button>
             <a 
               href={pdfUrl} 
               target="_blank" 
               rel="noopener noreferrer"
-              className="btn btn-sm btn-primary me-2"
+              className="btn btn-outline-primary btn-sm"
             >
-              Try in New Tab
+              Open in New Tab
             </a>
           </div>
           
@@ -151,7 +151,7 @@ export const PdfViewer = ({ pdfUrl, fileName }) => {
               <strong>File Not Found Error!</strong>
               <p className="mb-2">The server couldn't find the PDF file at the expected location.</p>
               <button 
-                className="btn btn-sm btn-warning"
+                className="btn btn-outline-warning btn-sm"
                 onClick={createDocumentsFolder}
               >
                 How to Fix This
@@ -179,22 +179,6 @@ export const PdfViewer = ({ pdfUrl, fileName }) => {
           </span>
           {fileName}
         </h5>
-        <div>
-          <button
-            onClick={testPdf}
-            className="btn btn-sm btn-outline-success me-2"
-          >
-            Test PDF
-          </button>
-          <a 
-            href={pdfUrl} 
-            target="_blank" 
-            rel="noopener noreferrer"
-            className="btn btn-sm btn-outline-primary"
-          >
-            Open in New Tab
-          </a>
-        </div>
       </div>
       <div className="pdf-viewer-content" style={{ flex: 1, overflow: 'hidden' }}>
         <object

@@ -2,6 +2,24 @@ import React, { useState, useMemo, useEffect, useRef, useCallback } from 'react'
 import { flattenNestedData } from '../utils/dataUtils';
 import PropTypes from 'prop-types';
 
+// ImageModal component for enlarged image view
+const ImageModal = ({ src, alt, onClose }) => (
+  <div 
+    className="image-modal-overlay"
+    onClick={onClose}
+  >
+    <div className="image-modal-content">
+      <img src={src} alt={alt} />
+      <button 
+        className="btn btn-outline-light close-button"
+        onClick={onClose}
+      >
+        Close
+      </button>
+    </div>
+  </div>
+);
+
 export const FlatDataTable = React.forwardRef(({
   data,
   sectionCode,
@@ -18,8 +36,20 @@ export const FlatDataTable = React.forwardRef(({
   const [filterColoredText, setFilterColoredText] = useState(false);
   const [wrapText, setWrapText] = useState(false);
   const [columnWidths, setColumnWidths] = useState({});
+  const [enlargedImage, setEnlargedImage] = useState(null);
   const isInitialized = useRef(false);
   const previousStateRef = useRef(null);
+  const headerRefs = useRef({});
+
+  // Add getHighlightColor function
+  const getHighlightColor = useCallback((value) => {
+    if (!value || typeof value !== 'string') return 'inherit';
+    
+    const columnName = value.toLowerCase();
+    if (columnName.includes('_blue')) return 'rgba(0, 0, 255, 0.1)';
+    if (columnName.includes('_red')) return 'rgba(255, 0, 0, 0.1)';
+    return 'inherit';
+  }, []);
 
   // Expose methods through ref
   React.useImperativeHandle(ref, () => ({
@@ -112,7 +142,6 @@ export const FlatDataTable = React.forwardRef(({
       columnWidths,
       filterColoredText,
       wrapText,
-      searchTerm
     };
 
     // Only notify if the state has actually changed
@@ -122,7 +151,7 @@ export const FlatDataTable = React.forwardRef(({
         onStateChange(currentState);
       }
     }
-  }, [selectedColumns, columnWidths, filterColoredText, wrapText, searchTerm, onStateChange]);
+  }, [selectedColumns, columnWidths, filterColoredText, wrapText, onStateChange]);
 
   const visibleColumns = useMemo(() => 
     processedData.keys.filter(key => selectedColumns[key]),
@@ -155,19 +184,76 @@ export const FlatDataTable = React.forwardRef(({
     );
   }, [processedData.flattenedRows, visibleColumns, filterColoredText]);
 
-  // Filter columns based on search term
-  const filteredKeys = useMemo(() => 
-    searchTerm 
-      ? processedData.keys.filter(key => 
-          key.toLowerCase().includes(searchTerm.toLowerCase())
-        )
-      : processedData.keys,
-    [processedData.keys, searchTerm]
-  );
+  // Helper function to check if a string is an image URL or base64
+  const isImageValue = useCallback((value, key) => {
+    if (typeof value !== 'string') return false;
+    
+    // Check if the column name indicates it's an image
+    if (key && (key.toLowerCase().includes('image') || key.toLowerCase().includes('img'))) {
+      return true;
+    }
+
+    // Check if it's a data URL
+    if (value.startsWith('data:image/')) {
+      return true;
+    }
+
+    // Check for image URLs
+    const hasImageExtension = value.match(/\.(jpg|jpeg|png|gif|bmp|svg|webp)$/i);
+    const isImageUrl = value.startsWith('http') && value.match(/\.(jpg|jpeg|png|gif|bmp|svg|webp)(\?.*)?$/i);
+    
+    return hasImageExtension || isImageUrl;
+  }, []);
+
+  // Function to convert base64 to data URL if needed
+  const getImageUrl = useCallback((value) => {
+    if (!value || typeof value !== 'string') return '';
+
+    // If it's already a data URL or regular URL, return as is
+    if (value.startsWith('data:') || value.startsWith('http')) {
+      return value;
+    }
+
+    // Try to convert base64 to data URL
+    try {
+      // Remove any whitespace and newlines from base64 string
+      const cleanBase64 = value.replace(/[\s\n\r]/g, '');
+      return `data:image/png;base64,${cleanBase64}`;
+    } catch (e) {
+      console.error('Error converting base64 to data URL:', e);
+      return '';
+    }
+  }, []);
 
   // Function to format value for display
   const formatValue = (value, key) => {
     if (value === null || value === undefined) return '';
+    
+    // Check if the value is an image
+    if (isImageValue(value, key)) {
+      const imageUrl = getImageUrl(value);
+      if (!imageUrl) return String(value);
+
+      return (
+        <div className="image-cell">
+          <img 
+            src={imageUrl} 
+            alt={`${key} content`} 
+            loading="lazy"
+            onError={(e) => {
+              e.target.style.display = 'none';
+              e.target.parentElement.textContent = 'Invalid image data';
+            }}
+            onClick={(e) => {
+              e.stopPropagation();
+              if (e.target.style.display !== 'none') {
+                setEnlargedImage({ src: imageUrl, alt: `${key} content` });
+              }
+            }}
+          />
+        </div>
+      );
+    }
     
     // Render HTML content for fields with _html in their name
     if (typeof value === 'string' && (
@@ -250,16 +336,15 @@ export const FlatDataTable = React.forwardRef(({
     }
   }, [selectedColumns, columnWidths]);
 
-  // Helper function to determine column background class
-  const getColumnClassName = (columnName, isWrapped) => {
-    const classes = [columnName];
-    if (isWrapped) {
-      classes.push('wrap-text');
-    } else {
-      classes.push('no-wrap');
-    }
-    return classes.join(' ');
-  };
+  // Filter columns based on search term
+  const filteredKeys = useMemo(() => 
+    searchTerm 
+      ? processedData.keys.filter(key => 
+          key.toLowerCase().includes(searchTerm.toLowerCase())
+        )
+      : processedData.keys,
+    [processedData.keys, searchTerm]
+  );
 
   // Early return moved here after all hooks
   if (!data || data.length === 0) {
@@ -270,7 +355,7 @@ export const FlatDataTable = React.forwardRef(({
   const columnCountDisplay = `(${visibleColumns.length}/${processedData.keys.length})`;
 
   return (
-    <div className="flat-table-view">
+    <div className="flat-data-table-wrapper">
       <div className="table-controls">
         <div className="left-controls">
           <h3>{title || 'Flat Data View'} ({flattenedRows.length} rows)</h3>
@@ -296,12 +381,12 @@ export const FlatDataTable = React.forwardRef(({
           )}
         </div>
         {showColumnSelection && (
-          <div className="column-controls">
-            <button 
-              className="column-selector-button"
+          <div className="column-selector-container">
+            <button
+              className="btn btn-outline-primary btn-sm"
               onClick={() => setShowColumnSelector(!showColumnSelector)}
             >
-              {showColumnSelector ? 'Hide Columns' : 'Select Columns'}
+              {showColumnSelector ? 'Hide Column Selector' : 'Show Column Selector'}
             </button>
             <span className="column-count">
               {columnCountDisplay}
@@ -323,10 +408,20 @@ export const FlatDataTable = React.forwardRef(({
                 className="column-search"
               />
               <div className="column-selector-actions">
-                <button onClick={() => selectAllColumns(true)}>Select All</button>
-                <button onClick={() => selectAllColumns(false)}>Deselect All</button>
-                <button 
-                  className="close-button"
+                <button
+                  className="btn btn-outline-secondary btn-sm"
+                  onClick={() => selectAllColumns(true)}
+                >
+                  Select All
+                </button>
+                <button
+                  className="btn btn-outline-secondary btn-sm"
+                  onClick={() => selectAllColumns(false)}
+                >
+                  Deselect All
+                </button>
+                <button
+                  className="btn btn-outline-primary btn-sm"
                   onClick={() => setShowColumnSelector(false)}
                 >
                   Close
@@ -352,46 +447,61 @@ export const FlatDataTable = React.forwardRef(({
       )}
       
       <div className="table-container">
-        <table className="data-table compact">
+        <table className="data-table">
           <thead>
             <tr>
-              {visibleColumns.map(key => (
-                <th 
-                  key={key} 
-                  title={key}
-                  style={{ 
-                    width: columnWidths[key] ? `${columnWidths[key]}px` : '150px'
-                  }}
-                >
-                  {key.split('.').pop()}
-                  <div 
-                    className="resizer"
-                    onMouseDown={(e) => handleResizeStart(e, key)}
-                  />
-                </th>
-              ))}
+              {visibleColumns
+                .filter((column) => selectedColumns[column])
+                .map((column) => (
+                  <th
+                    key={column}
+                    style={{ width: columnWidths[column] || 'auto' }}
+                    ref={(el) => (headerRefs.current[column] = el)}
+                  >
+                    <div
+                      className="header-content"
+                      onMouseDown={(e) => handleResizeStart(e, column)}
+                    >
+                      {column}
+                      <div className="resize-handle" />
+                    </div>
+                  </th>
+                ))}
             </tr>
           </thead>
           <tbody>
             {flattenedRows.map((row, rowIndex) => (
               <tr key={rowIndex}>
-                {visibleColumns.map(key => (
-                  <td 
-                    key={key}
-                    className={getColumnClassName(key, wrapText)}
-                    style={{ 
-                      width: columnWidths[key] ? `${columnWidths[key]}px` : '150px',
-                      maxWidth: columnWidths[key] ? `${columnWidths[key]}px` : '150px'
-                    }}
-                  >
-                    {formatValue(row[key], key)}
-                  </td>
-                ))}
+                {visibleColumns
+                  .filter((column) => selectedColumns[column])
+                  .map((column) => (
+                    <td
+                      key={column}
+                      style={{
+                        width: columnWidths[column] || 'auto',
+                        whiteSpace: allowTextWrapping ? 'normal' : 'nowrap',
+                        backgroundColor: showColorHighlighting
+                          ? getHighlightColor(row[column])
+                          : 'inherit',
+                      }}
+                      className={isImageValue(row[column], column) ? 'image-cell' : ''}
+                    >
+                      {formatValue(row[column], column)}
+                    </td>
+                  ))}
               </tr>
             ))}
           </tbody>
         </table>
       </div>
+
+      {enlargedImage && (
+        <ImageModal 
+          src={enlargedImage.src}
+          alt={enlargedImage.alt}
+          onClose={() => setEnlargedImage(null)}
+        />
+      )}
     </div>
   );
 });

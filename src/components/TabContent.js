@@ -347,7 +347,7 @@ export const TabContent = ({
       <div className="d-flex justify-content-between align-items-center mb-3">
         <h4>Parsed JSONs</h4>
         <button 
-          className="save-display-button"
+          className="btn btn-success"
           onClick={() => {
             const sectionCode = selectedParsedFile ? extractSectionCode(selectedParsedFile) : null;
             if (sectionCode) {
@@ -367,7 +367,7 @@ export const TabContent = ({
         isLoading={isLoadingParsed}
       />
       {tab4State.data && tab4State.data.length > 0 ? (
-        <div className="table-view" style={{ flex: 1, overflow: 'hidden' }}>
+        <div className="table-view" style={{ flex: 1, overflow: 'hidden', position: 'relative' }}>
           <FlatDataTable 
             ref={tab4Ref}
             key={`tab4-table-${selectedParsedFile}`}
@@ -385,7 +385,7 @@ export const TabContent = ({
         <div style={{ textAlign: 'center', padding: '20px' }}>
           <p>No data available for Tab 4. Please select a file and click "Process Files".</p>
           <button 
-            className="btn btn-primary mt-2"
+            className="btn btn-primary"
             onClick={processFiles}
           >
             Load Sample Data
@@ -400,7 +400,7 @@ export const TabContent = ({
       <div className="d-flex justify-content-between align-items-center mb-3">
         <h4>Enhanced JSONs</h4>
         <button 
-          className="save-display-button"
+          className="btn btn-success"
           onClick={() => {
             const sectionCode = selectedEnhancedFile ? extractSectionCode(selectedEnhancedFile) : null;
             if (sectionCode) {
@@ -420,7 +420,7 @@ export const TabContent = ({
         isLoading={isLoadingEnhanced}
       />
       {tab5State.data && tab5State.data.length > 0 ? (
-        <div className="table-view" style={{ flex: 1, overflow: 'hidden' }}>
+        <div className="table-view" style={{ flex: 1, overflow: 'hidden', position: 'relative' }}>
           <FlatDataTable 
             ref={tab5Ref}
             key={`tab5-table-${selectedEnhancedFile}`}
@@ -438,7 +438,7 @@ export const TabContent = ({
         <div style={{ textAlign: 'center', padding: '20px' }}>
           <p>No data available for Tab 5. Please select a file and click "Process Files".</p>
           <button 
-            className="btn btn-primary mt-2"
+            className="btn btn-primary"
             onClick={processFiles}
           >
             Load Sample Data
