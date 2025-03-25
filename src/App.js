@@ -200,14 +200,14 @@ function App() {
   }, [activePdfFile, resetTabStates]);
 
   return (
-    <div className="App container-fluid px-2 px-sm-3 px-md-4">
-      <header className="App-header mb-3">
+    <div className="App container-fluid px-2 px-sm-3 px-md-4" style={{ height: '100vh', display: 'flex', flexDirection: 'column', overflow: 'hidden' }}>
+      <header className="App-header py-2">
         <h1>Document Review Application v1</h1>
-        <p>Process multiple document files with different structures</p>
+        <p className="mb-2">Process multiple document files with different structures</p>
       </header>
       
-      <div className="row flex-grow-1" style={{ height: 'calc(100vh - 120px)', overflow: 'hidden' }}>
-        <div className="col-md-2 col-lg-2 col-xl-1 mb-3" style={{ height: '100%', overflowY: 'auto' }}>
+      <div className="row flex-grow-1" style={{ minHeight: 0, overflow: 'hidden' }}>
+        <div className="col-md-2 col-lg-2 col-xl-1" style={{ height: '100%', overflowY: 'auto', paddingBottom: '10px' }}>
           <Sidebar
             folders={folders}
             foldersLoading={foldersLoading}
@@ -222,16 +222,14 @@ function App() {
         </div>
         
         <div className="col-md-10 col-lg-10 col-xl-11" style={{ height: '100%', overflow: 'hidden' }}>
-          <div className="row h-100">
-            <div className="col-lg-6 mb-3" style={{ height: '100%' }}>
-              <div className="viewer-container h-100">
+          <div className="row h-100 g-3">
+            <div className="col-lg-6" style={{ height: '100%', display: 'flex', flexDirection: 'column' }}>
+              <div className="viewer-container flex-grow-1" style={{ minHeight: 0, overflow: 'hidden' }}>
                 <div className="page-viewer h-100">
                   <div 
                     style={{ 
                       border: '1px solid #ccc', 
-                      padding: '10px', 
                       height: '100%',
-                      margin: '0',
                       overflow: 'hidden'
                     }}
                   >
@@ -244,17 +242,17 @@ function App() {
               </div>
             </div>
             
-            <div className="col-lg-6 mb-3" style={{ height: '100%' }}>
+            <div className="col-lg-6" style={{ height: '100%', display: 'flex', flexDirection: 'column' }}>
               <div 
-                className="results-container" 
+                className="results-container flex-grow-1"
                 style={{ 
-                  height: '100%', 
                   display: 'flex', 
                   flexDirection: 'column',
+                  minHeight: 0,
                   overflow: 'hidden'
                 }}
               >
-                <div className="d-flex justify-content-start mb-3">
+                <div className="nav-tabs-wrapper">
                   <ul className="nav nav-tabs">
                     {[
                       'Tab 1: Basic', 
@@ -277,7 +275,7 @@ function App() {
                 
                 <div style={{ 
                   flex: 1,
-                  height: 'calc(100% - 45px)',
+                  minHeight: 0,
                   overflow: 'hidden'
                 }}>
                   <TabContent 

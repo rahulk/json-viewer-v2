@@ -47,6 +47,7 @@ body {
   min-height: 100vh;
   display: flex;
   flex-direction: column;
+  text-align: center;
 }
 
 /* App header */
@@ -60,12 +61,13 @@ body {
 
 .App-header h1 {
   margin: 0;
-  font-size: 24px;
+  font-size: 1.5rem;
 }
 
 .App-header p {
-  margin: 5px 0 0 0;
-  font-size: 14px;
+  margin: 0;
+  font-size: 0.9rem;
+  opacity: 0.8;
 }
 
 .container {
@@ -250,8 +252,16 @@ body {
 }
 
 @media (max-width: 768px) {
+  .App-header {
+    padding: 0.5rem;
+  }
+  
   .App-header h1 {
-    font-size: 20px;
+    font-size: 1.25rem;
+  }
+  
+  .App-header p {
+    font-size: 0.8rem;
   }
   
   .sidebar {
@@ -665,31 +675,45 @@ body {
 }
 
 /* Tab navigation */
-.nav-tabs {
+.nav-tabs-wrapper {
+  background-color: #f8f9fa;
   border-bottom: 1px solid #dee2e6;
+  margin-bottom: 1px;
+}
+
+.nav-tabs {
+  margin-bottom: 0;
+  flex-wrap: nowrap;
+  overflow-x: auto;
+  overflow-y: hidden;
+  -webkit-overflow-scrolling: touch;
+}
+
+.nav-tabs::-webkit-scrollbar {
+  height: 4px;
+}
+
+.nav-tabs::-webkit-scrollbar-track {
+  background: #f1f1f1;
+}
+
+.nav-tabs::-webkit-scrollbar-thumb {
+  background: #888;
+  border-radius: 2px;
 }
 
 .nav-tabs .nav-link {
+  white-space: nowrap;
   padding: 0.5rem 1rem;
-  border: 1px solid transparent;
-  border-top-left-radius: 0.25rem;
-  border-top-right-radius: 0.25rem;
-  margin-bottom: -1px;
-  background-color: transparent;
-  color: #00008B;
-  font-size: 14px;
-}
-
-.nav-tabs .nav-link:hover {
-  border-color: #e9ecef #e9ecef #dee2e6;
-  background-color: #f8f9fa;
+  border: none;
+  border-bottom: 2px solid transparent;
 }
 
 .nav-tabs .nav-link.active {
-  border-color: #dee2e6 #dee2e6 #fff;
-  background-color: #fff;
-  color: #495057;
-  font-weight: bold;
+  border: none;
+  border-bottom: 2px solid #007bff;
+  background-color: transparent;
+  color: #007bff;
 }
 
 .tab-content-container {
@@ -720,4 +744,15 @@ body {
 .html-viewer-content {
   min-height: 100%;
   padding: 10px;
+}
+
+/* Grid spacing */
+.row.g-3 {
+  margin-right: -0.75rem;
+  margin-left: -0.75rem;
+}
+
+.row.g-3 > [class*="col-"] {
+  padding-right: 0.75rem;
+  padding-left: 0.75rem;
 }
