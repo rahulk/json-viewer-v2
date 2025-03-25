@@ -106,7 +106,13 @@ function App() {
               <div className="results-container" style={{ height: '100%', display: 'flex', flexDirection: 'column' }}>
                 <div className="d-flex justify-content-start mb-3">
                   <ul className="nav nav-tabs">
-                    {['Tab 1: Basic', 'Tab 2: Modified', 'Tab 3: Enhanced', 'Tab 4: Parsed JSONs', 'Tab 5: Enhanced JSONs'].map((tab, index) => (
+                    {[
+                      'Tab 1: Basic', 
+                      'Tab 2: Enhanced', // Changed from 'Modified'
+                      'Tab 3: Modified', // Changed from 'Enhanced'
+                      'Tab 4: Parsed JSONs', 
+                      'Tab 5: Enhanced JSONs'
+                    ].map((tab, index) => (
                       <li className="nav-item" key={index}>
                         <button 
                           className={`nav-link ${selectedTab === index ? 'active' : ''}`}
