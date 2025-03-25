@@ -206,8 +206,8 @@ function App() {
         <p>Process multiple document files with different structures</p>
       </header>
       
-      <div className="row flex-grow-1">
-        <div className="col-md-2 col-lg-2 col-xl-1 mb-3">
+      <div className="row flex-grow-1" style={{ height: 'calc(100vh - 120px)', overflow: 'hidden' }}>
+        <div className="col-md-2 col-lg-2 col-xl-1 mb-3" style={{ height: '100%', overflowY: 'auto' }}>
           <Sidebar
             folders={folders}
             foldersLoading={foldersLoading}
@@ -221,17 +221,18 @@ function App() {
           />
         </div>
         
-        <div className="col-md-10 col-lg-10 col-xl-11">
+        <div className="col-md-10 col-lg-10 col-xl-11" style={{ height: '100%', overflow: 'hidden' }}>
           <div className="row h-100">
-            <div className="col-lg-6 mb-3">
+            <div className="col-lg-6 mb-3" style={{ height: '100%' }}>
               <div className="viewer-container h-100">
-                <div className="page-viewer">
+                <div className="page-viewer h-100">
                   <div 
                     style={{ 
                       border: '1px solid #ccc', 
                       padding: '10px', 
                       height: '100%',
-                      margin: '0'
+                      margin: '0',
+                      overflow: 'hidden'
                     }}
                   >
                     <PdfViewer 
@@ -243,14 +244,14 @@ function App() {
               </div>
             </div>
             
-            <div className="col-lg-6 mb-3">
+            <div className="col-lg-6 mb-3" style={{ height: '100%' }}>
               <div 
                 className="results-container" 
                 style={{ 
                   height: '100%', 
                   display: 'flex', 
                   flexDirection: 'column',
-                  minHeight: 'calc(100vh - 150px)'
+                  overflow: 'hidden'
                 }}
               >
                 <div className="d-flex justify-content-start mb-3">
@@ -275,10 +276,9 @@ function App() {
                 </div>
                 
                 <div style={{ 
-                  flex: 1, 
-                  minHeight: 0,
-                  position: 'relative',
-                  overflow: 'hidden' 
+                  flex: 1,
+                  height: 'calc(100% - 45px)',
+                  overflow: 'hidden'
                 }}>
                   <TabContent 
                     selectedTab={selectedTab}

@@ -124,7 +124,7 @@ export const TabContent = ({
       <div 
         className="html-content"
         style={{ 
-          height: 'calc(100vh - 250px)', // Adjust height to fit viewport
+          height: '100%',
           overflow: 'auto',
           padding: '15px',
           border: '1px solid #ddd',
@@ -139,14 +139,14 @@ export const TabContent = ({
   };
 
   const renderTab1Content = () => (
-    <div style={{ height: '100%' }}>
+    <div style={{ height: '100%', overflow: 'hidden' }}>
       <h4>Basic HTML View</h4>
       {renderHtmlContent(htmlContents[0])}
     </div>
   );
 
   const renderTab4Content = () => (
-    <div className="json-viewer" style={{ border: '1px solid #ccc', padding: '10px', height: 'calc(100% - 60px)', overflow: 'auto' }}>
+    <div className="json-viewer" style={{ height: '100%', display: 'flex', flexDirection: 'column', overflow: 'hidden' }}>
       <div className="d-flex justify-content-between align-items-center mb-3">
         <h4>Parsed JSONs</h4>
         <button 
@@ -164,17 +164,17 @@ export const TabContent = ({
         isLoading={isLoadingParsed}
       />
       {tab4State.data && tab4State.data.length > 0 ? (
-        <div className="table-view">
+        <div className="table-view" style={{ flex: 1, overflow: 'hidden' }}>
           <FlatDataTable 
             key="tab4-table"
             data={tab4State.data}
             sectionCode="TAB4"
             showColumnSelection={true}
             allowTextWrapping={true}
-            showColorHighlighting={false}  // Changed to false for Tab 4
+            showColorHighlighting={false}
             initialColumnVisibility={tab4State.columnVisibility}
             onStateChange={handleTab4StateChange}
-            title=""  // Removed the title
+            title=""
           />
         </div>
       ) : (
@@ -192,7 +192,7 @@ export const TabContent = ({
   );
 
   const renderTab5Content = () => (
-    <div className="json-viewer" style={{ border: '1px solid #ccc', padding: '10px', height: 'calc(100% - 60px)', overflow: 'auto' }}>
+    <div className="json-viewer" style={{ height: '100%', display: 'flex', flexDirection: 'column', overflow: 'hidden' }}>
       <div className="d-flex justify-content-between align-items-center mb-3">
         <h4>Enhanced JSONs</h4>
         <button 
@@ -210,17 +210,17 @@ export const TabContent = ({
         isLoading={isLoadingEnhanced}
       />
       {tab5State.data && tab5State.data.length > 0 ? (
-        <div className="table-view">
+        <div className="table-view" style={{ flex: 1, overflow: 'hidden' }}>
           <FlatDataTable 
             key="tab5-table"
             data={tab5State.data}
             sectionCode="TAB5"
             showColumnSelection={true}
             allowTextWrapping={true}
-            showColorHighlighting={true}  // Keep true for Tab 5
+            showColorHighlighting={true}
             initialColumnVisibility={tab5State.columnVisibility}
             onStateChange={handleTab5StateChange}
-            title=""  // Removed the title
+            title=""
           />
         </div>
       ) : (
