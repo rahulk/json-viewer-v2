@@ -139,14 +139,17 @@ export const TabContent = ({
       <div 
         className="html-content"
         style={{ 
-          height: '100%', 
+          height: 'calc(100vh - 250px)', // Adjust height to fit viewport
           overflow: 'auto',
-          padding: '10px',
+          padding: '15px',
           border: '1px solid #ddd',
-          borderRadius: '4px'
+          borderRadius: '4px',
+          backgroundColor: '#fff',
+          boxShadow: 'inset 0 0 5px rgba(0,0,0,0.1)'
         }}
-        dangerouslySetInnerHTML={{ __html: content }} 
-      />
+      >
+        <div dangerouslySetInnerHTML={{ __html: content }} />
+      </div>
     );
   };
 

@@ -229,7 +229,15 @@ function App() {
             </div>
             
             <div className="col-lg-6 mb-3">
-              <div className="results-container" style={{ height: '100%', display: 'flex', flexDirection: 'column' }}>
+              <div 
+                className="results-container" 
+                style={{ 
+                  height: '100%', 
+                  display: 'flex', 
+                  flexDirection: 'column',
+                  maxHeight: 'calc(100vh - 150px)' // Adjust container height
+                }}
+              >
                 <div className="d-flex justify-content-start mb-3">
                   <ul className="nav nav-tabs">
                     {[
@@ -251,7 +259,12 @@ function App() {
                   </ul>
                 </div>
                 
-                <div style={{ flex: 1, minHeight: 0 }}> {/* This ensures proper scrolling */}
+                <div style={{ 
+                  flex: 1, 
+                  minHeight: 0,
+                  position: 'relative',
+                  overflow: 'hidden' 
+                }}>
                   <TabContent 
                     selectedTab={selectedTab}
                     htmlContents={[

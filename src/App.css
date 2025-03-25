@@ -468,6 +468,30 @@ body {
   font-size: 11px;
 }
 
+/* Add custom scrollbar styling */
+.html-content {
+  scrollbar-width: thin;
+  scrollbar-color: #888 #f1f1f1;
+}
+
+.html-content::-webkit-scrollbar {
+  width: 8px;
+}
+
+.html-content::-webkit-scrollbar-track {
+  background: #f1f1f1;
+  border-radius: 4px;
+}
+
+.html-content::-webkit-scrollbar-thumb {
+  background: #888;
+  border-radius: 4px;
+}
+
+.html-content::-webkit-scrollbar-thumb:hover {
+  background: #555;
+}
+
 /* Compact table */
 .data-table.compact td {
   padding: 1px 4px;
