@@ -7,7 +7,13 @@
 }
 
 .table-controls {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
   margin-bottom: 16px;
+  padding: 8px;
+  background-color: #f5f5f5;
+  border-radius: 4px;
 }
 
 .left-controls {
@@ -24,6 +30,18 @@
   display: flex;
   align-items: center;
   gap: 8px;
+  margin: 0;
+}
+
+.column-controls {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+}
+
+.color-filter,
+.wrap-text-filter {
+  white-space: nowrap;
 }
 
 /* AG Grid Theme Customization */
@@ -66,4 +84,4 @@
 
 .html-content::-webkit-scrollbar-thumb:hover {
   background: #555;
-} 
+}

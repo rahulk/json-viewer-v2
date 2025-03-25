@@ -162,7 +162,15 @@ export const TabContent = ({
 
   const renderTab4Content = () => (
     <div className="json-viewer" style={{ border: '1px solid #ccc', padding: '10px', height: 'calc(100% - 60px)', overflow: 'auto' }}>
-      <h4>JSON Viewer - Tab 4 (Parsed JSON)</h4>
+      <div className="d-flex justify-content-between align-items-center mb-3">
+        <h4>JSON Viewer - Tab 4 (Parsed JSON)</h4>
+        <button 
+          className="save-display-button"
+          onClick={() => console.log('Save preferences for section:', 'TAB4')}
+        >
+          Save Display
+        </button>
+      </div>
       <JsonFileSelector 
         jsonFiles={parsedJsons}
         selectedFile={selectedParsedFile}
@@ -178,8 +186,8 @@ export const TabContent = ({
             data={tab4State.data}
             sectionCode="TAB4"
             showColumnSelection={true}
-            allowTextWrapping={tab4State.wrapText}
-            showColorHighlighting={tab4State.filterColoredText}
+            allowTextWrapping={true}  // Changed this
+            showColorHighlighting={true}  // Changed this
             initialColumnVisibility={tab4State.columnVisibility}
             onStateChange={handleTab4StateChange}
             title="Flat Data View (TAB4)"
@@ -201,7 +209,15 @@ export const TabContent = ({
 
   const renderTab5Content = () => (
     <div className="json-viewer" style={{ border: '1px solid #ccc', padding: '10px', height: 'calc(100% - 60px)', overflow: 'auto' }}>
-      <h4>JSON Viewer - Tab 5 (Enhanced JSON)</h4>
+      <div className="d-flex justify-content-between align-items-center mb-3">
+        <h4>JSON Viewer - Tab 5 (Enhanced JSON)</h4>
+        <button 
+          className="save-display-button"
+          onClick={() => console.log('Save preferences for section:', 'TAB5')}
+        >
+          Save Display
+        </button>
+      </div>
       <JsonFileSelector 
         jsonFiles={enhancedJsons}
         selectedFile={selectedEnhancedFile}
@@ -217,8 +233,8 @@ export const TabContent = ({
             data={tab5State.data}
             sectionCode="TAB5"
             showColumnSelection={true}
-            allowTextWrapping={tab5State.wrapText}
-            showColorHighlighting={tab5State.filterColoredText}
+            allowTextWrapping={true}  // Change this from tab5State.wrapText to true
+            showColorHighlighting={true}  // Change this from tab5State.filterColoredText to true
             initialColumnVisibility={tab5State.columnVisibility}
             onStateChange={handleTab5StateChange}
             title="Flat Data View (TAB5)"
