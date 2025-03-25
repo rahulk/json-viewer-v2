@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useCallback, useRef } from 'react';
+import React, { useState, useEffect, useCallback, useRef, useMemo } from 'react';
 import { FlatDataTable } from './FlatDataTable';
 import { JsonFileSelector } from './common/JsonFileSelector';
 
@@ -19,29 +19,42 @@ export const TabContent = ({
   const [selectedEnhancedFile, setSelectedEnhancedFile] = useState('');
   const [isLoadingParsed, setIsLoadingParsed] = useState(false);
   const [isLoadingEnhanced, setIsLoadingEnhanced] = useState(false);
-  const [preferencesLoaded, setPreferencesLoaded] = useState({
-    parsed: false,
-    enhanced: false
-  });
   
   // Use useRef instead of useState for refs
   const tab4Ref = useRef(null);
   const tab5Ref = useRef(null);
+  const previousParsedSectionCode = useRef(null);
+  const previousEnhancedSectionCode = useRef(null);
 
-  // Memoize the state change handlers
+  // Add state to track mounting keys, but make them fixed for each table to preserve state
+  const tab4Key = useMemo(() => `tab4-fixed-instance`, []);
+  const tab5Key = useMemo(() => `tab5-fixed-instance`, []);
+  
+  // Track previous tab selection to detect tab changes
+  const prevSelectedTabRef = useRef(selectedTab);
+  
+  // Track tab switches for debugging
+  useEffect(() => {
+    if (prevSelectedTabRef.current !== selectedTab) {
+      console.log(`Tab changed from ${prevSelectedTabRef.current} to ${selectedTab}`);
+      prevSelectedTabRef.current = selectedTab;
+    }
+  }, [selectedTab]);
+
+  // Memoize the state change handlers - don't automatically preserve data
   const handleTab4Change = useCallback((newState) => {
     handleTab4StateChange(prevState => ({
       ...prevState,
-      ...newState,
-      data: prevState.data // Always preserve existing data
+      ...newState
+      // No longer forcing data preservation
     }));
   }, [handleTab4StateChange]);
 
   const handleTab5Change = useCallback((newState) => {
     handleTab5StateChange(prevState => ({
       ...prevState,
-      ...newState,
-      data: prevState.data // Always preserve existing data
+      ...newState
+      // No longer forcing data preservation
     }));
   }, [handleTab5StateChange]);
 
@@ -50,6 +63,56 @@ export const TabContent = ({
     const match = filename.match(/_((?:ENR|AD|GEN|AMDT)_\d+(?:_\d+)?)/i);
     return match ? match[1] : null;
   }, []);
+
+  // Custom handler for parsed file selection to ONLY reset state on section code change
+  const handleParsedFileSelect = useCallback((filename) => {
+    const newSectionCode = extractSectionCode(filename);
+    const currentSectionCode = previousParsedSectionCode.current;
+    
+    if (newSectionCode !== currentSectionCode) {
+      console.log(`Section code changed from ${currentSectionCode} to ${newSectionCode}, completely resetting Tab 4 state`);
+      
+      // First, update the section code reference
+      previousParsedSectionCode.current = newSectionCode;
+      
+      // Reset EVERYTHING including the entire tab state
+      handleTab4StateChange({
+        data: [], // Empty the data completely
+        columnVisibility: {},
+        columnWidths: {},
+        columnOrder: [],
+        wrapText: false,
+        filterColoredText: false
+      });
+    }
+    
+    setSelectedParsedFile(filename);
+  }, [extractSectionCode, handleTab4StateChange]);
+  
+  // Custom handler for enhanced file selection to ONLY reset state on section code change
+  const handleEnhancedFileSelect = useCallback((filename) => {
+    const newSectionCode = extractSectionCode(filename);
+    const currentSectionCode = previousEnhancedSectionCode.current;
+    
+    if (newSectionCode !== currentSectionCode) {
+      console.log(`Section code changed from ${currentSectionCode} to ${newSectionCode}, completely resetting Tab 5 state`);
+      
+      // First, update the section code reference
+      previousEnhancedSectionCode.current = newSectionCode;
+      
+      // Reset EVERYTHING including the entire tab state
+      handleTab5StateChange({
+        data: [], // Empty the data completely
+        columnVisibility: {},
+        columnWidths: {},
+        columnOrder: [],
+        wrapText: false,
+        filterColoredText: false
+      });
+    }
+    
+    setSelectedEnhancedFile(filename);
+  }, [extractSectionCode, handleTab5StateChange]);
 
   // Function to show notification
   const showNotification = useCallback((message, isError = false) => {
@@ -179,63 +242,7 @@ export const TabContent = ({
     }
   }, [pdfFilename]);
 
-  // Load preferences for Tab 4 when PDF file or section code changes
-  useEffect(() => {
-    const loadPrefs = async () => {
-      if (selectedParsedFile && !preferencesLoaded.parsed) {
-        const sectionCode = extractSectionCode(selectedParsedFile);
-        if (sectionCode) {
-          const prefs = await loadDisplayPreferences('parsed', sectionCode);
-          if (prefs) {
-            handleTab4StateChange({
-              columnVisibility: prefs.selectedColumns,
-              columnWidths: prefs.columnWidths,
-              columnOrder: prefs.columnOrder
-            });
-            setPreferencesLoaded(prev => ({ ...prev, parsed: true }));
-          }
-        }
-      }
-    };
-    loadPrefs();
-  }, [selectedParsedFile, extractSectionCode, loadDisplayPreferences, handleTab4StateChange, preferencesLoaded.parsed]);
-
-  // Load preferences for Tab 5 when PDF file or section code changes
-  useEffect(() => {
-    const loadPrefs = async () => {
-      if (selectedEnhancedFile && !preferencesLoaded.enhanced) {
-        const sectionCode = extractSectionCode(selectedEnhancedFile);
-        if (sectionCode) {
-          const prefs = await loadDisplayPreferences('enhanced', sectionCode);
-          if (prefs) {
-            handleTab5StateChange({
-              columnVisibility: prefs.selectedColumns,
-              columnWidths: prefs.columnWidths,
-              columnOrder: prefs.columnOrder
-            });
-            setPreferencesLoaded(prev => ({ ...prev, enhanced: true }));
-          }
-        }
-      }
-    };
-    loadPrefs();
-  }, [selectedEnhancedFile, extractSectionCode, loadDisplayPreferences, handleTab5StateChange, preferencesLoaded.enhanced]);
-
-  // Reset preferences loaded state when files change
-  useEffect(() => {
-    setPreferencesLoaded({ parsed: false, enhanced: false });
-  }, [selectedParsedFile, selectedEnhancedFile]);
-
-  // Debug logging
-  useEffect(() => {
-    console.log('TabContent received JSON files:', {
-      parsed: parsedJsons,
-      enhanced: enhancedJsons,
-      folderPath,
-      pdfFilename
-    });
-  }, [parsedJsons, enhancedJsons, folderPath, pdfFilename]);
-
+  // Updated to load preferences after processing the JSON
   const handleProcessParsedJson = useCallback(async () => {
     if (!selectedParsedFile || !folderPath) {
       console.log('❌ Missing required data:', { selectedParsedFile, folderPath });
@@ -266,17 +273,41 @@ export const TabContent = ({
         success: data.success
       });
 
-      // Update only the data while preserving other state
+      // Update the data first
       handleTab4StateChange({
         data: data.results || []
       });
+
+      // Then load and apply saved preferences for this section code
+      const sectionCode = extractSectionCode(selectedParsedFile);
+      if (sectionCode) {
+        try {
+          console.log(`Loading preferences for section: ${sectionCode} after processing data`);
+          const prefs = await loadDisplayPreferences('parsed', sectionCode);
+          
+          if (prefs && Object.keys(prefs).length > 0) {
+            console.log('Found saved preferences, applying them:', prefs);
+            
+            handleTab4StateChange({
+              columnVisibility: prefs.selectedColumns || {},
+              columnWidths: prefs.columnWidths || {},
+              columnOrder: prefs.columnOrder || []
+            });
+          } else {
+            console.log('No saved preferences found, using defaults');
+          }
+        } catch (error) {
+          console.error('Error loading preferences:', error);
+        }
+      }
     } catch (error) {
       console.error('❌ Error processing JSON:', error);
     } finally {
       setIsLoadingParsed(false);
     }
-  }, [selectedParsedFile, folderPath, handleTab4StateChange]);
+  }, [selectedParsedFile, folderPath, extractSectionCode, loadDisplayPreferences, handleTab4StateChange]);
 
+  // Updated to load preferences after processing the JSON
   const handleProcessEnhancedJson = useCallback(async () => {
     if (!selectedEnhancedFile || !folderPath) {
       console.log('❌ Missing required data for enhanced JSON:', { selectedEnhancedFile, folderPath });
@@ -298,16 +329,50 @@ export const TabContent = ({
       }
 
       const data = await response.json();
-      // Update only the data while preserving other state
+      
+      // Update the data first
       handleTab5StateChange({
         data: data.results || []
       });
+      
+      // Then load and apply saved preferences for this section code
+      const sectionCode = extractSectionCode(selectedEnhancedFile);
+      if (sectionCode) {
+        try {
+          console.log(`Loading preferences for section: ${sectionCode} after processing data`);
+          const prefs = await loadDisplayPreferences('enhanced', sectionCode);
+          
+          if (prefs && Object.keys(prefs).length > 0) {
+            console.log('Found saved preferences, applying them:', prefs);
+            
+            handleTab5StateChange({
+              columnVisibility: prefs.selectedColumns || {},
+              columnWidths: prefs.columnWidths || {},
+              columnOrder: prefs.columnOrder || []
+            });
+          } else {
+            console.log('No saved preferences found, using defaults');
+          }
+        } catch (error) {
+          console.error('Error loading preferences:', error);
+        }
+      }
     } catch (error) {
       console.error('❌ Error processing enhanced JSON:', error);
     } finally {
       setIsLoadingEnhanced(false);
     }
-  }, [selectedEnhancedFile, folderPath, handleTab5StateChange]);
+  }, [selectedEnhancedFile, folderPath, extractSectionCode, loadDisplayPreferences, handleTab5StateChange]);
+
+  // Debug logging
+  useEffect(() => {
+    console.log('TabContent received JSON files:', {
+      parsed: parsedJsons,
+      enhanced: enhancedJsons,
+      folderPath,
+      pdfFilename
+    });
+  }, [parsedJsons, enhancedJsons, folderPath, pdfFilename]);
 
   // Update the renderHtmlContent function to show a more informative message
   const renderHtmlContent = (content) => {
@@ -369,6 +434,61 @@ export const TabContent = ({
     </div>
   );
 
+  // Memoize the FlatDataTable components to preserve them across tab changes
+  const parsedFlatDataTable = useMemo(() => (
+    <FlatDataTable 
+      ref={tab4Ref}
+      key={tab4Key}
+      componentId="parsed-table"
+      data={tab4State.data}
+      sectionCode={extractSectionCode(selectedParsedFile)}
+      showColumnSelection={true}
+      allowTextWrapping={true}
+      showColorHighlighting={false}
+      initialColumnVisibility={tab4State.columnVisibility}
+      initialColumnWidths={tab4State.columnWidths}
+      initialColumnOrder={tab4State.columnOrder}
+      onStateChange={handleTab4Change}
+      title=""
+    />
+  ), [
+    tab4Key, 
+    tab4State.data, 
+    tab4State.columnVisibility, 
+    tab4State.columnWidths, 
+    tab4State.columnOrder, 
+    selectedParsedFile, 
+    handleTab4Change, 
+    extractSectionCode
+  ]);
+
+  const enhancedFlatDataTable = useMemo(() => (
+    <FlatDataTable 
+      ref={tab5Ref}
+      key={tab5Key}
+      componentId="enhanced-table"
+      data={tab5State.data}
+      sectionCode={extractSectionCode(selectedEnhancedFile)}
+      showColumnSelection={true}
+      allowTextWrapping={true}
+      showColorHighlighting={true}
+      initialColumnVisibility={tab5State.columnVisibility}
+      initialColumnWidths={tab5State.columnWidths}
+      initialColumnOrder={tab5State.columnOrder}
+      onStateChange={handleTab5Change}
+      title=""
+    />
+  ), [
+    tab5Key, 
+    tab5State.data, 
+    tab5State.columnVisibility, 
+    tab5State.columnWidths, 
+    tab5State.columnOrder, 
+    selectedEnhancedFile, 
+    handleTab5Change, 
+    extractSectionCode
+  ]);
+
   const renderTab4Content = () => (
     <div style={{ 
       height: '100%',
@@ -377,11 +497,10 @@ export const TabContent = ({
       overflow: 'visible'
     }}>
       <div style={{ 
-        marginBottom: '8px', 
+        marginBottom: '16px', 
         flexShrink: 0,
         display: 'flex',
-        flexWrap: 'wrap',
-        alignItems: 'center',
+        flexDirection: 'column',
         gap: '8px'
       }}>
         <div style={{ display: 'flex', alignItems: 'center', flexGrow: 1, maxWidth: '100%' }}>
@@ -389,7 +508,7 @@ export const TabContent = ({
             <JsonFileSelector
               jsonFiles={parsedJsons}
               selectedFile={selectedParsedFile}
-              onFileSelect={setSelectedParsedFile}
+              onFileSelect={handleParsedFileSelect}
               isLoading={isLoadingParsed}
               onProcessFile={handleProcessParsedJson}
             />
@@ -397,11 +516,16 @@ export const TabContent = ({
           <button
             className="btn btn-outline-secondary ms-2"
             onClick={() => saveDisplayPreferences('parsed', tab4Ref, extractSectionCode(selectedParsedFile))}
-            disabled={!selectedParsedFile}
+            disabled={!selectedParsedFile || !tab4State.data || tab4State.data.length === 0}
             style={{ whiteSpace: 'nowrap' }}
           >
             Save Display Settings
           </button>
+        </div>
+        
+        {/* Add simple workflow instructions */}
+        <div className="small text-muted">
+          <strong>How to use:</strong> 1) Select a section code from the dropdown 2) Click "Process File" to load data and apply saved view settings
         </div>
       </div>
 
@@ -409,7 +533,7 @@ export const TabContent = ({
         <div style={{ 
           display: 'flex',
           flexDirection: 'column',
-          height: 'calc(100vh - 200px)',
+          height: 'calc(100vh - 220px)', /* Updated to account for the instructions */
           overflow: 'visible',
           position: 'relative',
           backgroundColor: '#fff',
@@ -418,30 +542,51 @@ export const TabContent = ({
           minHeight: '0',
           minWidth: '0'
         }}>
-          <FlatDataTable 
-            ref={tab4Ref}
-            key={`tab4-table-${selectedParsedFile}`}
-            data={tab4State.data}
-            sectionCode={selectedParsedFile ? extractSectionCode(selectedParsedFile) : null}
-            showColumnSelection={true}
-            allowTextWrapping={true}
-            showColorHighlighting={false}
-            initialColumnVisibility={tab4State.columnVisibility}
-            initialColumnWidths={tab4State.columnWidths}
-            initialColumnOrder={tab4State.columnOrder}
-            onStateChange={handleTab4Change}
-            title=""
-          />
+          {parsedFlatDataTable}
         </div>
       ) : (
-        <div style={{ textAlign: 'center', padding: '20px' }}>
-          <p>No data available for Tab 4. Please select a file and click "Process Files".</p>
-          <button 
-            className="btn btn-primary"
-            onClick={processFiles}
-          >
-            Load Sample Data
-          </button>
+        <div className="card p-4 text-center" style={{ backgroundColor: '#f9f9f9' }}>
+          <div className="mb-3">
+            <i className="bi bi-table fs-1 text-muted"></i>
+          </div>
+          <h5>No Data Loaded</h5>
+          {selectedParsedFile ? (
+            <>
+              <p className="text-muted mb-3">
+                You've selected section code <strong>{extractSectionCode(selectedParsedFile)}</strong>.<br/>
+                Click "Load Data" to view the contents and apply any saved display settings.
+              </p>
+              <button 
+                className="btn btn-primary"
+                onClick={handleProcessParsedJson}
+                disabled={isLoadingParsed}
+              >
+                {isLoadingParsed ? (
+                  <>
+                    <span className="spinner-border spinner-border-sm me-2"></span>
+                    Loading...
+                  </>
+                ) : (
+                  'Load Data'
+                )}
+              </button>
+            </>
+          ) : (
+            <>
+              <p className="text-muted mb-3">
+                Select a section code from the dropdown above to get started.
+              </p>
+              <div className="text-muted small">
+                <strong>OR</strong>
+              </div>
+              <button 
+                className="btn btn-outline-secondary mt-2"
+                onClick={processFiles}
+              >
+                Load Sample Data
+              </button>
+            </>
+          )}
         </div>
       )}
     </div>
@@ -455,11 +600,10 @@ export const TabContent = ({
       overflow: 'visible'
     }}>
       <div style={{ 
-        marginBottom: '8px', 
+        marginBottom: '16px', 
         flexShrink: 0,
         display: 'flex',
-        flexWrap: 'wrap',
-        alignItems: 'center',
+        flexDirection: 'column',
         gap: '8px'
       }}>
         <div style={{ display: 'flex', alignItems: 'center', flexGrow: 1, maxWidth: '100%' }}>
@@ -467,7 +611,7 @@ export const TabContent = ({
             <JsonFileSelector
               jsonFiles={enhancedJsons}
               selectedFile={selectedEnhancedFile}
-              onFileSelect={setSelectedEnhancedFile}
+              onFileSelect={handleEnhancedFileSelect}
               isLoading={isLoadingEnhanced}
               onProcessFile={handleProcessEnhancedJson}
             />
@@ -475,11 +619,16 @@ export const TabContent = ({
           <button
             className="btn btn-outline-secondary ms-2"
             onClick={() => saveDisplayPreferences('enhanced', tab5Ref, extractSectionCode(selectedEnhancedFile))}
-            disabled={!selectedEnhancedFile}
+            disabled={!selectedEnhancedFile || !tab5State.data || tab5State.data.length === 0}
             style={{ whiteSpace: 'nowrap' }}
           >
             Save Display Settings
           </button>
+        </div>
+        
+        {/* Add simple workflow instructions */}
+        <div className="small text-muted">
+          <strong>How to use:</strong> 1) Select a section code from the dropdown 2) Click "Process File" to load data and apply saved view settings
         </div>
       </div>
 
@@ -487,7 +636,7 @@ export const TabContent = ({
         <div style={{ 
           display: 'flex',
           flexDirection: 'column',
-          height: 'calc(100vh - 200px)',
+          height: 'calc(100vh - 220px)', /* Updated to account for the instructions */
           overflow: 'visible',
           position: 'relative',
           backgroundColor: '#fff',
@@ -496,30 +645,51 @@ export const TabContent = ({
           minHeight: '0',
           minWidth: '0'
         }}>
-          <FlatDataTable 
-            ref={tab5Ref}
-            key={`tab5-table-${selectedEnhancedFile}`}
-            data={tab5State.data}
-            sectionCode={selectedEnhancedFile ? extractSectionCode(selectedEnhancedFile) : null}
-            showColumnSelection={true}
-            allowTextWrapping={true}
-            showColorHighlighting={true}
-            initialColumnVisibility={tab5State.columnVisibility}
-            initialColumnWidths={tab5State.columnWidths}
-            initialColumnOrder={tab5State.columnOrder}
-            onStateChange={handleTab5Change}
-            title=""
-          />
+          {enhancedFlatDataTable}
         </div>
       ) : (
-        <div style={{ textAlign: 'center', padding: '20px' }}>
-          <p>No data available for Tab 5. Please select a file and click "Process Files".</p>
-          <button 
-            className="btn btn-primary"
-            onClick={processFiles}
-          >
-            Load Sample Data
-          </button>
+        <div className="card p-4 text-center" style={{ backgroundColor: '#f9f9f9' }}>
+          <div className="mb-3">
+            <i className="bi bi-table fs-1 text-muted"></i>
+          </div>
+          <h5>No Enhanced Data Loaded</h5>
+          {selectedEnhancedFile ? (
+            <>
+              <p className="text-muted mb-3">
+                You've selected section code <strong>{extractSectionCode(selectedEnhancedFile)}</strong>.<br/>
+                Click "Load Data" to view the enhanced contents and apply any saved display settings.
+              </p>
+              <button 
+                className="btn btn-primary"
+                onClick={handleProcessEnhancedJson}
+                disabled={isLoadingEnhanced}
+              >
+                {isLoadingEnhanced ? (
+                  <>
+                    <span className="spinner-border spinner-border-sm me-2"></span>
+                    Loading...
+                  </>
+                ) : (
+                  'Load Data'
+                )}
+              </button>
+            </>
+          ) : (
+            <>
+              <p className="text-muted mb-3">
+                Select a section code from the dropdown above to get started.
+              </p>
+              <div className="text-muted small">
+                <strong>OR</strong>
+              </div>
+              <button 
+                className="btn btn-outline-secondary mt-2"
+                onClick={processFiles}
+              >
+                Load Sample Data
+              </button>
+            </>
+          )}
         </div>
       )}
     </div>

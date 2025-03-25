@@ -128,7 +128,16 @@ export const useJsonProcessing = () => {
 
   // Ensure these handlers properly merge the state updates
   const handleTab4StateChange = useCallback((newState) => {
+    // Check if this is a reset operation (data is empty array)
+    const isReset = newState.data && Array.isArray(newState.data) && newState.data.length === 0;
+    
     setTab4State(prevState => {
+      // For a reset operation, don't merge with previous state
+      if (isReset) {
+        console.log('Detected tab4 reset operation, replacing entire state');
+        return newState;
+      }
+      
       // For deep objects, we need to ensure we're properly merging
       const newStateObj = { ...prevState };
       
@@ -160,7 +169,16 @@ export const useJsonProcessing = () => {
   }, []);
 
   const handleTab5StateChange = useCallback((newState) => {
+    // Check if this is a reset operation (data is empty array)
+    const isReset = newState.data && Array.isArray(newState.data) && newState.data.length === 0;
+    
     setTab5State(prevState => {
+      // For a reset operation, don't merge with previous state
+      if (isReset) {
+        console.log('Detected tab5 reset operation, replacing entire state');
+        return newState;
+      }
+      
       // For deep objects, we need to ensure we're properly merging
       const newStateObj = { ...prevState };
       
@@ -192,14 +210,28 @@ export const useJsonProcessing = () => {
   }, []);
 
   const resetTabStates = useCallback(() => {
-    setTab4State(prevState => ({
-      ...prevState,
-      data: []
-    }));
-    setTab5State(prevState => ({
-      ...prevState,
-      data: []
-    }));
+    // Completely reset tab states to initial values
+    setTab4State({
+      data: [],
+      columnVisibility: {},
+      filters: {},
+      wrapText: false,
+      filterColoredText: false,
+      columnWidths: {},
+      columnOrder: []
+    });
+    
+    setTab5State({
+      data: [],
+      columnVisibility: {},
+      filters: {},
+      wrapText: false,
+      filterColoredText: false,
+      columnWidths: {},
+      columnOrder: []
+    });
+    
+    console.log('Tab states completely reset');
   }, []);
   
   return {

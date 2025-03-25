@@ -113,6 +113,53 @@ app.get('/api/display-preferences', async (req, res) => {
   }
 });
 
+// Add another route to handle the format used by FlatDataTable
+app.get('/api/display-preferences/:sectionCode', async (req, res) => {
+  try {
+    await ensurePrefsDir();
+    const sectionCode = req.params.sectionCode;
+    
+    if (!sectionCode) {
+      return res.status(400).json({ 
+        error: 'Section code is required' 
+      });
+    }
+
+    console.log('Looking for preferences with section code:', sectionCode);
+    
+    // List all preferences files
+    const files = await fs.readdir(PREFS_DIR);
+    
+    // Find any file that contains the section code
+    const matchingFiles = files.filter(file => file.includes(sectionCode));
+    
+    if (matchingFiles.length === 0) {
+      // No matching file found
+      console.log('No preferences found for section code:', sectionCode);
+      return res.json({});
+    }
+    
+    // Use the first matching file
+    const filePath = path.join(PREFS_DIR, matchingFiles[0]);
+    console.log('Loading preferences from:', filePath);
+    
+    try {
+      const data = await fs.readFile(filePath, 'utf8');
+      res.json(JSON.parse(data));
+    } catch (error) {
+      if (error.code === 'ENOENT') {
+        // File doesn't exist - return empty preferences
+        res.json({});
+      } else {
+        throw error;
+      }
+    }
+  } catch (error) {
+    console.error('Error loading preferences by section code:', error);
+    res.status(500).json({ error: 'Failed to load preferences' });
+  }
+});
+
 // Add these API endpoints to your existing server file
 
 // API endpoint to get folders

@@ -30,7 +30,8 @@ export const FlatDataTable = React.forwardRef(({
   showColumnSelection = true,
   allowTextWrapping = true,
   showColorHighlighting = true,
-  title
+  title,
+  componentId = 'default'
 }, ref) => {
   const [selectedColumns, setSelectedColumns] = useState({});
   const [showColumnSelector, setShowColumnSelector] = useState(false);
@@ -41,11 +42,52 @@ export const FlatDataTable = React.forwardRef(({
   const [enlargedImage, setEnlargedImage] = useState(null);
   const isInitialized = useRef(false);
   const previousStateRef = useRef(null);
+  const previousSectionCode = useRef(sectionCode);
+  const mountedRef = useRef(false);
   
   // New state for column ordering
   const [columnOrder, setColumnOrder] = useState(initialColumnOrder.length > 0 ? initialColumnOrder : []);
   const [draggedColumn, setDraggedColumn] = useState(null);
   const [dragOverColumn, setDragOverColumn] = useState(null);
+
+  // Prevent resetting state on component remount due to tab change
+  useEffect(() => {
+    // If this is the first mount, set the mounted flag
+    if (!mountedRef.current) {
+      mountedRef.current = true;
+      console.log(`FlatDataTable ${componentId} initialized for first time`);
+    } else {
+      console.log(`FlatDataTable ${componentId} remounted, preserving state`);
+    }
+  }, [componentId]);
+
+  // Reset state ONLY when sectionCode changes, not when tabs switch
+  useEffect(() => {
+    if (sectionCode !== previousSectionCode.current && sectionCode) {
+      console.log('Section code changed from', previousSectionCode.current, 'to', sectionCode);
+      console.log('Completely resetting FlatDataTable internal state');
+      
+      // Reset all state to initial values
+      setSelectedColumns({});
+      setColumnWidths({});
+      setColumnOrder([]);
+      setFilterColoredText(false);
+      setWrapText(false);
+      setShowColumnSelector(false);
+      setSearchTerm('');
+      
+      // Reset initialized flag to trigger reinitialization
+      isInitialized.current = false;
+      
+      // Update the reference
+      previousSectionCode.current = sectionCode;
+      
+      // Force re-render to ensure processedData is recalculated
+      if (onStateChange) {
+        onStateChange({ forceUpdate: Date.now() });
+      }
+    }
+  }, [sectionCode, onStateChange]);
 
   // Expose methods to parent component through ref
   React.useImperativeHandle(ref, () => ({
@@ -111,6 +153,7 @@ export const FlatDataTable = React.forwardRef(({
 
       try {
         console.log('Loading preferences for section:', sectionCode);
+        // Use the new API endpoint we added
         const response = await fetch(`http://localhost:3001/api/display-preferences/${encodeURIComponent(sectionCode)}`);
         
         if (!isMounted) return;
@@ -118,17 +161,65 @@ export const FlatDataTable = React.forwardRef(({
         if (response.ok) {
           const prefs = await response.json();
           console.log('Loaded preferences:', prefs);
+          
+          // Replace state completely instead of merging
           if (prefs.selectedColumns) {
-            setSelectedColumns(prefs.selectedColumns);
+            setSelectedColumns(prevColumns => {
+              // Only keep columns that exist in the current data
+              const columnsForCurrentData = {};
+              Object.keys(prefs.selectedColumns).forEach(key => {
+                if (processedData.keys.includes(key)) {
+                  columnsForCurrentData[key] = prefs.selectedColumns[key];
+                }
+              });
+              return columnsForCurrentData;
+            });
+          } else {
+            // If no saved preferences, initialize with all columns visible
+            setSelectedColumns(
+              Object.fromEntries(processedData.keys.map(key => [key, true]))
+            );
           }
+          
           if (prefs.columnWidths) {
-            setColumnWidths(prefs.columnWidths);
+            setColumnWidths(prevWidths => {
+              // Only keep widths for columns that exist in the current data
+              const widthsForCurrentData = {};
+              Object.keys(prefs.columnWidths).forEach(key => {
+                if (processedData.keys.includes(key)) {
+                  widthsForCurrentData[key] = prefs.columnWidths[key];
+                }
+              });
+              return widthsForCurrentData;
+            });
           }
+          
           if (prefs.columnOrder && prefs.columnOrder.length > 0) {
-            setColumnOrder(prefs.columnOrder);
+            // Filter out columns that don't exist in the current data
+            const validOrder = prefs.columnOrder.filter(col => 
+              processedData.keys.includes(col)
+            );
+            
+            // Add any new columns that aren't in the saved order
+            const newOrder = [...validOrder];
+            processedData.keys.forEach(key => {
+              if (!newOrder.includes(key)) {
+                newOrder.push(key);
+              }
+            });
+            
+            setColumnOrder(newOrder);
+          } else {
+            // If no saved order, use processed data keys order
+            setColumnOrder([...processedData.keys]);
           }
         } else {
           console.log('No saved preferences found for section:', sectionCode);
+          // Initialize with all columns visible
+          setSelectedColumns(
+            Object.fromEntries(processedData.keys.map(key => [key, true]))
+          );
+          setColumnOrder([...processedData.keys]);
         }
       } catch (error) {
         if (!isMounted) return;
@@ -141,7 +232,7 @@ export const FlatDataTable = React.forwardRef(({
     return () => {
       isMounted = false;
     };
-  }, [sectionCode]);
+  }, [sectionCode, processedData.keys]);
 
   // Initialize selected columns if no preferences were loaded
   useEffect(() => {
@@ -150,7 +241,22 @@ export const FlatDataTable = React.forwardRef(({
         ? initialColumnVisibility
         : Object.fromEntries(processedData.keys.map(key => [key, true]));
       
-      setSelectedColumns(initialSelection);
+      // Filter out any columns that don't exist in the current dataset
+      const validSelection = {};
+      Object.keys(initialSelection).forEach(key => {
+        if (processedData.keys.includes(key)) {
+          validSelection[key] = initialSelection[key];
+        }
+      });
+      
+      // Make sure all keys from the dataset are included
+      processedData.keys.forEach(key => {
+        if (validSelection[key] === undefined) {
+          validSelection[key] = true; // Default to visible
+        }
+      });
+      
+      setSelectedColumns(validSelection);
       isInitialized.current = true;
     }
   }, [processedData.keys, initialColumnVisibility]);
@@ -158,23 +264,60 @@ export const FlatDataTable = React.forwardRef(({
   // Update state when initialColumnVisibility changes
   useEffect(() => {
     if (Object.keys(initialColumnVisibility).length > 0) {
-      setSelectedColumns(initialColumnVisibility);
+      // Filter to only include valid columns for the current dataset
+      const validVisibility = {};
+      
+      // First, include all columns from initialColumnVisibility that exist in the data
+      Object.keys(initialColumnVisibility).forEach(key => {
+        if (processedData.keys.includes(key)) {
+          validVisibility[key] = initialColumnVisibility[key];
+        }
+      });
+      
+      // Then make sure all columns in the data are included
+      processedData.keys.forEach(key => {
+        if (validVisibility[key] === undefined) {
+          validVisibility[key] = true; // Default to visible
+        }
+      });
+      
+      setSelectedColumns(validVisibility);
     }
-  }, [initialColumnVisibility]);
+  }, [initialColumnVisibility, processedData.keys]);
 
   // Update state when initialColumnWidths changes
   useEffect(() => {
     if (Object.keys(initialColumnWidths).length > 0) {
-      setColumnWidths(initialColumnWidths);
+      // Filter to only include valid columns for the current dataset
+      const validWidths = {};
+      Object.keys(initialColumnWidths).forEach(key => {
+        if (processedData.keys.includes(key)) {
+          validWidths[key] = initialColumnWidths[key];
+        }
+      });
+      setColumnWidths(validWidths);
     }
-  }, [initialColumnWidths]);
+  }, [initialColumnWidths, processedData.keys]);
 
   // Update state when initialColumnOrder changes
   useEffect(() => {
     if (initialColumnOrder && initialColumnOrder.length > 0) {
-      setColumnOrder(initialColumnOrder);
+      // Filter to only include valid columns that exist in the dataset
+      const validOrder = initialColumnOrder.filter(col => 
+        processedData.keys.includes(col)
+      );
+      
+      // Add any missing columns from the dataset
+      const newOrder = [...validOrder];
+      processedData.keys.forEach(key => {
+        if (!newOrder.includes(key)) {
+          newOrder.push(key);
+        }
+      });
+      
+      setColumnOrder(newOrder);
     }
-  }, [initialColumnOrder]);
+  }, [initialColumnOrder, processedData.keys]);
 
   // Notify parent of state changes, but only when they actually change
   useEffect(() => {
@@ -197,21 +340,26 @@ export const FlatDataTable = React.forwardRef(({
 
   // Get visible columns in proper order
   const visibleColumns = useMemo(() => {
-    // First ensure all keys are in columnOrder (in case new columns were added)
+    // First ensure all keys in the current dataset are in columnOrder
     const currentOrder = [...columnOrder];
+    
+    // Filter columnOrder to only include columns that exist in the dataset
+    const validOrder = currentOrder.filter(key => processedData.keys.includes(key));
+    
+    // Add any new columns that aren't in the order
     processedData.keys.forEach(key => {
-      if (!currentOrder.includes(key)) {
-        currentOrder.push(key);
+      if (!validOrder.includes(key)) {
+        validOrder.push(key);
       }
     });
     
-    // Use the updated order
-    if (currentOrder.length !== columnOrder.length) {
-      setColumnOrder(currentOrder);
+    // Update columnOrder if it changed
+    if (JSON.stringify(validOrder) !== JSON.stringify(currentOrder)) {
+      setColumnOrder(validOrder);
     }
     
     // Return only visible columns in the correct order
-    return currentOrder.filter(key => selectedColumns[key]);
+    return validOrder.filter(key => selectedColumns[key]);
   }, [processedData.keys, selectedColumns, columnOrder]);
 
   const flattenedRows = useMemo(() => {
@@ -457,6 +605,11 @@ export const FlatDataTable = React.forwardRef(({
   if (!data || data.length === 0) {
     return <div>No data available</div>;
   }
+  
+  // Also return early if there's no section code - this prevents showing data during transitions
+  if (!sectionCode) {
+    return <div>No section code provided. Please select a section.</div>;
+  }
 
   // Update the column count display
   const columnCountDisplay = `(${visibleColumns.length}/${processedData.keys.length})`;
@@ -642,5 +795,6 @@ FlatDataTable.propTypes = {
   showColumnSelection: PropTypes.bool,
   allowTextWrapping: PropTypes.bool,
   showColorHighlighting: PropTypes.bool,
-  title: PropTypes.string
+  title: PropTypes.string,
+  componentId: PropTypes.string
 };

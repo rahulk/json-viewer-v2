@@ -16,7 +16,7 @@ export const JsonFileSelector = ({
         value={selectedFile || ''}
         onChange={(e) => onFileSelect(e.target.value)}
       >
-        <option value="">Select Section Code</option>
+        <option value="">-- Select Section Code --</option>
         {(jsonFiles || []).map((file, index) => (
           <option key={index} value={file.filename}>
             {file.sectionCode}
@@ -29,14 +29,15 @@ export const JsonFileSelector = ({
         onClick={onProcessFile}
         disabled={!selectedFile || isLoading}
         style={{ whiteSpace: 'nowrap' }}
+        title="Load data and apply saved view settings for this section"
       >
         {isLoading ? (
           <>
             <span className="spinner-border spinner-border-sm me-1" />
-            Processing...
+            Loading...
           </>
         ) : (
-          'Process File'
+          'Load Data'
         )}
       </button>
     </div>
