@@ -111,9 +111,11 @@ export const TabContent = ({
   const renderHtmlContent = (content) => {
     if (!content) {
       return (
-        <div className="alert alert-info text-center">
-          <p>No content available</p>
-          <small className="d-block mt-2">Select a PDF file to view its HTML content</small>
+        <div className="alert alert-info text-center h-100 d-flex align-items-center justify-content-center">
+          <div>
+            <p>No content available</p>
+            <small className="d-block mt-2">Select a PDF file to view its HTML content</small>
+          </div>
         </div>
       );
     }

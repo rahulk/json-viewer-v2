@@ -206,18 +206,7 @@ function App() {
         <p>Process multiple document files with different structures</p>
       </header>
       
-      {/* Commented out FileUploader
-      <div className="mb-3">
-        <FileUploader
-          onFileChange={setFiles}
-          onProcess={processFiles}
-          isLoading={isLoading}
-          error={error}
-        />
-      </div>
-      */}
-      
-      <div className="row">
+      <div className="row flex-grow-1">
         <div className="col-md-2 col-lg-2 col-xl-1 mb-3">
           <Sidebar
             folders={folders}
@@ -233,7 +222,7 @@ function App() {
         </div>
         
         <div className="col-md-10 col-lg-10 col-xl-11">
-          <div className="row">
+          <div className="row h-100">
             <div className="col-lg-6 mb-3">
               <div className="viewer-container h-100">
                 <div className="page-viewer">
@@ -261,7 +250,7 @@ function App() {
                   height: '100%', 
                   display: 'flex', 
                   flexDirection: 'column',
-                  maxHeight: 'calc(100vh - 150px)' // Adjust container height
+                  minHeight: 'calc(100vh - 150px)'
                 }}
               >
                 <div className="d-flex justify-content-start mb-3">
