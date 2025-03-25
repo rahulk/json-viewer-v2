@@ -35,7 +35,11 @@
     "DepartureAirport_red_html": true,
     "DepartureAirport_red": false
   },
-  "columnWidths": {},
+  "columnWidths": {
+    "DepartureAirport_html": 235,
+    "DepartureAirport_red_html": 100,
+    "DepartureAirport_blue_html": 100
+  },
   "columnOrder": [
     "section_code",
     "title",

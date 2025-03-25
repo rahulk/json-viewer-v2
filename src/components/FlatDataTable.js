@@ -521,7 +521,7 @@ export const FlatDataTable = React.forwardRef(({
       const deltaX = moveEvent.clientX - startX;
       const newWidth = Math.max(100, startWidth + deltaX);
       
-      // Update columnWidths state
+      // Update columnWidths state with the new width for this column
       setColumnWidths(prev => ({
         ...prev,
         [column]: newWidth
@@ -532,11 +532,21 @@ export const FlatDataTable = React.forwardRef(({
       document.removeEventListener('mousemove', handleMouseMove);
       document.removeEventListener('mouseup', handleMouseUp);
       document.body.classList.remove('column-resizing');
+      
+      // Notify parent of column width change
+      if (onStateChange) {
+        onStateChange({
+          columnWidths: {
+            ...columnWidths,
+            [column]: columnWidths[column] || 200
+          }
+        });
+      }
     };
     
     document.addEventListener('mousemove', handleMouseMove);
     document.addEventListener('mouseup', handleMouseUp);
-  }, [columnWidths]);
+  }, [columnWidths, onStateChange]);
 
   // New drag and drop handlers for column reordering
   const handleDragStart = useCallback((e, column) => {
@@ -757,6 +767,7 @@ export const FlatDataTable = React.forwardRef(({
                   <div 
                     className="resize-handle"
                     onMouseDown={(e) => handleResizeStart(e, column)}
+                    title="Drag to resize column"
                   />
                 </th>
               ))}
