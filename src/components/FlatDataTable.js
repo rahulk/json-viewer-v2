@@ -253,6 +253,9 @@ export const FlatDataTable = React.forwardRef(({
     return <div>No data available</div>;
   }
 
+  // Update the column count display
+  const columnCountDisplay = `(${visibleColumns.length}/${processedData.keys.length})`;
+
   return (
     <div className="flat-table-view">
       <div className="table-controls">
@@ -288,7 +291,7 @@ export const FlatDataTable = React.forwardRef(({
               {showColumnSelector ? 'Hide Columns' : 'Select Columns'}
             </button>
             <span className="column-count">
-              Showing {visibleColumns.length} of {processedData.keys.length} columns
+              {columnCountDisplay}
             </span>
           </div>
         )}

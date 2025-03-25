@@ -186,11 +186,11 @@ export const TabContent = ({
             data={tab4State.data}
             sectionCode="TAB4"
             showColumnSelection={true}
-            allowTextWrapping={true}  // Changed this
-            showColorHighlighting={true}  // Changed this
+            allowTextWrapping={true}
+            showColorHighlighting={false}  // Changed to false for Tab 4
             initialColumnVisibility={tab4State.columnVisibility}
             onStateChange={handleTab4StateChange}
-            title="Flat Data View (TAB4)"
+            title=""  // Removed the title
           />
         </div>
       ) : (
@@ -233,11 +233,11 @@ export const TabContent = ({
             data={tab5State.data}
             sectionCode="TAB5"
             showColumnSelection={true}
-            allowTextWrapping={true}  // Change this from tab5State.wrapText to true
-            showColorHighlighting={true}  // Change this from tab5State.filterColoredText to true
+            allowTextWrapping={true}
+            showColorHighlighting={true}  // Keep true for Tab 5
             initialColumnVisibility={tab5State.columnVisibility}
             onStateChange={handleTab5StateChange}
-            title="Flat Data View (TAB5)"
+            title=""  // Removed the title
           />
         </div>
       ) : (
