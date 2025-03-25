@@ -4,8 +4,7 @@
   height: 100%;
   width: 100%;
   padding: 16px;
-  overflow-x: visible; /* Allow horizontal overflow */
-  overflow-y: hidden; /* Keep vertical overflow contained */
+  overflow: hidden; /* Changed from overflow-x: visible */
 }
 
 .table-controls {
@@ -213,8 +212,7 @@
   flex-direction: column;
   height: 100%;
   width: 100%;
-  overflow-x: visible; /* Allow horizontal overflow */
-  overflow-y: hidden; /* Keep vertical overflow hidden */
+  overflow: hidden; /* Changed from overflow-x: visible */
   position: relative;
   background: #fff;
   min-height: 0;
@@ -222,14 +220,15 @@
 
 /* Update the table container for proper scrolling */
 .table-container {
-  flex: 1;
+  flex: 1 1 auto;
   overflow: auto !important; /* Force overflow auto */
+  height: 100%;
+  width: 100%;
   min-height: 0;
-  min-width: 0; /* This is crucial - prevents flex items from expanding beyond parent */
+  min-width: 100%; /* Changed from min-width: 0 */
   border: 1px solid #ddd;
   background: #fff;
   position: relative;
-  width: 100%;
   padding-bottom: 16px; /* More space for scrollbar */
   /* Ensure the horizontal scrollbar is visible */
   margin-bottom: 5px;
@@ -327,6 +326,7 @@
   width: 14px;
   height: 14px;
   background-color: #f5f5f5;
+  display: block !important; /* Force display of scrollbar */
 }
 
 .table-container::-webkit-scrollbar-track {

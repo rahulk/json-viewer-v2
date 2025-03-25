@@ -353,7 +353,14 @@ export const FlatDataTable = React.forwardRef(({
   const columnCountDisplay = `(${visibleColumns.length}/${processedData.keys.length})`;
 
   return (
-    <div className="flat-data-table-wrapper">
+    <div className="flat-data-table-wrapper" style={{
+      display: 'flex',
+      flexDirection: 'column',
+      height: '100%',
+      width: '100%',
+      position: 'relative',
+      overflow: 'hidden' // Changed from overflow-x: visible to prevent overflow conflicts
+    }}>
       <div className="table-controls">
         <div className="left-controls">
           <h3>{title || 'Flat Data View'} ({flattenedRows.length} rows)</h3>
@@ -444,13 +451,21 @@ export const FlatDataTable = React.forwardRef(({
         </div>
       )}
       
-      <div className="table-container">
+      <div className="table-container" style={{
+        flex: '1 1 auto',
+        overflow: 'auto !important',
+        position: 'relative',
+        width: '100%',
+        minWidth: '100%', // Changed from min-width: 0
+        height: '100%',
+        minHeight: '0',
+      }}>
         <table 
           className="data-table"
           style={{ 
             tableLayout: 'auto',
             width: 'auto',
-            minWidth: 'max-content'
+            minWidth: 'max-content' // Ensures table expands to fit all columns
           }}
         >
           <thead style={{ position: 'sticky', top: 0, zIndex: 20 }}>
