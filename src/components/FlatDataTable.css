@@ -166,39 +166,65 @@
 }
 
 /* Table container styles */
+.flat-data-table-wrapper {
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+  width: 100%;
+  overflow: hidden;
+}
+
+/* Table container styles */
 .table-container {
+  flex: 1;
   overflow: auto;
-  max-height: calc(100vh - 250px);
   border: 1px solid #ddd;
   position: relative;
   width: 100%;
-  /* Enable smooth scrolling */
+  min-height: 0; /* Important for flex child scrolling */
   scroll-behavior: smooth;
 }
 
-/* Ensure the table takes full width and allows horizontal scroll */
+/* Table styles */
 .data-table {
-  width: max-content;
-  min-width: 100%;
   border-collapse: collapse;
-  table-layout: fixed;
-  font-size: 11px;
+  width: auto; /* Allow table to expand based on content */
+  min-width: 100%;
+  background: white;
 }
 
-/* Add custom scrollbar styling */
+.data-table th,
+.data-table td {
+  padding: 8px;
+  border: 1px solid #ddd;
+  min-width: 150px; /* Ensure minimum column width */
+  max-width: 300px; /* Prevent columns from getting too wide */
+}
+
+.data-table th {
+  position: sticky;
+  top: 0;
+  z-index: 2;
+  background: #f5f5f5;
+  font-weight: bold;
+  text-align: left;
+  white-space: nowrap;
+}
+
+/* Custom scrollbar styles */
 .table-container::-webkit-scrollbar {
-  height: 12px;
   width: 12px;
+  height: 12px; /* Ensure horizontal scrollbar height */
 }
 
 .table-container::-webkit-scrollbar-track {
   background: #f1f1f1;
-  border-radius: 4px;
+  border-radius: 6px;
 }
 
 .table-container::-webkit-scrollbar-thumb {
   background: #888;
-  border-radius: 4px;
+  border-radius: 6px;
   border: 3px solid #f1f1f1;
 }
 
@@ -206,12 +232,8 @@
   background: #555;
 }
 
-/* Ensure sticky header works with horizontal scroll */
-.data-table th {
-  position: sticky;
-  top: 0;
-  z-index: 2;
-  background-color: #f5f5f5;
+.table-container::-webkit-scrollbar-corner {
+  background: #f1f1f1; /* Style the corner where scrollbars meet */
 }
 
 /* Column Selector Modal Styles */

@@ -367,7 +367,13 @@ export const TabContent = ({
         isLoading={isLoadingParsed}
       />
       {tab4State.data && tab4State.data.length > 0 ? (
-        <div className="table-view" style={{ flex: 1, overflow: 'hidden', position: 'relative' }}>
+        <div className="table-view" style={{ 
+          flex: 1, 
+          display: 'flex', 
+          flexDirection: 'column',
+          minHeight: 0, // Important for flex child scrolling
+          overflow: 'hidden'
+        }}>
           <FlatDataTable 
             ref={tab4Ref}
             key={`tab4-table-${selectedParsedFile}`}
@@ -420,7 +426,13 @@ export const TabContent = ({
         isLoading={isLoadingEnhanced}
       />
       {tab5State.data && tab5State.data.length > 0 ? (
-        <div className="table-view" style={{ flex: 1, overflow: 'hidden', position: 'relative' }}>
+        <div className="table-view" style={{ 
+          flex: 1, 
+          display: 'flex', 
+          flexDirection: 'column',
+          minHeight: 0, // Important for flex child scrolling
+          overflow: 'hidden'
+        }}>
           <FlatDataTable 
             ref={tab5Ref}
             key={`tab5-table-${selectedEnhancedFile}`}
