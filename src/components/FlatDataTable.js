@@ -1,6 +1,8 @@
 import React, { useState, useMemo, useEffect, useRef, useCallback } from 'react';
 import { flattenNestedData } from '../utils/dataUtils';
 import PropTypes from 'prop-types';
+import { searchJsonForText, CustomJsonView } from '../utils/jsonUtils';
+import 'react-json-view-lite/dist/index.css';
 
 // ImageModal component for enlarged image view
 const ImageModal = ({ src, alt, onClose }) => (
@@ -40,6 +42,11 @@ export const FlatDataTable = React.forwardRef(({
   const [wrapText, setWrapText] = useState(false);
   const [columnWidths, setColumnWidths] = useState(initialColumnWidths);
   const [enlargedImage, setEnlargedImage] = useState(null);
+  const [showRawJson, setShowRawJson] = useState(false);
+  const [jsonDarkTheme, setJsonDarkTheme] = useState(false);
+  const [jsonSearchTerm, setJsonSearchTerm] = useState('');
+  const [searchResults, setSearchResults] = useState([]);
+  const [searchResultCount, setSearchResultCount] = useState(0);
   const isInitialized = useRef(false);
   const previousStateRef = useRef(null);
   const previousSectionCode = useRef(sectionCode);
@@ -75,6 +82,11 @@ export const FlatDataTable = React.forwardRef(({
       setWrapText(false);
       setShowColumnSelector(false);
       setSearchTerm('');
+      setShowRawJson(false);
+      setJsonDarkTheme(false);
+      setJsonSearchTerm('');
+      setSearchResults([]);
+      setSearchResultCount(0);
       
       // Reset initialized flag to trigger reinitialization
       isInitialized.current = false;
@@ -101,6 +113,18 @@ export const FlatDataTable = React.forwardRef(({
       console.log(`Data updated for FlatDataTable ${componentId}, rows:`, data.length);
     }
   }, [data, componentId]);
+
+  // Handle JSON search
+  useEffect(() => {
+    if (jsonSearchTerm.trim() && data) {
+      const results = searchJsonForText(data, jsonSearchTerm);
+      setSearchResults(results);
+      setSearchResultCount(results.length);
+    } else {
+      setSearchResults([]);
+      setSearchResultCount(0);
+    }
+  }, [jsonSearchTerm, data]);
 
   // Expose methods to parent component through ref
   React.useImperativeHandle(ref, () => ({
@@ -339,7 +363,10 @@ export const FlatDataTable = React.forwardRef(({
       columnWidths,
       filterColoredText,
       wrapText,
-      columnOrder
+      columnOrder,
+      showRawJson,
+      jsonDarkTheme,
+      jsonSearchTerm
     };
 
     // Only notify if the state has actually changed
@@ -349,7 +376,7 @@ export const FlatDataTable = React.forwardRef(({
         onStateChange(currentState);
       }
     }
-  }, [selectedColumns, columnWidths, filterColoredText, wrapText, columnOrder, onStateChange]);
+  }, [selectedColumns, columnWidths, filterColoredText, wrapText, columnOrder, showRawJson, jsonDarkTheme, jsonSearchTerm, onStateChange]);
 
   // Get visible columns in proper order
   const visibleColumns = useMemo(() => {
@@ -669,8 +696,15 @@ export const FlatDataTable = React.forwardRef(({
               Wrap text in cells
             </label>
           )}
+          <button
+            className="btn btn-outline-secondary btn-sm"
+            onClick={() => setShowRawJson(!showRawJson)}
+            title="Toggle between table view and raw JSON view"
+          >
+            {showRawJson ? 'Show Table View' : 'Show Raw JSON'}
+          </button>
         </div>
-        {showColumnSelection && (
+        {showColumnSelection && !showRawJson && (
           <div className="column-selector-container">
             <button
               className="btn btn-outline-primary btn-sm"
@@ -685,7 +719,7 @@ export const FlatDataTable = React.forwardRef(({
         )}
       </div>
       
-      {showColumnSelector && (
+      {showColumnSelector && !showRawJson && (
         <div className="column-selector-modal-overlay">
           <div className="column-selector-modal">
             <div className="column-selector-header">
@@ -736,67 +770,107 @@ export const FlatDataTable = React.forwardRef(({
         </div>
       )}
       
-      <div className="table-container">
-        <table className="data-table">
-          <thead>
-            <tr>
-              {visibleColumns
-                .filter((column) => selectedColumns[column])
-                .map((column) => (
-                <th 
-                  key={column}
-                  style={{ 
-                    width: columnWidths[column] ? `${columnWidths[column]}px` : '200px',
-                    backgroundColor: draggedColumn === column ? '#e0e0e0' : 
-                                    dragOverColumn === column ? '#f0f7ff' : '#f5f5f5',
-                    cursor: 'grab',
-                    borderLeft: dragOverColumn === column ? '2px solid #2196F3' : '1px solid #ddd',
-                    position: 'relative'
-                  }}
-                  draggable="true"
-                  onDragStart={(e) => handleDragStart(e, column)}
-                  onDragOver={(e) => handleDragOver(e, column)}
-                  onDragLeave={handleDragLeave}
-                  onDrop={(e) => handleDrop(e, column)}
-                  onDragEnd={handleDragEnd}
+      {showRawJson ? (
+        <div className="raw-json-container" data-theme={jsonDarkTheme ? 'dark' : 'light'}>
+          <div className="json-controls">
+            <div className="json-search">
+              <input
+                type="text"
+                placeholder="Search in JSON..."
+                value={jsonSearchTerm}
+                onChange={(e) => setJsonSearchTerm(e.target.value)}
+                className="json-search-input"
+              />
+              {jsonSearchTerm && (
+                <button
+                  className="btn btn-sm btn-outline-secondary clear-search"
+                  onClick={() => setJsonSearchTerm('')}
                 >
-                  <div className="header-content">
-                    <div className="drag-handle" title="Drag to reorder column">::</div>
-                    {column}
-                  </div>
-                  <div 
-                    className="resize-handle"
-                    onMouseDown={(e) => handleResizeStart(e, column)}
-                    title="Drag to resize column"
-                  />
-                </th>
-              ))}
-            </tr>
-          </thead>
-          <tbody>
-            {flattenedRows.map((row, rowIndex) => (
-              <tr key={rowIndex}>
+                  ✕
+                </button>
+              )}
+              {searchResultCount > 0 && (
+                <span className="search-count">{searchResultCount} matches</span>
+              )}
+            </div>
+            <button
+              className={`btn btn-sm ${jsonDarkTheme ? 'btn-light' : 'btn-dark'}`}
+              onClick={() => setJsonDarkTheme(!jsonDarkTheme)}
+              title={jsonDarkTheme ? 'Switch to light theme' : 'Switch to dark theme'}
+            >
+              {jsonDarkTheme ? '☀️' : '🌙'}
+            </button>
+          </div>
+          
+          <CustomJsonView 
+            data={data} 
+            searchTerm={jsonSearchTerm}
+            searchResults={searchResults}
+          />
+        </div>
+      ) : (
+        <div className="table-container">
+          <table className="data-table">
+            <thead>
+              <tr>
                 {visibleColumns
                   .filter((column) => selectedColumns[column])
                   .map((column) => (
-                    <td
-                      key={column}
-                      style={{
-                        width: columnWidths[column] ? `${columnWidths[column]}px` : '200px',
-                        whiteSpace: wrapText ? 'normal' : 'nowrap',
-                        backgroundColor: getHighlightColor(row[column], column),
-                        overflow: 'hidden'
-                      }}
-                      className={isImageValue(row[column], column) ? 'image-cell' : ''}
-                    >
-                      {formatValue(row[column], column)}
-                    </td>
-                  ))}
+                  <th 
+                    key={column}
+                    style={{ 
+                      width: columnWidths[column] ? `${columnWidths[column]}px` : '200px',
+                      backgroundColor: draggedColumn === column ? '#e0e0e0' : 
+                                      dragOverColumn === column ? '#f0f7ff' : '#f5f5f5',
+                      cursor: 'grab',
+                      borderLeft: dragOverColumn === column ? '2px solid #2196F3' : '1px solid #ddd',
+                      position: 'relative'
+                    }}
+                    draggable="true"
+                    onDragStart={(e) => handleDragStart(e, column)}
+                    onDragOver={(e) => handleDragOver(e, column)}
+                    onDragLeave={handleDragLeave}
+                    onDrop={(e) => handleDrop(e, column)}
+                    onDragEnd={handleDragEnd}
+                  >
+                    <div className="header-content">
+                      <div className="drag-handle" title="Drag to reorder column">::</div>
+                      {column}
+                    </div>
+                    <div 
+                      className="resize-handle"
+                      onMouseDown={(e) => handleResizeStart(e, column)}
+                      title="Drag to resize column"
+                    />
+                  </th>
+                ))}
               </tr>
-            ))}
-          </tbody>
-        </table>
-      </div>
+            </thead>
+            <tbody>
+              {flattenedRows.map((row, rowIndex) => (
+                <tr key={rowIndex}>
+                  {visibleColumns
+                    .filter((column) => selectedColumns[column])
+                    .map((column) => (
+                      <td
+                        key={column}
+                        style={{
+                          width: columnWidths[column] ? `${columnWidths[column]}px` : '200px',
+                          whiteSpace: wrapText ? 'normal' : 'nowrap',
+                          backgroundColor: getHighlightColor(row[column], column),
+                          overflow: 'hidden'
+                        }}
+                        className={isImageValue(row[column], column) ? 'image-cell' : ''}
+                      >
+                        {formatValue(row[column], column)}
+                      </td>
+                    ))}
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        </div>
+      )}
 
       {enlargedImage && (
         <ImageModal 

@@ -437,3 +437,463 @@
   color: #555;
   opacity: 1;
 }
+
+/* Raw JSON display */
+.raw-json-container {
+  flex: 1 1 auto;
+  overflow: auto;
+  height: 100%;
+  width: 100%;
+  border: 1px solid #ddd;
+  background: #fff;
+  margin-bottom: 5px;
+  border-radius: 4px;
+  padding: 16px;
+  position: relative;
+  text-align: left !important;
+}
+
+/* JSON controls */
+.json-controls {
+  display: flex;
+  justify-content: space-between;
+  margin-bottom: 12px;
+  position: sticky;
+  top: 0;
+  z-index: 100;
+  background: inherit;
+  padding-bottom: 8px;
+  border-bottom: 1px solid #eee;
+  text-align: left !important;
+}
+
+/* Add additional CSS to force left alignment */
+.ljv, .ljv-node, .ljv-child, .ljv-index, .ljv-key, .ljv-value, .ljv-container {
+  text-align: left !important;
+  justify-content: flex-start !important;
+  margin-right: auto !important;
+  margin-left: 0 !important;
+}
+
+.ljv {
+  text-align: left !important;
+  display: block !important;
+  margin-right: auto !important;
+  margin-left: 0 !important;
+  width: 100% !important;
+}
+
+.ljv-node, .ljv-child {
+  text-align: left !important;
+  display: block !important;
+  width: 100% !important;
+}
+
+.ljv-key, .ljv-value {
+  text-align: left !important;
+}
+
+.ljv-children {
+  margin-left: 20px !important;
+  padding-left: 0 !important;
+  text-align: left !important;
+  display: block !important;
+  width: calc(100% - 20px) !important;
+}
+
+.json-search {
+  position: relative;
+  flex: 1;
+  max-width: 300px;
+}
+
+.json-search-input {
+  width: 100%;
+  padding: 6px 12px;
+  border: 1px solid #ced4da;
+  border-radius: 4px;
+  font-size: 14px;
+}
+
+.json-search-input:focus {
+  outline: none;
+  border-color: #80bdff;
+  box-shadow: 0 0 0 0.2rem rgba(0, 123, 255, 0.25);
+}
+
+.clear-search {
+  position: absolute;
+  right: 8px;
+  top: 50%;
+  transform: translateY(-50%);
+  background: none;
+  border: none;
+  cursor: pointer;
+  color: #6c757d;
+  font-size: 14px;
+  padding: 0;
+  line-height: 1;
+}
+
+/* Dark theme */
+.raw-json-container[data-theme="dark"] {
+  background-color: #1e1e1e;
+  color: #d4d4d4;
+  border-color: #444;
+}
+
+.raw-json-container[data-theme="dark"] .json-controls {
+  border-bottom-color: #444;
+}
+
+.raw-json-container[data-theme="dark"] .json-search-input {
+  background-color: #333;
+  border-color: #555;
+  color: #d4d4d4;
+}
+
+.raw-json-container[data-theme="dark"] .ljv {
+  background-color: transparent !important;
+  color: #d4d4d4 !important;
+}
+
+.raw-json-container[data-theme="dark"] .ljv-key {
+  color: #9cdcfe !important;
+}
+
+.raw-json-container[data-theme="dark"] .ljv-string {
+  color: #ce9178 !important;
+}
+
+.raw-json-container[data-theme="dark"] .ljv-number {
+  color: #b5cea8 !important;
+}
+
+.raw-json-container[data-theme="dark"] .ljv-boolean {
+  color: #569cd6 !important;
+}
+
+.raw-json-container[data-theme="dark"] .ljv-null {
+  color: #d16969 !important;
+}
+
+.raw-json-container[data-theme="dark"] .ljv-icon {
+  color: #d4d4d4 !important;
+}
+
+.raw-json-container[data-theme="dark"] .ljv-copy-btn {
+  background-color: #333 !important;
+  border-color: #555 !important;
+  color: #d4d4d4 !important;
+}
+
+.raw-json-container[data-theme="dark"] .ljv-copy-btn:hover {
+  background-color: #444 !important;
+}
+
+/* Override react-json-view-lite styles for better integration */
+.raw-json-container .ljv {
+  background-color: transparent !important;
+  font-family: 'Monaco', 'Menlo', 'Ubuntu Mono', 'Consolas', monospace !important;
+  font-size: 13px !important;
+  padding: 0 !important;
+  border: none !important;
+  text-align: left !important;
+}
+
+/* Fix the alignment of nodes */
+.ljv-node {
+  text-align: left !important;
+  display: flex !important;
+  flex-direction: row !important;
+  align-items: flex-start !important;
+}
+
+.ljv-node > .ljv-icon {
+  display: inline-block !important;
+  margin-right: 4px !important;
+  margin-top: 2px !important;
+}
+
+.ljv-children {
+  margin-left: 20px !important;
+  padding-left: 0 !important;
+  text-align: left !important;
+}
+
+.ljv-child {
+  text-align: left !important;
+  display: flex !important;
+}
+
+.raw-json-container .ljv-key {
+  color: #881391 !important;
+  font-weight: bold !important;
+}
+
+.raw-json-container .ljv-string {
+  color: #1a1aa6 !important;
+}
+
+.raw-json-container .ljv-number {
+  color: #116644 !important;
+}
+
+.raw-json-container .ljv-boolean {
+  color: #0000ff !important;
+  font-weight: bold !important;
+}
+
+.raw-json-container .ljv-null {
+  color: #ff0000 !important;
+  font-weight: bold !important;
+}
+
+.raw-json-container .ljv-icon {
+  margin-right: 6px !important;
+  margin-left: 0 !important;
+}
+
+.raw-json-container .ljv-copy-btn {
+  background-color: #f8f9fa !important;
+  border: 1px solid #dee2e6 !important;
+  color: #212529 !important;
+  padding: 5px 10px !important;
+  font-size: 12px !important;
+  border-radius: 4px !important;
+  position: absolute !important;
+  top: 12px !important;
+  right: 12px !important;
+  z-index: 100 !important;
+  transition: all 0.2s ease !important;
+}
+
+.raw-json-container .ljv-copy-btn:hover {
+  background-color: #e9ecef !important;
+  border-color: #ced4da !important;
+}
+
+/* Highlight search results */
+.search-highlight {
+  background-color: #ffff00 !important;
+  color: #000 !important;
+  border-radius: 2px;
+  padding: 0 2px;
+}
+
+.raw-json-container[data-theme="dark"] .search-highlight {
+  background-color: #b58900 !important;
+  color: #fff !important;
+}
+
+/* Custom scrollbar styling for JSON viewer */
+.raw-json-container::-webkit-scrollbar {
+  width: 14px;
+  height: 14px;
+  background-color: #f5f5f5;
+  display: block !important;
+}
+
+.raw-json-container::-webkit-scrollbar-track {
+  background: #f1f1f1;
+  border-radius: 6px;
+  box-shadow: inset 0 0 6px rgba(0,0,0,0.1);
+}
+
+.raw-json-container::-webkit-scrollbar-thumb {
+  background: #888;
+  border-radius: 6px;
+  border: 3px solid #f1f1f1;
+  min-width: 50px;
+  min-height: 50px;
+}
+
+.raw-json-container::-webkit-scrollbar-thumb:hover {
+  background: #666;
+}
+
+.search-count {
+  position: absolute;
+  right: -80px;
+  top: 50%;
+  transform: translateY(-50%);
+  font-size: 12px;
+  color: #6c757d;
+  background-color: #f8f9fa;
+  padding: 2px 8px;
+  border-radius: 10px;
+  border: 1px solid #dee2e6;
+}
+
+.raw-json-container[data-theme="dark"] .search-count {
+  background-color: #333;
+  color: #ccc;
+  border-color: #555;
+}
+
+/* Direct and aggressive targeting of JSON view elements */
+.custom-json-view {
+  text-align: left !important;
+  margin: 0 !important;
+  padding: 0 !important;
+  display: block !important;
+  width: 100% !important;
+}
+
+/* Target all divs within the JSON view */
+.raw-json-container div {
+  text-align: left !important;
+  justify-content: flex-start !important;
+  align-items: flex-start !important;
+  margin-left: 0 !important;
+  width: auto !important;
+  max-width: 100% !important;
+}
+
+/* Force key-value pairs to align left */
+.ljv-node > span {
+  text-align: left !important;
+  display: inline-block !important;
+}
+
+/* Override any flex or grid layouts that might be causing centering */
+.ljv, .ljv-node, .ljv-child {
+  display: block !important;
+  flex-direction: unset !important;
+  grid-template-columns: unset !important;
+  text-align: left !important;
+  width: 100% !important;
+}
+
+/* Ensure parent elements don't center their children */
+.raw-json-container, .ljv-children {
+  display: block !important;
+  flex-direction: column !important;
+  align-items: flex-start !important;
+  justify-content: flex-start !important;
+  text-align: left !important;
+}
+
+/* Override any inline styles */
+[style*="text-align: center"],
+[style*="align-items: center"],
+[style*="justify-content: center"] {
+  text-align: left !important;
+  align-items: flex-start !important;
+  justify-content: flex-start !important;
+}
+
+/* Style the indentation for better readability */
+.ljv-indent {
+  margin-left: 20px !important;
+  padding-left: 0 !important;
+  text-align: left !important;
+  display: block !important;
+}
+
+/* Make values display on the same line as keys */
+.ljv-key + span {
+  display: inline !important;
+}
+
+/* Custom JSON Renderer Styles */
+.custom-json-renderer {
+  font-family: 'Monaco', 'Menlo', 'Ubuntu Mono', 'Consolas', monospace;
+  font-size: 13px;
+  line-height: 1.5;
+  text-align: left !important;
+  white-space: pre-wrap;
+  width: 100% !important;
+}
+
+.custom-json-renderer .json-bracket {
+  color: #444;
+  font-weight: bold;
+}
+
+.custom-json-renderer .json-property {
+  margin-left: 0;
+  text-align: left !important;
+  display: block !important;
+}
+
+.custom-json-renderer .json-property-key {
+  color: #881391;
+  font-weight: bold;
+}
+
+.custom-json-renderer .json-string {
+  color: #1a1aa6;
+}
+
+.custom-json-renderer .json-number {
+  color: #116644;
+}
+
+.custom-json-renderer .json-boolean {
+  color: #0000ff;
+  font-weight: bold;
+}
+
+.custom-json-renderer .json-null {
+  color: #ff0000;
+  font-weight: bold;
+}
+
+.custom-json-renderer .json-array-marker {
+  color: #888;
+  margin-right: 4px;
+  user-select: none;
+}
+
+.custom-json-renderer .json-highlight {
+  background-color: #ffff00;
+  color: #000;
+}
+
+.custom-json-renderer .json-highlight-key {
+  background-color: rgba(255, 255, 0, 0.3);
+  border-radius: 2px;
+}
+
+.raw-json-container[data-theme="dark"] .custom-json-renderer .json-property-key {
+  color: #9cdcfe;
+}
+
+.raw-json-container[data-theme="dark"] .custom-json-renderer .json-string {
+  color: #ce9178;
+}
+
+.raw-json-container[data-theme="dark"] .custom-json-renderer .json-number {
+  color: #b5cea8;
+}
+
+.raw-json-container[data-theme="dark"] .custom-json-renderer .json-boolean {
+  color: #569cd6;
+}
+
+.raw-json-container[data-theme="dark"] .custom-json-renderer .json-null {
+  color: #d16969;
+}
+
+.raw-json-container[data-theme="dark"] .custom-json-renderer .json-bracket {
+  color: #d4d4d4;
+}
+
+.raw-json-container[data-theme="dark"] .custom-json-renderer .json-array-marker {
+  color: #999;
+}
+
+.raw-json-container[data-theme="dark"] .custom-json-renderer .json-highlight {
+  background-color: #b58900;
+  color: #fff;
+}
+
+.custom-json-renderer .json-highlight-path {
+  background-color: rgba(255, 255, 0, 0.15);
+  border-radius: 2px;
+}
+
+.raw-json-container[data-theme="dark"] .custom-json-renderer .json-highlight-path {
+  background-color: rgba(181, 137, 0, 0.2);
+}
