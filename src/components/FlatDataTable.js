@@ -58,6 +58,7 @@ export const FlatDataTable = React.forwardRef(({
   const [columnOrder, setColumnOrder] = useState(initialColumnOrder.length > 0 ? initialColumnOrder : []);
   const [draggedColumn, setDraggedColumn] = useState(null);
   const [dragOverColumn, setDragOverColumn] = useState(null);
+  const [recentlyHiddenColumns, setRecentlyHiddenColumns] = useState([]);
 
   // Prevent resetting state on component remount due to tab change
   useEffect(() => {
@@ -315,6 +316,64 @@ export const FlatDataTable = React.forwardRef(({
         .data-table th .header-content {
           position: relative !important;
           z-index: 1001 !important;
+          display: flex !important;
+          align-items: center !important;
+          justify-content: space-between !important;
+        }
+
+        /* Hide column button styling */
+        .hide-column-btn {
+          opacity: 0.2;
+          background: none;
+          border: none;
+          font-size: 12px;
+          cursor: pointer;
+          padding: 2px 5px;
+          border-radius: 2px;
+          margin-left: 5px;
+        }
+        
+        .hide-column-btn:hover {
+          opacity: 1;
+          background-color: #e0e0e0;
+        }
+
+        /* Recently hidden columns styles */
+        .recently-hidden-columns {
+          display: flex;
+          flex-wrap: wrap;
+          align-items: center;
+          gap: 5px;
+          padding: 5px 10px;
+          background-color: #f9f9f9;
+          border-bottom: 1px solid #ddd;
+          margin-bottom: 5px;
+        }
+        
+        .recently-hidden-label {
+          font-size: 0.85rem;
+          color: #666;
+          margin-right: 5px;
+        }
+        
+        .restore-column-btn {
+          font-size: 0.8rem;
+          padding: 2px 8px;
+          white-space: nowrap;
+          max-width: 200px;
+          overflow: hidden;
+          text-overflow: ellipsis;
+        }
+        
+        .restore-icon {
+          font-weight: bold;
+          margin-left: 3px;
+        }
+        
+        .clear-recent {
+          font-size: 0.8rem;
+          padding: 2px 8px;
+          margin-left: auto;
         }
 
         /* Make sure resize handles stay above content */
@@ -581,10 +640,23 @@ export const FlatDataTable = React.forwardRef(({
 
   // Toggle column selection
   const toggleColumn = useCallback((column) => {
-    setSelectedColumns(prev => ({
-      ...prev,
-      [column]: !prev[column]
-    }));
+    setSelectedColumns(prev => {
+      const newState = {
+        ...prev,
+        [column]: !prev[column]
+      };
+      
+      // If we're hiding a column, add it to recently hidden list
+      if (prev[column] && !newState[column]) {
+        setRecentlyHiddenColumns(recent => {
+          // Add to the beginning, limit to 5 recent columns
+          const newRecent = [column, ...recent.filter(col => col !== column)].slice(0, 5);
+          return newRecent;
+        });
+      }
+      
+      return newState;
+    });
   }, []);
 
   // Select/deselect all columns
@@ -832,6 +904,33 @@ export const FlatDataTable = React.forwardRef(({
         </div>
       )}
       
+      {/* Recently hidden columns bar */}
+      {recentlyHiddenColumns.length > 0 && !showRawJson && (
+        <div className="recently-hidden-columns">
+          <span className="recently-hidden-label">Recently hidden:</span>
+          {recentlyHiddenColumns.map(column => (
+            <button
+              key={column}
+              className="btn btn-sm btn-outline-secondary restore-column-btn"
+              onClick={() => {
+                toggleColumn(column);
+                setRecentlyHiddenColumns(prev => prev.filter(col => col !== column));
+              }}
+              title={`Restore column: ${column}`}
+            >
+              {column} <span className="restore-icon">+</span>
+            </button>
+          ))}
+          <button
+            className="btn btn-sm btn-outline-danger clear-recent"
+            onClick={() => setRecentlyHiddenColumns([])}
+            title="Clear recently hidden columns list"
+          >
+            Clear
+          </button>
+        </div>
+      )}
+      
       {showRawJson ? (
         <div className="raw-json-container" data-theme={jsonDarkTheme ? 'dark' : 'light'}>
           <div className="json-controls">
@@ -898,6 +997,16 @@ export const FlatDataTable = React.forwardRef(({
                     <div className="header-content">
                       <div className="drag-handle" title="Drag to reorder column">::</div>
                       {column}
+                      <button 
+                        className="hide-column-btn" 
+                        title="Hide this column"
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          toggleColumn(column);
+                        }}
+                      >
+                        ✕
+                      </button>
                     </div>
                     <div 
                       className="resize-handle"
