@@ -3,6 +3,7 @@
  */
 
 import React from 'react';
+import ReactJsonView from 'react-json-view';
 
 /**
  * Renders JSON data with syntax highlighting
@@ -126,114 +127,118 @@ export const searchJsonForText = (json, searchText) => {
 };
 
 /**
- * Custom React component to render JSON with left alignment
+ * Custom React component to render JSON with better collapsible functionality
  */
-export const CustomJsonView = ({ data, searchTerm = '', searchResults = [] }) => {
-  // Function to check if a path should be highlighted (for path-based search results)
-  const shouldHighlightPath = (path) => {
-    if (!searchResults || searchResults.length === 0) return false;
-    
-    // Convert current path to string for easier comparison
-    const pathStr = path.join('.');
-    
-    // Check if any search result path matches or contains this path
-    return searchResults.some(result => {
-      const resultPathStr = result.path.join('.');
-      return resultPathStr.includes(pathStr) || pathStr.includes(resultPathStr);
-    });
-  };
-  
-  const renderValue = (value, isKey = false, level = 0, path = []) => {
-    // Handle different data types
-    if (value === null) {
-      return <span className="json-null">null</span>;
-    }
-    
-    if (typeof value === 'boolean') {
-      return <span className="json-boolean">{String(value)}</span>;
-    }
-    
-    if (typeof value === 'number') {
-      return <span className="json-number">{value}</span>;
-    }
-    
-    if (typeof value === 'string') {
-      // Highlight matches if there's a search term
-      if (searchTerm && value.toLowerCase().includes(searchTerm.toLowerCase())) {
-        return <span className="json-string json-highlight">"{value}"</span>;
-      }
-      
-      // Also highlight if the path is in search results
-      if (shouldHighlightPath(path)) {
-        return <span className={isKey ? "json-key json-highlight-path" : "json-string json-highlight-path"}>"{value}"</span>;
-      }
-      
-      return <span className={isKey ? "json-key" : "json-string"}>"{value}"</span>;
-    }
-    
-    // Handle objects and arrays
-    if (Array.isArray(value)) {
-      if (value.length === 0) return <span>[ ]</span>;
-      
-      const isHighlighted = shouldHighlightPath(path);
-      
+export const CustomJsonView = ({ 
+  data, 
+  searchTerm = '', 
+  searchResults = [],
+  enableClipboard = false,
+  enableCollapse = true,
+  collapseStringsAfterLength = 100,
+  displayDataTypes = false,
+  displayObjectSize = true,
+  indentWidth = 2,
+  collapsed = false
+}) => {
+  // Configure color based on theme preference
+  const darkTheme = document.body.classList.contains('dark-theme') ||
+                   (window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches);
+
+  // Apply custom renderer functions for search terms
+  const customLabelRenderer = searchTerm ? (keyPath, keyName, data) => {
+    if (typeof keyName === 'string' && searchTerm && keyName.toLowerCase().includes(searchTerm.toLowerCase())) {
+      const parts = keyName.split(new RegExp(`(${searchTerm})`, 'gi'));
       return (
-        <div className={`json-array ${isHighlighted ? 'json-highlight-path' : ''}`} style={{ paddingLeft: level > 0 ? '20px' : '0' }}>
-          <span className="json-bracket">[</span>
-          <div className="json-array-items">
-            {value.map((item, index) => (
-              <div key={index} className="json-array-item" style={{ textAlign: 'left' }}>
-                <span className="json-array-marker">▸</span> {renderValue(item, false, level + 1, [...path, index])}
-                {index < value.length - 1 && <span>,</span>}
-              </div>
-            ))}
-          </div>
-          <span className="json-bracket">]</span>
-        </div>
+        <span>
+          {parts.map((part, i) => 
+            part.toLowerCase() === searchTerm.toLowerCase() 
+              ? <span key={i} className="search-highlight">{part}</span> 
+              : part
+          )}
+        </span>
       );
     }
-    
-    // It's an object
-    if (typeof value === 'object') {
-      const entries = Object.entries(value);
-      if (entries.length === 0) return <span>{ }</span>;
-      
-      const isHighlighted = shouldHighlightPath(path);
-      
+    return undefined;
+  } : undefined;
+
+  const customValueRenderer = searchTerm ? (key, value) => {
+    if (typeof value === 'string' && searchTerm && value.toLowerCase().includes(searchTerm.toLowerCase())) {
+      const parts = value.split(new RegExp(`(${searchTerm})`, 'gi'));
       return (
-        <div className={`json-object ${isHighlighted ? 'json-highlight-path' : ''}`} style={{ paddingLeft: level > 0 ? '20px' : '0' }}>
-          <span className="json-bracket">{'{'}</span>
-          <div className="json-object-properties">
-            {entries.map(([key, propValue], index) => {
-              const isKeyMatch = searchTerm && key.toLowerCase().includes(searchTerm.toLowerCase());
-              const propPath = [...path, key];
-              const isPathMatch = shouldHighlightPath(propPath);
-              
-              return (
-                <div key={key} className={`json-property ${isKeyMatch ? 'json-highlight-key' : ''} ${isPathMatch ? 'json-highlight-path' : ''}`} style={{ textAlign: 'left' }}>
-                  <span className="json-property-key">
-                    <span className="json-array-marker">▸</span> {renderValue(key, true, level, propPath)}:
-                  </span>{' '}
-                  <span className="json-property-value">
-                    {renderValue(propValue, false, level + 1, propPath)}
-                  </span>
-                  {index < entries.length - 1 && <span>,</span>}
-                </div>
-              );
-            })}
-          </div>
-          <span className="json-bracket">{'}'}</span>
-        </div>
+        <span>
+          {parts.map((part, i) => 
+            part.toLowerCase() === searchTerm.toLowerCase() 
+              ? <span key={i} className="search-highlight">{part}</span> 
+              : part
+          )}
+        </span>
       );
     }
-    
-    // Fallback for any other type
-    return <span>{String(value)}</span>;
-  };
-  
+    return undefined;
+  } : undefined;
+
   return (
-    <div className="custom-json-renderer" style={{ textAlign: 'left', width: '100%' }}>
-      {renderValue(data, false, 0, [])}
-    </div>
+    <ReactJsonView
+      src={data}
+      name={null}
+      theme={darkTheme ? "monokai" : "rjv-default"}
+      collapsed={collapsed ? 1 : false}
+      displayDataTypes={displayDataTypes}
+      displayObjectSize={displayObjectSize}
+      enableClipboard={enableClipboard}
+      indentWidth={indentWidth}
+      collapseStringsAfterLength={collapseStringsAfterLength}
+      iconStyle="triangle"
+      style={{
+        fontFamily: 'Monaco, Menlo, Consolas, monospace',
+        fontSize: '13px',
+        lineHeight: '1.4',
+        width: '100%',
+        height: '100%',
+        overflow: 'auto',
+        padding: '12px',
+        backgroundColor: 'transparent',
+        textAlign: 'left'
+      }}
+      quotesOnKeys={false}
+      onSelect={(select) => {
+        // Auto-expand nodes when selected
+        if (select.namespace.length > 0) {
+          // This helps ensure the selected node is visible
+          return true;
+        }
+      }}
+      // Apply the custom search highlighting renderers
+      labelRenderer={customLabelRenderer}
+      valueRenderer={customValueRenderer}
+      // Enable editing functions (all disabled)
+      onEdit={false}
+      onDelete={false}
+      onAdd={false}
+      // This works for auto-expanding matching nodes when there's a search term
+      shouldExpandNode={(keyPath, data, level) => {
+        if (collapsed) return false;
+        
+        // Always expand root node
+        if (keyPath.length === 0) return true;
+        
+        // If there's a search term, expand nodes containing search results
+        if (searchTerm && searchResults.length > 0) {
+          // Convert keyPath to a string format for easier comparison
+          const currentPath = keyPath.join('.');
+          
+          // Check if any search result contains this path as a prefix
+          return searchResults.some(result => {
+            if (!result.path) return false;
+            const resultPath = result.path.join('.');
+            return resultPath.startsWith(currentPath);
+          });
+        }
+        
+        // Default based on level
+        return level < 2; // Expand first two levels by default
+      }}
+    />
   );
 }; 

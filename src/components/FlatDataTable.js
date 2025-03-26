@@ -47,6 +47,9 @@ export const FlatDataTable = React.forwardRef(({
   const [jsonSearchTerm, setJsonSearchTerm] = useState('');
   const [searchResults, setSearchResults] = useState([]);
   const [searchResultCount, setSearchResultCount] = useState(0);
+  const [jsonExpanded, setJsonExpanded] = useState(true);
+  const [currentSearchResultIndex, setCurrentSearchResultIndex] = useState(0);
+  const jsonViewerRef = useRef(null);
   const isInitialized = useRef(false);
   const previousStateRef = useRef(null);
   const previousSectionCode = useRef(sectionCode);
@@ -90,6 +93,7 @@ export const FlatDataTable = React.forwardRef(({
       setJsonSearchTerm('');
       setSearchResults([]);
       setSearchResultCount(0);
+      setJsonExpanded(true);
       
       // Reset initialized flag to trigger reinitialization
       isInitialized.current = false;
@@ -376,6 +380,185 @@ export const FlatDataTable = React.forwardRef(({
           margin-left: auto;
         }
 
+        /* JSON Viewer styles */
+        .raw-json-container {
+          display: flex;
+          flex-direction: column;
+          height: 100%;
+          overflow: hidden;
+          border: 1px solid #ddd;
+          border-radius: 4px;
+        }
+        
+        .json-viewer-wrapper {
+          flex-grow: 1;
+          overflow: auto;
+          padding: 10px;
+          height: calc(100vh - 150px);
+          position: relative;
+        }
+        
+        .json-controls {
+          display: flex;
+          justify-content: space-between;
+          align-items: center;
+          padding: 8px 12px;
+          background-color: #f5f5f5;
+          border-bottom: 1px solid #ddd;
+        }
+        
+        .json-search {
+          display: flex;
+          align-items: center;
+          flex: 1;
+          margin-right: 10px;
+        }
+        
+        .json-search-input {
+          flex: 1;
+          padding: 4px 8px;
+          border: 1px solid #ccc;
+          border-radius: 4px;
+          font-size: 14px;
+        }
+        
+        .json-view-actions {
+          display: flex;
+          align-items: center;
+          gap: 8px;
+        }
+        
+        .search-count {
+          margin-left: 8px;
+          font-size: 12px;
+          color: #666;
+          background: #e9ecef;
+          padding: 2px 6px;
+          border-radius: 10px;
+          white-space: nowrap;
+        }
+        
+        .search-navigation {
+          display: flex;
+          gap: 2px;
+          margin-left: 5px;
+        }
+        
+        .nav-btn {
+          padding: 0px 4px;
+          font-size: 12px;
+          line-height: 1.2;
+        }
+        
+        .mr-2 {
+          margin-right: 8px;
+        }
+        
+        /* Enhance collapse/expand buttons */
+        .raw-json-container [aria-label="collapse"] {
+          cursor: pointer !important;
+          color: #0275d8 !important;
+          font-weight: bold !important;
+          margin-right: 5px !important;
+          user-select: none !important;
+        }
+        
+        .raw-json-container [aria-label="expand"] {
+          cursor: pointer !important;
+          color: #0275d8 !important;
+          font-weight: bold !important;
+          margin-right: 5px !important;
+          user-select: none !important;
+        }
+        
+        /* Highlight JSON search results */
+        .json-search-highlight {
+          background-color: yellow !important;
+          padding: 0 2px !important;
+          border-radius: 2px !important;
+        }
+        
+        .current-highlight {
+          background-color: orange !important;
+          outline: 2px solid #ff4500 !important;
+          transition: background-color 0.3s ease-out !important;
+        }
+        
+        /* Dark theme styles */
+        .raw-json-container[data-theme="dark"] {
+          background-color: #1e1e1e;
+          color: #d4d4d4;
+        }
+        
+        .raw-json-container[data-theme="dark"] .json-controls {
+          background-color: #2d2d2d;
+          border-color: #444;
+        }
+        
+        .raw-json-container[data-theme="dark"] .json-search-input {
+          background-color: #333;
+          border-color: #555;
+          color: #fff;
+        }
+        
+        .raw-json-container[data-theme="dark"] .search-count {
+          background-color: #444;
+          color: #ddd;
+        }
+        
+        .raw-json-container[data-theme="dark"] .json-search-highlight {
+          background-color: #806300 !important;
+          color: #fff !important;
+        }
+
+        /* React JSON View Customizations */
+        .react-json-view {
+          background-color: transparent !important;
+          width: 100% !important;
+          height: auto !important;
+          overflow: visible !important;
+          margin: 0 !important;
+          padding: 0 !important;
+        }
+        
+        .raw-json-container .variable-row, 
+        .raw-json-container .object-key-val {
+          border-left: none !important;
+          padding-top: 4px !important;
+          padding-bottom: 4px !important;
+          min-height: auto !important;
+          margin-top: 1px !important;
+          margin-bottom: 1px !important;
+        }
+        
+        .raw-json-container .variable-row:hover, 
+        .raw-json-container .object-key-val:hover {
+          background-color: rgba(0, 0, 0, 0.05) !important;
+          border-radius: 3px !important;
+        }
+        
+        .raw-json-container[data-theme="dark"] .variable-row:hover, 
+        .raw-json-container[data-theme="dark"] .object-key-val:hover {
+          background-color: rgba(255, 255, 255, 0.05) !important;
+        }
+        
+        .raw-json-container .icon-container svg {
+          cursor: pointer !important;
+          margin-right: 5px !important;
+        }
+        
+        .raw-json-container .search-highlight {
+          background-color: #ffff00 !important;
+          color: #000000 !important;
+          border-radius: 2px !important;
+          padding: 0 2px !important;
+        }
+        
+        .raw-json-container[data-theme="dark"] .search-highlight {
+          background-color: #806300 !important;
+          color: #ffffff !important;
+        }
+
         /* Make sure resize handles stay above content */
         .resize-handle {
           position: absolute !important;
@@ -436,17 +619,104 @@ export const FlatDataTable = React.forwardRef(({
     }
   }, [data, componentId, sectionCode, processedData.keys, loadPreferences]);
 
-  // Handle JSON search
+  // Handle JSON search and navigation
   useEffect(() => {
     if (jsonSearchTerm.trim() && data) {
       const results = searchJsonForText(data, jsonSearchTerm);
       setSearchResults(results);
       setSearchResultCount(results.length);
+      setCurrentSearchResultIndex(0); // Reset to first result
+      
+      // When searching, automatically expand the JSON view to show results
+      setJsonExpanded(true);
+      
+      // Auto-scroll to first result if found
+      if (results.length > 0 && jsonViewerRef.current) {
+        setTimeout(() => {
+          const highlightedEl = jsonViewerRef.current.querySelector('.search-highlight');
+          if (highlightedEl) {
+            highlightedEl.scrollIntoView({ behavior: 'smooth', block: 'center' });
+          }
+        }, 300); // Slightly longer timeout to allow for expansion
+      }
     } else {
       setSearchResults([]);
       setSearchResultCount(0);
+      setCurrentSearchResultIndex(0);
     }
   }, [jsonSearchTerm, data]);
+  
+  // Function to navigate to next/prev search result
+  const navigateSearchResults = useCallback((direction) => {
+    if (searchResults.length === 0) return;
+    
+    let nextIndex;
+    if (direction === 'next') {
+      nextIndex = (currentSearchResultIndex + 1) % searchResults.length;
+    } else {
+      nextIndex = (currentSearchResultIndex - 1 + searchResults.length) % searchResults.length;
+    }
+    
+    setCurrentSearchResultIndex(nextIndex);
+    
+    // Find the path to the search result
+    const result = searchResults[nextIndex];
+    if (result && result.path) {
+      // Expand all parent nodes to make the result visible
+      if (jsonViewerRef.current) {
+        // Highlight the search result in React JSON View
+        // The library doesn't provide direct access to elements, so we'll use a visual queue
+        // and a setTimeout to give feedback to the user
+        const highlightedElement = jsonViewerRef.current.querySelector('.search-highlight');
+        if (highlightedElement) {
+          highlightedElement.scrollIntoView({ behavior: 'smooth', block: 'center' });
+          
+          // Add a temporary pulse effect
+          highlightedElement.classList.add('current-highlight');
+          setTimeout(() => {
+            highlightedElement.classList.remove('current-highlight');
+          }, 1000);
+        }
+      }
+    }
+  }, [searchResults, currentSearchResultIndex]);
+  
+  // Add keyboard listener for search
+  useEffect(() => {
+    if (!showRawJson) return;
+    
+    const handleKeyDown = (e) => {
+      // Ctrl+F to focus search
+      if ((e.ctrlKey || e.metaKey) && e.key === 'f') {
+        e.preventDefault();
+        const searchInput = document.querySelector('.json-search-input');
+        if (searchInput) searchInput.focus();
+      }
+      
+      // F3 or Enter in search box to go to next result
+      if (e.key === 'F3' || 
+          (e.key === 'Enter' && document.activeElement.classList.contains('json-search-input'))) {
+        e.preventDefault();
+        navigateSearchResults('next');
+      }
+      
+      // Shift+F3 or Shift+Enter in search box to go to previous result
+      if ((e.key === 'F3' && e.shiftKey) || 
+          (e.key === 'Enter' && e.shiftKey && document.activeElement.classList.contains('json-search-input'))) {
+        e.preventDefault();
+        navigateSearchResults('prev');
+      }
+      
+      // Escape to clear search
+      if (e.key === 'Escape' && jsonSearchTerm) {
+        e.preventDefault();
+        setJsonSearchTerm('');
+      }
+    };
+    
+    window.addEventListener('keydown', handleKeyDown);
+    return () => window.removeEventListener('keydown', handleKeyDown);
+  }, [showRawJson, jsonSearchTerm, navigateSearchResults]);
 
   // Expose methods to parent component through ref
   React.useImperativeHandle(ref, () => ({
@@ -937,7 +1207,7 @@ export const FlatDataTable = React.forwardRef(({
             <div className="json-search">
               <input
                 type="text"
-                placeholder="Search in JSON..."
+                placeholder="Search in JSON... (Ctrl+F)"
                 value={jsonSearchTerm}
                 onChange={(e) => setJsonSearchTerm(e.target.value)}
                 className="json-search-input"
@@ -951,23 +1221,61 @@ export const FlatDataTable = React.forwardRef(({
                 </button>
               )}
               {searchResultCount > 0 && (
-                <span className="search-count">{searchResultCount} matches</span>
+                <>
+                  <span className="search-count">
+                    {currentSearchResultIndex + 1} of {searchResultCount} matches
+                  </span>
+                  <div className="search-navigation">
+                    <button 
+                      className="btn btn-sm btn-outline-secondary nav-btn"
+                      onClick={() => navigateSearchResults('prev')}
+                      title="Previous match (Shift+F3)"
+                    >
+                      ↑
+                    </button>
+                    <button 
+                      className="btn btn-sm btn-outline-secondary nav-btn"
+                      onClick={() => navigateSearchResults('next')}
+                      title="Next match (F3)"
+                    >
+                      ↓
+                    </button>
+                  </div>
+                </>
               )}
             </div>
-            <button
-              className={`btn btn-sm ${jsonDarkTheme ? 'btn-light' : 'btn-dark'}`}
-              onClick={() => setJsonDarkTheme(!jsonDarkTheme)}
-              title={jsonDarkTheme ? 'Switch to light theme' : 'Switch to dark theme'}
-            >
-              {jsonDarkTheme ? '☀️' : '🌙'}
-            </button>
+            <div className="json-view-actions">
+              <button
+                className="btn btn-sm btn-outline-secondary mr-2"
+                onClick={() => setJsonExpanded(!jsonExpanded)}
+                title={jsonExpanded ? "Collapse All" : "Expand All"}
+              >
+                {jsonExpanded ? "Collapse All" : "Expand All"}
+              </button>
+              <button
+                className={`btn btn-sm ${jsonDarkTheme ? 'btn-light' : 'btn-dark'}`}
+                onClick={() => setJsonDarkTheme(!jsonDarkTheme)}
+                title={jsonDarkTheme ? 'Switch to light theme' : 'Switch to dark theme'}
+              >
+                {jsonDarkTheme ? '☀️' : '🌙'}
+              </button>
+            </div>
           </div>
           
-          <CustomJsonView 
-            data={data} 
-            searchTerm={jsonSearchTerm}
-            searchResults={searchResults}
-          />
+          <div className="json-viewer-wrapper" ref={jsonViewerRef}>
+            <CustomJsonView 
+              data={data} 
+              searchTerm={jsonSearchTerm}
+              searchResults={searchResults}
+              enableClipboard={false}
+              enableCollapse={true}
+              collapseStringsAfterLength={100}
+              displayDataTypes={false}
+              displayObjectSize={true}
+              indentWidth={2}
+              collapsed={!jsonExpanded}
+            />
+          </div>
         </div>
       ) : (
         <div className="table-container">
