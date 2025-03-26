@@ -51,6 +51,7 @@ export const FlatDataTable = React.forwardRef(({
   const previousStateRef = useRef(null);
   const previousSectionCode = useRef(sectionCode);
   const mountedRef = useRef(false);
+  const preferenceLoadedRef = useRef(false);
   
   // New state for column ordering
   const [columnOrder, setColumnOrder] = useState(initialColumnOrder.length > 0 ? initialColumnOrder : []);
@@ -72,7 +73,7 @@ export const FlatDataTable = React.forwardRef(({
   useEffect(() => {
     if (sectionCode !== previousSectionCode.current && sectionCode) {
       console.log('Section code changed from', previousSectionCode.current, 'to', sectionCode);
-      console.log('Completely resetting FlatDataTable internal state for component', componentId);
+      console.log('Resetting state for new section code');
       
       // Reset all state to initial values
       setSelectedColumns({});
@@ -90,29 +91,195 @@ export const FlatDataTable = React.forwardRef(({
       
       // Reset initialized flag to trigger reinitialization
       isInitialized.current = false;
+      preferenceLoadedRef.current = false;
       
       // Update the reference
       previousSectionCode.current = sectionCode;
-      
-      // Force re-render to ensure processedData is recalculated
-      if (onStateChange) {
-        onStateChange({ 
-          forceUpdate: Date.now(),
-          reset: true,
-          newSectionCode: sectionCode,
-          oldSectionCode: previousSectionCode.current
-        });
-      }
     }
-  }, [sectionCode, onStateChange, componentId]);
+  }, [sectionCode]);
+
+  // Process data and get keys
+  const processedData = useMemo(() => {
+    if (!data || data.length === 0) {
+      return { flattenedRows: [], fieldOrder: [], keys: [] };
+    }
+
+    const flattenedData = flattenNestedData(data);
+    const allKeys = new Set([...flattenedData.fieldOrder]);
+    flattenedData.rows.forEach(item => {
+      Object.keys(item).forEach(key => allKeys.add(key));
+    });
+
+    return {
+      flattenedRows: flattenedData.rows,
+      fieldOrder: flattenedData.fieldOrder,
+      keys: Array.from(allKeys)
+    };
+  }, [data]);
+
+  // Move initializeWithDefaults before loadPreferences to avoid circular dependency
+  const initializeWithDefaults = useCallback(() => {
+    if (!processedData.keys.length) return;
+    
+    console.log('Initializing with defaults');
+    
+    // Use initialColumnVisibility if provided, otherwise set all columns visible
+    const initVisibility = Object.keys(initialColumnVisibility).length > 0
+      ? { ...initialColumnVisibility }
+      : Object.fromEntries(processedData.keys.map(key => [key, true]));
+    
+    // Filter to only include valid columns
+    const validVisibility = {};
+    processedData.keys.forEach(key => {
+      validVisibility[key] = initVisibility[key] !== undefined ? initVisibility[key] : true;
+    });
+    
+    // Set column visibility
+    setSelectedColumns(validVisibility);
+    
+    // Use initialColumnWidths if provided
+    if (Object.keys(initialColumnWidths).length > 0) {
+      const validWidths = {};
+      Object.keys(initialColumnWidths).forEach(key => {
+        if (processedData.keys.includes(key)) {
+          validWidths[key] = initialColumnWidths[key];
+        }
+      });
+      setColumnWidths(validWidths);
+    }
+    
+    // Use initialColumnOrder if provided, otherwise use keys order
+    if (initialColumnOrder.length > 0) {
+      const validOrder = initialColumnOrder.filter(col => 
+        processedData.keys.includes(col)
+      );
+      
+      const newOrder = [...validOrder];
+      processedData.keys.forEach(key => {
+        if (!newOrder.includes(key)) {
+          newOrder.push(key);
+        }
+      });
+      
+      setColumnOrder(newOrder);
+    } else {
+      setColumnOrder([...processedData.keys]);
+    }
+    
+    preferenceLoadedRef.current = true;
+    isInitialized.current = true;
+  }, [processedData.keys, initialColumnVisibility, initialColumnWidths, initialColumnOrder]);
+
+  // Define loadPreferences after initializeWithDefaults
+  const loadPreferences = useCallback(async () => {
+    if (!sectionCode || !processedData.keys.length) {
+      console.log('Skipping preference load - missing section code or data keys');
+      return;
+    }
+
+    // Don't load preferences more than once for the same section code and data
+    if (preferenceLoadedRef.current) {
+      console.log('Preferences already loaded for this section code and data');
+      return;
+    }
+
+    console.log('Loading preferences for section:', sectionCode);
+    try {
+      // Create query params matching the format used in TabContent.js
+      const params = new URLSearchParams({
+        sectionCode,
+        tabType: componentId.includes('enhanced') ? 'enhanced' : 'parsed'
+      });
+
+      // Use the correct endpoint format with query parameters
+      const response = await fetch(`http://localhost:3001/api/display-preferences?${params}`);
+
+      if (response.ok) {
+        const prefs = await response.json();
+        console.log('Loaded preferences:', prefs);
+        
+        if (Object.keys(prefs).length > 0) {
+          // Apply column visibility
+          if (prefs.selectedColumns) {
+            const columnsForCurrentData = {};
+            Object.keys(prefs.selectedColumns).forEach(key => {
+              if (processedData.keys.includes(key)) {
+                columnsForCurrentData[key] = prefs.selectedColumns[key];
+              }
+            });
+            setSelectedColumns(columnsForCurrentData);
+          }
+          
+          // Apply column widths
+          if (prefs.columnWidths) {
+            const widthsForCurrentData = {};
+            Object.keys(prefs.columnWidths).forEach(key => {
+              if (processedData.keys.includes(key)) {
+                widthsForCurrentData[key] = prefs.columnWidths[key];
+              }
+            });
+            setColumnWidths(widthsForCurrentData);
+          }
+          
+          // Apply column order
+          if (prefs.columnOrder && prefs.columnOrder.length > 0) {
+            const validOrder = prefs.columnOrder.filter(col => 
+              processedData.keys.includes(col)
+            );
+            
+            const newOrder = [...validOrder];
+            processedData.keys.forEach(key => {
+              if (!newOrder.includes(key)) {
+                newOrder.push(key);
+              }
+            });
+            
+            setColumnOrder(newOrder);
+          }
+          
+          preferenceLoadedRef.current = true;
+          isInitialized.current = true;
+          return;
+        }
+      }
+      
+      // If no preferences found or response not ok, initialize with defaults
+      console.log('No saved preferences found or error. Initializing with defaults.');
+      initializeWithDefaults();
+      
+    } catch (error) {
+      console.error('Error loading preferences:', error);
+      initializeWithDefaults();
+    }
+  }, [sectionCode, processedData.keys, initializeWithDefaults, componentId]);
+
+  // Main initialization effect
+  useEffect(() => {
+    if (!isInitialized.current && processedData.keys.length > 0 && sectionCode) {
+      console.log('Data is available, triggering initialization');
+      loadPreferences();
+    }
+  }, [sectionCode, processedData.keys, loadPreferences]);
 
   // Detect data changes
   useEffect(() => {
     // Only log if data changed from something to something else (both non-empty)
     if (data && data.length > 0) {
       console.log(`Data updated for FlatDataTable ${componentId}, rows:`, data.length);
+      
+      // Reset initialization flags when data changes
+      if (isInitialized.current) {
+        console.log('Data changed after initialization, resetting preference flags');
+        preferenceLoadedRef.current = false;
+        
+        // Don't reset isInitialized here to avoid flickering
+        // But do trigger loadPreferences again to ensure we're showing the right columns
+        if (sectionCode && processedData.keys.length > 0) {
+          loadPreferences();
+        }
+      }
     }
-  }, [data, componentId]);
+  }, [data, componentId, sectionCode, processedData.keys, loadPreferences]);
 
   // Handle JSON search
   useEffect(() => {
@@ -154,207 +321,6 @@ export const FlatDataTable = React.forwardRef(({
     
     return 'inherit';
   }, [showColorHighlighting]);
-
-  // Process data and get keys
-  const processedData = useMemo(() => {
-    if (!data || data.length === 0) {
-      return { flattenedRows: [], fieldOrder: [], keys: [] };
-    }
-
-    const flattenedData = flattenNestedData(data);
-    const allKeys = new Set([...flattenedData.fieldOrder]);
-    flattenedData.rows.forEach(item => {
-      Object.keys(item).forEach(key => allKeys.add(key));
-    });
-
-    return {
-      flattenedRows: flattenedData.rows,
-      fieldOrder: flattenedData.fieldOrder,
-      keys: Array.from(allKeys)
-    };
-  }, [data]);
-
-  // Initialize column order when data changes
-  useEffect(() => {
-    if (processedData.keys.length > 0 && columnOrder.length === 0) {
-      setColumnOrder([...processedData.keys]);
-    }
-  }, [processedData.keys, columnOrder.length]);
-
-  // Load display preferences when section code changes
-  useEffect(() => {
-    let isMounted = true;
-
-    const loadPreferences = async () => {
-      if (!sectionCode) return;
-
-      try {
-        console.log('Loading preferences for section:', sectionCode);
-        // Use the new API endpoint we added
-        const response = await fetch(`http://localhost:3001/api/display-preferences/${encodeURIComponent(sectionCode)}`);
-        
-        if (!isMounted) return;
-
-        if (response.ok) {
-          const prefs = await response.json();
-          console.log('Loaded preferences:', prefs);
-          
-          // Replace state completely instead of merging
-          if (prefs.selectedColumns) {
-            setSelectedColumns(prevColumns => {
-              // Only keep columns that exist in the current data
-              const columnsForCurrentData = {};
-              Object.keys(prefs.selectedColumns).forEach(key => {
-                if (processedData.keys.includes(key)) {
-                  columnsForCurrentData[key] = prefs.selectedColumns[key];
-                }
-              });
-              return columnsForCurrentData;
-            });
-          } else {
-            // If no saved preferences, initialize with all columns visible
-            setSelectedColumns(
-              Object.fromEntries(processedData.keys.map(key => [key, true]))
-            );
-          }
-          
-          if (prefs.columnWidths) {
-            setColumnWidths(prevWidths => {
-              // Only keep widths for columns that exist in the current data
-              const widthsForCurrentData = {};
-              Object.keys(prefs.columnWidths).forEach(key => {
-                if (processedData.keys.includes(key)) {
-                  widthsForCurrentData[key] = prefs.columnWidths[key];
-                }
-              });
-              return widthsForCurrentData;
-            });
-          }
-          
-          if (prefs.columnOrder && prefs.columnOrder.length > 0) {
-            // Filter out columns that don't exist in the current data
-            const validOrder = prefs.columnOrder.filter(col => 
-              processedData.keys.includes(col)
-            );
-            
-            // Add any new columns that aren't in the saved order
-            const newOrder = [...validOrder];
-            processedData.keys.forEach(key => {
-              if (!newOrder.includes(key)) {
-                newOrder.push(key);
-              }
-            });
-            
-            setColumnOrder(newOrder);
-          } else {
-            // If no saved order, use processed data keys order
-            setColumnOrder([...processedData.keys]);
-          }
-        } else {
-          console.log('No saved preferences found for section:', sectionCode);
-          // Initialize with all columns visible
-          setSelectedColumns(
-            Object.fromEntries(processedData.keys.map(key => [key, true]))
-          );
-          setColumnOrder([...processedData.keys]);
-        }
-      } catch (error) {
-        if (!isMounted) return;
-        console.error('Error loading display preferences:', error);
-      }
-    };
-
-    loadPreferences();
-
-    return () => {
-      isMounted = false;
-    };
-  }, [sectionCode, processedData.keys]);
-
-  // Initialize selected columns if no preferences were loaded
-  useEffect(() => {
-    if (!isInitialized.current && processedData.keys.length > 0) {
-      const initialSelection = Object.keys(initialColumnVisibility).length > 0
-        ? initialColumnVisibility
-        : Object.fromEntries(processedData.keys.map(key => [key, true]));
-      
-      // Filter out any columns that don't exist in the current dataset
-      const validSelection = {};
-      Object.keys(initialSelection).forEach(key => {
-        if (processedData.keys.includes(key)) {
-          validSelection[key] = initialSelection[key];
-        }
-      });
-      
-      // Make sure all keys from the dataset are included
-      processedData.keys.forEach(key => {
-        if (validSelection[key] === undefined) {
-          validSelection[key] = true; // Default to visible
-        }
-      });
-      
-      setSelectedColumns(validSelection);
-      isInitialized.current = true;
-    }
-  }, [processedData.keys, initialColumnVisibility]);
-
-  // Update state when initialColumnVisibility changes
-  useEffect(() => {
-    if (Object.keys(initialColumnVisibility).length > 0) {
-      // Filter to only include valid columns for the current dataset
-      const validVisibility = {};
-      
-      // First, include all columns from initialColumnVisibility that exist in the data
-      Object.keys(initialColumnVisibility).forEach(key => {
-        if (processedData.keys.includes(key)) {
-          validVisibility[key] = initialColumnVisibility[key];
-        }
-      });
-      
-      // Then make sure all columns in the data are included
-      processedData.keys.forEach(key => {
-        if (validVisibility[key] === undefined) {
-          validVisibility[key] = true; // Default to visible
-        }
-      });
-      
-      setSelectedColumns(validVisibility);
-    }
-  }, [initialColumnVisibility, processedData.keys]);
-
-  // Update state when initialColumnWidths changes
-  useEffect(() => {
-    if (Object.keys(initialColumnWidths).length > 0) {
-      // Filter to only include valid columns for the current dataset
-      const validWidths = {};
-      Object.keys(initialColumnWidths).forEach(key => {
-        if (processedData.keys.includes(key)) {
-          validWidths[key] = initialColumnWidths[key];
-        }
-      });
-      setColumnWidths(validWidths);
-    }
-  }, [initialColumnWidths, processedData.keys]);
-
-  // Update state when initialColumnOrder changes
-  useEffect(() => {
-    if (initialColumnOrder && initialColumnOrder.length > 0) {
-      // Filter to only include valid columns that exist in the dataset
-      const validOrder = initialColumnOrder.filter(col => 
-        processedData.keys.includes(col)
-      );
-      
-      // Add any missing columns from the dataset
-      const newOrder = [...validOrder];
-      processedData.keys.forEach(key => {
-        if (!newOrder.includes(key)) {
-          newOrder.push(key);
-        }
-      });
-      
-      setColumnOrder(newOrder);
-    }
-  }, [initialColumnOrder, processedData.keys]);
 
   // Notify parent of state changes, but only when they actually change
   useEffect(() => {

@@ -1,0 +1,31 @@
+{
+  "selectedColumns": {
+    "section_code": true,
+    "title": true,
+    "items": true,
+    "items.id": true,
+    "items.enr_4.4": true,
+    "items.namecode": true,
+    "items.coordinates": true,
+    "items.atsroutes": true,
+    "general_remarks": true,
+    "metadata": true,
+    "metadata.source": true,
+    "metadata.processing_timestamp": true
+  },
+  "columnWidths": {},
+  "columnOrder": [
+    "section_code",
+    "title",
+    "items",
+    "items.id",
+    "items.enr_4.4",
+    "items.namecode",
+    "items.coordinates",
+    "items.atsroutes",
+    "general_remarks",
+    "metadata",
+    "metadata.source",
+    "metadata.processing_timestamp"
+  ]
+}
