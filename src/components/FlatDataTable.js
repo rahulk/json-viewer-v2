@@ -52,6 +52,7 @@ export const FlatDataTable = React.forwardRef(({
   const previousSectionCode = useRef(sectionCode);
   const mountedRef = useRef(false);
   const preferenceLoadedRef = useRef(false);
+  const stickyStyleRef = useRef(null);
   
   // New state for column ordering
   const [columnOrder, setColumnOrder] = useState(initialColumnOrder.length > 0 ? initialColumnOrder : []);
@@ -260,6 +261,101 @@ export const FlatDataTable = React.forwardRef(({
       loadPreferences();
     }
   }, [sectionCode, processedData.keys, loadPreferences]);
+
+  // NEW EFFECT: Add sticky header functionality
+  useEffect(() => {
+    if (!processedData.flattenedRows.length) return;
+    
+    // Function to apply sticky headers
+    const applyFixedHeaders = () => {
+      // Clean up any existing style
+      if (stickyStyleRef.current) {
+        stickyStyleRef.current.remove();
+        stickyStyleRef.current = null;
+      }
+      
+      // Create a new style element
+      const style = document.createElement('style');
+      style.id = `sticky-headers-${componentId}`;
+      
+      // Define CSS to fix the headers
+      style.textContent = `
+        /* Core table container styles */
+        .table-container {
+          overflow: auto !important;
+          position: relative !important;
+        }
+
+        /* Fix table structure for sticky headers */
+        .data-table {
+          border-collapse: separate !important;
+          border-spacing: 0 !important;
+        }
+
+        /* Make thead sticky */
+        .data-table thead {
+          position: -webkit-sticky !important;
+          position: sticky !important;
+          top: 0 !important;
+          z-index: 1000 !important;
+          background-color: #f5f5f5 !important;
+        }
+
+        /* Make th cells sticky */
+        .data-table th {
+          position: -webkit-sticky !important;
+          position: sticky !important;
+          top: 0 !important;
+          z-index: 1000 !important;
+          background-color: #f5f5f5 !important;
+          box-shadow: 0 2px 3px rgba(0,0,0,0.1) !important;
+        }
+
+        /* Ensure header content is visible */
+        .data-table th .header-content {
+          position: relative !important;
+          z-index: 1001 !important;
+        }
+
+        /* Make sure resize handles stay above content */
+        .resize-handle {
+          position: absolute !important;
+          z-index: 1002 !important;
+        }
+
+        /* Fix for Firefox */
+        @-moz-document url-prefix() {
+          .data-table thead,
+          .data-table th {
+            position: sticky !important;
+            top: 0 !important;
+          }
+        }
+      `;
+      
+      // Add the style to the document head
+      document.head.appendChild(style);
+      
+      // Save reference for cleanup
+      stickyStyleRef.current = style;
+      
+      // Log for debugging
+      console.log('Applied sticky header styles for', componentId);
+      
+      return style;
+    };
+    
+    // Apply sticky headers
+    const styleElement = applyFixedHeaders();
+    
+    // Clean up function
+    return () => {
+      if (styleElement && styleElement.parentNode) {
+        styleElement.parentNode.removeChild(styleElement);
+      }
+      stickyStyleRef.current = null;
+    };
+  }, [processedData.flattenedRows, componentId]);
 
   // Detect data changes
   useEffect(() => {
