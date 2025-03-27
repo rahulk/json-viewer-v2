@@ -92,7 +92,8 @@ export const useJsonProcessor = (folderPath, loadDisplayPreferences) => {
           data: data.results || [],
           columnVisibility: preferences.selectedColumns || {},
           columnWidths: preferences.columnWidths || {},
-          columnOrder: preferences.columnOrder || []
+          columnOrder: preferences.columnOrder || [],
+          lockedColumns: preferences.lockedColumns || []
         });
       } else {
         console.log('Applying data only, no saved preferences found');

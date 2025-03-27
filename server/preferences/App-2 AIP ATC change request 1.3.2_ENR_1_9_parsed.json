@@ -1,12 +1,8 @@
 {
   "selectedColumns": {
-    "section_code": true,
-    "title": true,
+    "metadata": true,
+    "metadata.processing_timestamp": true,
     "routes": true,
-    "routes.routes": true,
-    "routes.routes_html": false,
-    "routes.topnotes": true,
-    "routes.topnotes_html": true,
     "routes.Routes": true,
     "routes.Routes.DepartureAirport": true,
     "routes.Routes.DepartureAirport_html": true,
@@ -15,9 +11,13 @@
     "routes.Routes.route/exitpoint": true,
     "routes.Routes.route/exitpoint_html": true,
     "routes.general_remarks": true,
-    "routes.general_remarks_html": false,
-    "metadata": true,
-    "metadata.processing_timestamp": true
+    "routes.general_remarks_html": true,
+    "routes.routes": true,
+    "routes.routes_html": true,
+    "routes.topnotes": true,
+    "routes.topnotes_html": true,
+    "section_code": true,
+    "title": true
   },
   "columnWidths": {
     "section_code": 352,
@@ -41,9 +41,9 @@
   },
   "columnOrder": [
     "section_code",
-    "routes.routes_html",
     "title",
     "routes",
+    "routes.routes_html",
     "routes.routes",
     "routes.topnotes",
     "routes.topnotes_html",

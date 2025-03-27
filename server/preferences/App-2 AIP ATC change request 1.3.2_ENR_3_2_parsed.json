@@ -166,5 +166,10 @@
     "routes.waypoints.navigation_accuracy_html",
     "routes.waypoints.remarks_row1_html",
     "routes.waypoints.remarks_row2_html"
+  ],
+  "lockedColumns": [
+    "routes.waypoints.images",
+    "routes.route_designator",
+    "routes.waypoints.id"
   ]
 }
