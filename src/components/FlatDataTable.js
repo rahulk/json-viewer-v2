@@ -695,25 +695,28 @@ export const FlatDataTable = React.forwardRef(({
   }));
 
   // Add getHighlightColor function
-  const getHighlightColor = useCallback((value, columnName) => {
-    // If showing color highlighting is disabled, return inherit
-    if (!showColorHighlighting) return 'inherit';
-    
-    // Check if the column name indicates coloring
-    if (columnName && typeof columnName === 'string') {
-      const column = columnName.toLowerCase();
-      if (column.includes('_blue')) return 'rgba(0, 0, 255, 0.1)';
-      if (column.includes('_red')) return 'rgba(255, 0, 0, 0.1)';
+  const getHighlightColor = useCallback((value, columnName, rowIndex) => {
+    // If showing color highlighting is enabled (for tab 5), handle red/blue highlighting
+    if (showColorHighlighting) {
+      // Check if the column name indicates coloring
+      if (columnName && typeof columnName === 'string') {
+        const column = columnName.toLowerCase();
+        if (column.includes('_blue')) return 'rgba(0, 0, 255, 0.1)';
+        if (column.includes('_red')) return 'rgba(255, 0, 0, 0.1)';
+      }
+      
+      // For backward compatibility, also check values
+      if (value && typeof value === 'string') {
+        const cellValue = value.toLowerCase();
+        if (cellValue.includes('_blue')) return 'rgba(0, 0, 255, 0.1)';
+        if (cellValue.includes('_red')) return 'rgba(255, 0, 0, 0.1)';
+      }
+      
+      return 'inherit';
     }
     
-    // For backward compatibility, also check values
-    if (value && typeof value === 'string') {
-      const cellValue = value.toLowerCase();
-      if (cellValue.includes('_blue')) return 'rgba(0, 0, 255, 0.1)';
-      if (cellValue.includes('_red')) return 'rgba(255, 0, 0, 0.1)';
-    }
-    
-    return 'inherit';
+    // For tab 4 (parsed JSONs), implement alternate row coloring
+    return rowIndex % 2 === 0 ? '#ffffff' : '#f9f9f9';
   }, [showColorHighlighting]);
 
   // Notify parent of state changes, but only when they actually change
@@ -1324,7 +1327,7 @@ export const FlatDataTable = React.forwardRef(({
                         style={{
                           width: columnWidths[column] ? `${columnWidths[column]}px` : '200px',
                           whiteSpace: wrapText ? 'normal' : 'nowrap',
-                          backgroundColor: getHighlightColor(row[column], column),
+                          backgroundColor: getHighlightColor(row[column], column, rowIndex),
                           overflow: 'hidden'
                         }}
                         className={isImageValue(row[column], column) ? 'image-cell' : ''}
