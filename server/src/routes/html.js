@@ -3,10 +3,10 @@ const router = express.Router();
 const fs = require('fs').promises;
 const fsSync = require('fs');
 const path = require('path');
-const { PDF_BASE_PATH } = require('../config/constants');
+const config = require('../config/config');
 
 // Add new endpoint to get basic HTML content
-router.get('/basic-html', async (req, res) => {
+router.get(config.API.ENDPOINTS.BASIC_HTML, async (req, res) => {
   console.log('\n=== 📄 BASIC HTML API CALL ===');
   console.log('Query parameters:', req.query);
   
@@ -19,8 +19,13 @@ router.get('/basic-html', async (req, res) => {
     }
 
     // Remove .pdf extension and build the HTML path
-    const baseFilename = filename.replace(/\.pdf$/i, '');
-    const htmlPath = path.join(PDF_BASE_PATH, folderPath, 'basic_html', `${baseFilename}.html`);
+    const baseFilename = filename.replace(new RegExp(config.FILES.EXTENSIONS.PDF + '$', 'i'), '');
+    const htmlPath = path.join(
+      config.PATHS.PDF_BASE_PATH, 
+      folderPath, 
+      config.PATHS.SUBFOLDERS.BASIC_HTML, 
+      `${baseFilename}${config.FILES.EXTENSIONS.HTML}`
+    );
     console.log('📂 Looking for HTML file at:', htmlPath);
 
     try {
@@ -44,7 +49,7 @@ router.get('/basic-html', async (req, res) => {
 });
 
 // HTML endpoint with folder, subFolder, file parameters
-router.get('/html', (req, res) => {
+router.get(config.API.ENDPOINTS.HTML, (req, res) => {
   console.log('\n=== 📄 HTML API CALL ===');
   console.log('Query parameters:', req.query);
   
@@ -57,7 +62,7 @@ router.get('/html', (req, res) => {
     });
   }
   
-  const filePath = path.join(PDF_BASE_PATH, folder, subFolder, file);
+  const filePath = path.join(config.PATHS.PDF_BASE_PATH, folder, subFolder, file);
   console.log('📂 Looking for HTML file at:', filePath);
   
   // Use async fs instead of sync for better performance

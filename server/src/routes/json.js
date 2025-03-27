@@ -2,11 +2,11 @@ const express = require('express');
 const router = express.Router();
 const fs = require('fs').promises;
 const path = require('path');
-const { PDF_BASE_PATH } = require('../config/constants');
+const config = require('../config/config');
 const { extractSectionCode } = require('../utils/fileUtils');
 
 // API endpoint to get parsed JSON files associated with a PDF
-router.get('/parsed-jsons', async (req, res) => {
+router.get(config.API.ENDPOINTS.PARSED_JSONS, async (req, res) => {
   console.log('\n=== PARSED JSONS API CALL ===');
   console.log('Query parameters:', req.query);
   
@@ -19,11 +19,11 @@ router.get('/parsed-jsons', async (req, res) => {
     }
     
     // Build the correct path to include documents directory
-    const jsonFolderPath = path.join(PDF_BASE_PATH, folderPath, 'parsed_jsons');
+    const jsonFolderPath = path.join(config.PATHS.PDF_BASE_PATH, folderPath, config.PATHS.SUBFOLDERS.PARSED_JSONS);
     console.log('Looking in folder:', jsonFolderPath);
     
     // Remove file extension from PDF filename
-    const baseFilename = pdfFilename.replace(/\.pdf$/i, '');
+    const baseFilename = pdfFilename.replace(new RegExp(config.FILES.EXTENSIONS.PDF + '$', 'i'), '');
     console.log('Base filename:', baseFilename);
 
     try {
@@ -39,7 +39,7 @@ router.get('/parsed-jsons', async (req, res) => {
     
     const matchingJsonFiles = files
       .filter(file => {
-        const matches = file.startsWith(baseFilename + '_') && file.endsWith('.json');
+        const matches = file.startsWith(baseFilename + '_') && file.endsWith(config.FILES.EXTENSIONS.JSON);
         console.log(`File: ${file}, Matches: ${matches}`);
         return matches;
       })
@@ -68,7 +68,7 @@ router.get('/parsed-jsons', async (req, res) => {
 });
 
 // Similar update for enhanced-jsons endpoint
-router.get('/enhanced-jsons', async (req, res) => {
+router.get(config.API.ENDPOINTS.ENHANCED_JSONS, async (req, res) => {
   console.log('\n=== ENHANCED JSONS API CALL ===');
   console.log('Query parameters:', req.query);
   
@@ -81,11 +81,11 @@ router.get('/enhanced-jsons', async (req, res) => {
     }
     
     // Build the correct path to include documents directory
-    const jsonFolderPath = path.join(PDF_BASE_PATH, folderPath, 'enhanced_jsons');
+    const jsonFolderPath = path.join(config.PATHS.PDF_BASE_PATH, folderPath, config.PATHS.SUBFOLDERS.ENHANCED_JSONS);
     console.log('Looking in folder:', jsonFolderPath);
     
     // Remove file extension from PDF filename
-    const baseFilename = pdfFilename.replace(/\.pdf$/i, '');
+    const baseFilename = pdfFilename.replace(new RegExp(config.FILES.EXTENSIONS.PDF + '$', 'i'), '');
     console.log('Base filename:', baseFilename);
 
     try {
@@ -101,7 +101,7 @@ router.get('/enhanced-jsons', async (req, res) => {
     
     const matchingJsonFiles = files
       .filter(file => {
-        const matches = file.startsWith(baseFilename + '_') && file.endsWith('_enhanced.json');
+        const matches = file.startsWith(baseFilename + '_') && file.endsWith(config.FILES.EXTENSIONS.ENHANCED_JSON_SUFFIX);
         console.log(`File: ${file}, Matches: ${matches}`);
         return matches;
       })
@@ -130,7 +130,7 @@ router.get('/enhanced-jsons', async (req, res) => {
 });
 
 // Add this endpoint to process JSON files
-router.get('/process-json', async (req, res) => {
+router.get(config.API.ENDPOINTS.PROCESS_JSON, async (req, res) => {
   console.log('\n=== 🔄 PROCESS JSON API CALL ===');
   console.log('⏰ Timestamp:', new Date().toISOString());
   console.log('📝 Query parameters:', req.query);
@@ -144,7 +144,7 @@ router.get('/process-json', async (req, res) => {
     }
 
     // Build the absolute path to the JSON file
-    const fullPath = path.join(PDF_BASE_PATH, filePath);
+    const fullPath = path.join(config.PATHS.PDF_BASE_PATH, filePath);
     console.log('📂 Looking for JSON file at:', fullPath);
 
     try {

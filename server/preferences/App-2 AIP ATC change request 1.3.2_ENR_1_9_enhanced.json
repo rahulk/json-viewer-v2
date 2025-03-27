@@ -32,7 +32,7 @@
     "routes.Routes.DepartureAirport_blue": true,
     "routes.Routes.DepartureAirport_red_html": true,
     "routes.Routes.DepartureAirport_red": true,
-    "metadata": true,
+    "metadata": false,
     "metadata.processing_timestamp": false
   },
   "columnWidths": {
@@ -87,8 +87,8 @@
     "routes.general_remarks_blue",
     "routes.general_remarks_red_html",
     "routes.general_remarks_red",
-    "routes.routes",
     "routes.Routes.DepartureAirport",
+    "routes.routes",
     "routes.Routes.DepartureAirport_html",
     "routes.Routes.destination",
     "routes.Routes.destination_html",

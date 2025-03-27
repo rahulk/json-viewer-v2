@@ -41,8 +41,8 @@
   },
   "columnOrder": [
     "section_code",
-    "title",
     "routes.routes_html",
+    "title",
     "routes",
     "routes.routes",
     "routes.topnotes",
