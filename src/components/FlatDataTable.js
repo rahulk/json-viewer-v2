@@ -27,7 +27,8 @@ export const FlatDataTable = React.forwardRef(({
   sectionCode,
   initialColumnVisibility = {},
   initialColumnWidths = {}, 
-  initialColumnOrder = [], 
+  initialColumnOrder = [],
+  initialLockedColumns = [],
   onStateChange,
   showColumnSelection = true,
   allowTextWrapping = true,
@@ -49,8 +50,9 @@ export const FlatDataTable = React.forwardRef(({
   const [searchResultCount, setSearchResultCount] = useState(0);
   const [jsonExpanded, setJsonExpanded] = useState(true);
   const [currentSearchResultIndex, setCurrentSearchResultIndex] = useState(0);
+  const [lockedColumns, setLockedColumns] = useState(initialLockedColumns);
   const jsonViewerRef = useRef(null);
-  const isInitialized = useRef(false); // Tracks if the component has been initialized with preferences for the current data structure
+  const isInitialized = useRef(false);
   const previousStateRef = useRef(null);
   const previousSectionCode = useRef(sectionCode);
   const mountedRef = useRef(false);
@@ -106,6 +108,7 @@ export const FlatDataTable = React.forwardRef(({
       setSelectedColumns({});
       setColumnWidths({});
       setColumnOrder([]);
+      setLockedColumns([]);
       setFilterColoredText(false);
       setWrapText(false);
       setShowColumnSelector(false);
@@ -227,11 +230,24 @@ export const FlatDataTable = React.forwardRef(({
     } else {
       setColumnOrder([...processedData.keys]);
     }
+
+    // Initialize locked columns from saved preferences
+    if (initialLockedColumns.length > 0) {
+      // Filter out any locked columns that don't exist in the current dataset
+      const validLockedColumns = initialLockedColumns.filter(col => 
+        processedData.keys.includes(col)
+      );
+      setLockedColumns(validLockedColumns);
+    }
     
-    console.log('Initialized component with', processedData.keys.length, 'columns from current dataset');
+    console.log('Initialized component with', {
+      columns: processedData.keys.length,
+      lockedColumns: initialLockedColumns.length
+    });
+    
     preferenceLoadedRef.current = true;
     isInitialized.current = true;
-  }, [processedData.keys, initialColumnVisibility, initialColumnWidths, initialColumnOrder]);
+  }, [processedData.keys, initialColumnVisibility, initialColumnWidths, initialColumnOrder, initialLockedColumns]);
 
   // Main initialization effect
   useEffect(() => {
@@ -260,19 +276,32 @@ export const FlatDataTable = React.forwardRef(({
   useEffect(() => {
     if (!processedData.flattenedRows.length) return;
     
-    // Function to apply sticky headers
     const applyFixedHeaders = () => {
-      // Clean up any existing style
       if (stickyStyleRef.current) {
         stickyStyleRef.current.remove();
         stickyStyleRef.current = null;
       }
+
+      // Get the actual widths of columns from the DOM
+      const getColumnWidth = (column) => {
+        const headerCell = document.querySelector(`.data-table th[data-column="${column}"]`);
+        if (headerCell) {
+          return headerCell.offsetWidth;
+        }
+        return columnWidths[column] || 200; // Fallback to state or default
+      };
       
-      // Create a new style element
+      // Calculate cumulative widths for locked columns
+      const cumulativeWidths = {};
+      let totalWidth = 0;
+      lockedColumns.forEach((col) => {
+        cumulativeWidths[col] = totalWidth;
+        totalWidth += getColumnWidth(col);
+      });
+
       const style = document.createElement('style');
       style.id = `sticky-headers-${componentId}`;
       
-      // Define CSS to fix the headers
       style.textContent = `
         /* Core table container styles */
         .table-container {
@@ -284,6 +313,7 @@ export const FlatDataTable = React.forwardRef(({
         .data-table {
           border-collapse: separate !important;
           border-spacing: 0 !important;
+          position: relative !important;
         }
 
         /* Make thead sticky */
@@ -291,7 +321,7 @@ export const FlatDataTable = React.forwardRef(({
           position: -webkit-sticky !important;
           position: sticky !important;
           top: 0 !important;
-          z-index: 1000 !important;
+          z-index: 2 !important;
           background-color: #f5f5f5 !important;
         }
 
@@ -300,258 +330,98 @@ export const FlatDataTable = React.forwardRef(({
           position: -webkit-sticky !important;
           position: sticky !important;
           top: 0 !important;
-          z-index: 1000 !important;
+          z-index: 2 !important;
           background-color: #f5f5f5 !important;
-          box-shadow: 0 2px 3px rgba(0,0,0,0.1) !important;
+        }
+
+        /* Locked columns styles */
+        ${lockedColumns.map((col, index) => `
+          .data-table td[data-column="${col}"],
+          .data-table th[data-column="${col}"] {
+            position: sticky !important;
+            left: ${cumulativeWidths[col]}px !important;
+            background-color: inherit !important;
+          }
+          
+          .data-table td[data-column="${col}"] {
+            z-index: 1 !important;
+            background-color: inherit !important;
+          }
+          
+          .data-table th[data-column="${col}"] {
+            z-index: 3 !important;
+            background-color: #f5f5f5 !important;
+          }
+
+          /* Add shadow only to the last locked column */
+          ${index === lockedColumns.length - 1 ? `
+            .data-table td[data-column="${col}"],
+            .data-table th[data-column="${col}"] {
+              box-shadow: 2px 0 3px rgba(0,0,0,0.1) !important;
+            }
+          ` : ''}
+
+          /* Ensure proper background for locked cells */
+          .data-table tr:nth-child(even) td[data-column="${col}"] {
+            background-color: #ffffff !important;
+          }
+          
+          .data-table tr:nth-child(odd) td[data-column="${col}"] {
+            background-color: #f9f9f9 !important;
+          }
+        `).join('\n')}
+
+        /* Add transition for smooth column locking */
+        .data-table td,
+        .data-table th {
+          transition: left 0.2s ease-out !important;
         }
 
         /* Ensure header content is visible */
         .data-table th .header-content {
           position: relative !important;
-          z-index: 1001 !important;
+          z-index: 1 !important;
           display: flex !important;
           align-items: center !important;
           justify-content: space-between !important;
         }
 
-        /* Hide column button styling */
-        .hide-column-btn {
-          opacity: 0.2;
-          background: none;
-          border: none;
-          font-size: 12px;
-          cursor: pointer;
-          padding: 2px 5px;
-          border-radius: 2px;
-          margin-left: 5px;
-        }
-        
-        .hide-column-btn:hover {
-          opacity: 1;
-          background-color: #e0e0e0;
+        /* Lock controls styles */
+        .lock-controls {
+          display: flex;
+          align-items: center;
+          gap: 10px;
+          margin-left: 10px;
         }
 
-        /* Recently hidden columns styles */
-        .recently-hidden-columns {
-          display: flex;
-          flex-wrap: wrap;
-          align-items: center;
-          gap: 5px;
-          padding: 5px 10px;
-          background-color: #f9f9f9;
-          border-bottom: 1px solid #ddd;
-          margin-bottom: 5px;
-        }
-        
-        .recently-hidden-label {
-          font-size: 0.85rem;
-          color: #666;
-          margin-right: 5px;
-        }
-        
-        .restore-column-btn {
-          font-size: 0.8rem;
-          padding: 2px 8px;
-          white-space: nowrap;
-          max-width: 200px;
-          overflow: hidden;
-          text-overflow: ellipsis;
-        }
-        
-        .restore-icon {
-          font-weight: bold;
-          margin-left: 3px;
-        }
-        
-        .clear-recent {
-          font-size: 0.8rem;
-          padding: 2px 8px;
-          margin-left: auto;
-        }
-
-        /* JSON Viewer styles */
-        .raw-json-container {
-          display: flex;
-          flex-direction: column;
-          height: 100%;
-          overflow: hidden;
-          border: 1px solid #ddd;
-          border-radius: 4px;
-        }
-        
-        .json-viewer-wrapper {
-          flex-grow: 1;
-          overflow: auto;
-          padding: 10px;
-          height: calc(100vh - 150px);
-          position: relative;
-        }
-        
-        .json-controls {
-          display: flex;
-          justify-content: space-between;
-          align-items: center;
-          padding: 8px 12px;
-          background-color: #f5f5f5;
-          border-bottom: 1px solid #ddd;
-        }
-        
-        .json-search {
-          display: flex;
-          align-items: center;
-          flex: 1;
-          margin-right: 10px;
-        }
-        
-        .json-search-input {
-          flex: 1;
-          padding: 4px 8px;
-          border: 1px solid #ccc;
-          border-radius: 4px;
-          font-size: 14px;
-        }
-        
-        .json-view-actions {
-          display: flex;
-          align-items: center;
-          gap: 8px;
-        }
-        
-        .search-count {
-          margin-left: 8px;
-          font-size: 12px;
-          color: #666;
-          background: #e9ecef;
+        .lock-btn {
           padding: 2px 6px;
-          border-radius: 10px;
-          white-space: nowrap;
-        }
-        
-        .search-navigation {
-          display: flex;
-          gap: 2px;
-          margin-left: 5px;
-        }
-        
-        .nav-btn {
-          padding: 0px 4px;
           font-size: 12px;
-          line-height: 1.2;
-        }
-        
-        .mr-2 {
-          margin-right: 8px;
-        }
-        
-        /* Enhance collapse/expand buttons */
-        .raw-json-container [aria-label="collapse"] {
-          cursor: pointer !important;
-          color: #0275d8 !important;
-          font-weight: bold !important;
-          margin-right: 5px !important;
-          user-select: none !important;
-        }
-        
-        .raw-json-container [aria-label="expand"] {
-          cursor: pointer !important;
-          color: #0275d8 !important;
-          font-weight: bold !important;
-          margin-right: 5px !important;
-          user-select: none !important;
+          border: 1px solid #ddd;
+          border-radius: 3px;
+          background: #fff;
+          cursor: pointer;
+          opacity: 0.7;
+          z-index: 4 !important;
+          transition: all 0.2s ease !important;
         }
 
-        /* Highlight JSON search results */
-        .json-search-highlight {
-          background-color: yellow !important;
-          padding: 0 2px !important;
-          border-radius: 2px !important;
-        }
-        
-        .current-highlight {
-          background-color: orange !important;
-          outline: 2px solid #ff4500 !important;
-          transition: background-color 0.3s ease-out !important;
-        }
-        
-        /* Dark theme styles */
-        .raw-json-container[data-theme="dark"] {
-          background-color: #1e1e1e;
-          color: #d4d4d4;
-        }
-        
-        .raw-json-container[data-theme="dark"] .json-controls {
-          background-color: #2d2d2d;
-          border-color: #444;
-        }
-        
-        .raw-json-container[data-theme="dark"] .json-search-input {
-          background-color: #333;
-          border-color: #555;
-          color: #fff;
-        }
-        
-        .raw-json-container[data-theme="dark"] .search-count {
-          background-color: #444;
-          color: #ddd;
-        }
-        
-        .raw-json-container[data-theme="dark"] .json-search-highlight {
-          background-color: #806300 !important;
-          color: #fff !important;
+        .lock-btn:hover {
+          opacity: 1;
+          background: #f0f7ff;
         }
 
-        /* React JSON View Customizations */
-        .react-json-view {
-          background-color: transparent !important;
-          width: 100% !important;
-          height: auto !important;
-          overflow: visible !important;
-          margin: 0 !important;
-          padding: 0 !important;
-        }
-        
-        .raw-json-container .variable-row, 
-        .raw-json-container .object-key-val {
-          border-left: none !important;
-          padding-top: 4px !important;
-          padding-bottom: 4px !important;
-          min-height: auto !important;
-          margin-top: 1px !important;
-          margin-bottom: 1px !important;
-        }
-        
-        .raw-json-container .variable-row:hover, 
-        .raw-json-container .object-key-val:hover {
-          background-color: rgba(0, 0, 0, 0.05) !important;
-          border-radius: 3px !important;
-        }
-        
-        .raw-json-container[data-theme="dark"] .variable-row:hover, 
-        .raw-json-container[data-theme="dark"] .object-key-val:hover {
-          background-color: rgba(255, 255, 255, 0.05) !important;
-        }
-        
-        .raw-json-container .icon-container svg {
-          cursor: pointer !important;
-          margin-right: 5px !important;
-        }
-        
-        .raw-json-container .search-highlight {
-          background-color: #ffff00 !important;
-          color: #000000 !important;
-          border-radius: 2px !important;
-          padding: 0 2px !important;
-        }
-        
-        .raw-json-container[data-theme="dark"] .search-highlight {
-          background-color: #806300 !important;
-          color: #ffffff !important;
+        .lock-btn.locked {
+          background: #e3f2fd;
+          border-color: #2196f3;
+          color: #1976d2;
+          opacity: 1;
         }
 
         /* Make sure resize handles stay above content */
         .resize-handle {
           position: absolute !important;
-          z-index: 1002 !important;
+          z-index: 4 !important;
         }
 
         /* Fix for Firefox */
@@ -559,34 +429,27 @@ export const FlatDataTable = React.forwardRef(({
           .data-table thead,
           .data-table th {
             position: sticky !important;
-            top: 0 !important;
           }
         }
       `;
       
-      // Add the style to the document head
       document.head.appendChild(style);
-      
-      // Save reference for cleanup
       stickyStyleRef.current = style;
-      
-      // Log for debugging
-      console.log('Applied sticky header styles for', componentId);
       
       return style;
     };
     
-    // Apply sticky headers
-    const styleElement = applyFixedHeaders();
+    // Add a small delay to ensure DOM is ready
+    const timeoutId = setTimeout(applyFixedHeaders, 0);
     
-    // Clean up function
     return () => {
-      if (styleElement && styleElement.parentNode) {
-        styleElement.parentNode.removeChild(styleElement);
+      clearTimeout(timeoutId);
+      if (stickyStyleRef.current && stickyStyleRef.current.parentNode) {
+        stickyStyleRef.current.parentNode.removeChild(stickyStyleRef.current);
       }
       stickyStyleRef.current = null;
     };
-  }, [processedData.flattenedRows, componentId]);
+  }, [processedData.flattenedRows, componentId, lockedColumns, columnWidths]);
 
   // Handle JSON search and navigation
   useEffect(() => {
@@ -691,7 +554,8 @@ export const FlatDataTable = React.forwardRef(({
   React.useImperativeHandle(ref, () => ({
     getSelectedColumns: () => selectedColumns,
     getColumnWidths: () => columnWidths,
-    getColumnOrder: () => columnOrder
+    getColumnOrder: () => columnOrder,
+    getLockedColumns: () => lockedColumns
   }));
 
   // Add getHighlightColor function
@@ -729,7 +593,8 @@ export const FlatDataTable = React.forwardRef(({
       columnOrder,
       showRawJson,
       jsonDarkTheme,
-      jsonSearchTerm
+      jsonSearchTerm,
+      lockedColumns
     };
 
     // Only notify if the state has actually changed
@@ -739,7 +604,8 @@ export const FlatDataTable = React.forwardRef(({
         onStateChange(currentState);
       }
     }
-  }, [selectedColumns, columnWidths, filterColoredText, wrapText, columnOrder, showRawJson, jsonDarkTheme, jsonSearchTerm, onStateChange]);
+  }, [selectedColumns, columnWidths, filterColoredText, wrapText, columnOrder, 
+      showRawJson, jsonDarkTheme, jsonSearchTerm, lockedColumns, onStateChange]);
 
   // Get visible columns in proper order
   const visibleColumns = useMemo(() => {
@@ -1031,10 +897,11 @@ export const FlatDataTable = React.forwardRef(({
       window.displayPreferences.current = {
         selectedColumns,
         columnWidths,
-        columnOrder
+        columnOrder,
+        lockedColumns
       };
     }
-  }, [selectedColumns, columnWidths, columnOrder]);
+  }, [selectedColumns, columnWidths, columnOrder, lockedColumns]);
 
   // Filter columns based on search term
   const filteredKeys = useMemo(() => 
@@ -1045,6 +912,27 @@ export const FlatDataTable = React.forwardRef(({
       : processedData.keys,
     [processedData.keys, searchTerm]
   );
+
+  // Add new function to handle column locking
+  const toggleColumnLock = useCallback((column) => {
+    setLockedColumns(prev => {
+      if (prev.includes(column)) {
+        // Remove from locked columns
+        return prev.filter(col => col !== column);
+      } else {
+        // Add to locked columns, maintaining order
+        const newLocked = [...prev];
+        const columnIndex = visibleColumns.indexOf(column);
+        const insertIndex = newLocked.findIndex(col => visibleColumns.indexOf(col) > columnIndex);
+        if (insertIndex === -1) {
+          newLocked.push(column);
+        } else {
+          newLocked.splice(insertIndex, 0, column);
+        }
+        return newLocked;
+      }
+    });
+  }, [visibleColumns]);
 
   // Early return moved here after all hooks
   if (!data || data.length === 0) {
@@ -1058,6 +946,95 @@ export const FlatDataTable = React.forwardRef(({
 
   // Update the column count display
   const columnCountDisplay = `(${visibleColumns.length}/${processedData.keys.length})`;
+
+  // Modify the table header rendering to include lock controls
+  const renderTableHeader = () => (
+    <thead>
+      <tr>
+        {visibleColumns
+          .filter((column) => selectedColumns[column])
+          .map((column) => (
+            <th 
+              key={column}
+              data-column={column}
+              style={{ 
+                width: columnWidths[column] ? `${columnWidths[column]}px` : '200px',
+                backgroundColor: draggedColumn === column ? '#e0e0e0' : 
+                                dragOverColumn === column ? '#f0f7ff' : '#f5f5f5',
+                cursor: 'grab',
+                borderLeft: dragOverColumn === column ? '2px solid #2196F3' : '1px solid #ddd',
+                position: 'relative'
+              }}
+              draggable="true"
+              onDragStart={(e) => handleDragStart(e, column)}
+              onDragOver={(e) => handleDragOver(e, column)}
+              onDragLeave={handleDragLeave}
+              onDrop={(e) => handleDrop(e, column)}
+              onDragEnd={handleDragEnd}
+            >
+              <div className="header-content">
+                <div className="drag-handle" title="Drag to reorder column">::</div>
+                {column}
+                <div className="lock-controls">
+                  <button 
+                    className={`lock-btn ${lockedColumns.includes(column) ? 'locked' : ''}`}
+                    title={lockedColumns.includes(column) ? "Unlock column" : "Lock column"}
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      toggleColumnLock(column);
+                    }}
+                  >
+                    {lockedColumns.includes(column) ? '🔒' : '🔓'}
+                  </button>
+                  <button 
+                    className="hide-column-btn" 
+                    title="Hide this column"
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      toggleColumn(column);
+                    }}
+                  >
+                    ✕
+                  </button>
+                </div>
+              </div>
+              <div 
+                className="resize-handle"
+                onMouseDown={(e) => handleResizeStart(e, column)}
+                title="Drag to resize column"
+              />
+            </th>
+          ))}
+      </tr>
+    </thead>
+  );
+
+  // Modify the table body rendering to include data-column attribute
+  const renderTableBody = () => (
+    <tbody>
+      {flattenedRows.map((row, rowIndex) => (
+        <tr key={rowIndex}>
+          {visibleColumns
+            .filter((column) => selectedColumns[column])
+            .map((column) => (
+              <td
+                key={column}
+                data-column={column}
+                style={{
+                  width: columnWidths[column] ? `${columnWidths[column]}px` : '200px',
+                  whiteSpace: wrapText ? 'normal' : 'nowrap',
+                  backgroundColor: getHighlightColor(row[column], column, rowIndex),
+                  overflow: 'hidden'
+                }}
+                className={isImageValue(row[column], column) ? 'image-cell' : ''}
+              >
+                {formatValue(row[column], column)}
+              </td>
+            ))}
+        </tr>
+      ))}
+    </tbody>
+  );
 
   return (
     <div className="flat-data-table-wrapper" style={{
@@ -1271,73 +1248,8 @@ export const FlatDataTable = React.forwardRef(({
       ) : (
         <div className="table-container">
           <table className="data-table">
-            <thead>
-              <tr>
-                {visibleColumns
-                  .filter((column) => selectedColumns[column])
-                  .map((column) => (
-                  <th 
-                    key={column}
-                    style={{ 
-                      width: columnWidths[column] ? `${columnWidths[column]}px` : '200px',
-                      backgroundColor: draggedColumn === column ? '#e0e0e0' : 
-                                      dragOverColumn === column ? '#f0f7ff' : '#f5f5f5',
-                      cursor: 'grab',
-                      borderLeft: dragOverColumn === column ? '2px solid #2196F3' : '1px solid #ddd',
-                      position: 'relative'
-                    }}
-                    draggable="true"
-                    onDragStart={(e) => handleDragStart(e, column)}
-                    onDragOver={(e) => handleDragOver(e, column)}
-                    onDragLeave={handleDragLeave}
-                    onDrop={(e) => handleDrop(e, column)}
-                    onDragEnd={handleDragEnd}
-                  >
-                    <div className="header-content">
-                      <div className="drag-handle" title="Drag to reorder column">::</div>
-                      {column}
-                      <button 
-                        className="hide-column-btn" 
-                        title="Hide this column"
-                        onClick={(e) => {
-                          e.stopPropagation();
-                          toggleColumn(column);
-                        }}
-                      >
-                        ✕
-                      </button>
-                    </div>
-                    <div 
-                      className="resize-handle"
-                      onMouseDown={(e) => handleResizeStart(e, column)}
-                      title="Drag to resize column"
-                    />
-                  </th>
-                ))}
-              </tr>
-            </thead>
-            <tbody>
-              {flattenedRows.map((row, rowIndex) => (
-                <tr key={rowIndex}>
-                  {visibleColumns
-                    .filter((column) => selectedColumns[column])
-                    .map((column) => (
-                      <td
-                        key={column}
-                        style={{
-                          width: columnWidths[column] ? `${columnWidths[column]}px` : '200px',
-                          whiteSpace: wrapText ? 'normal' : 'nowrap',
-                          backgroundColor: getHighlightColor(row[column], column, rowIndex),
-                          overflow: 'hidden'
-                        }}
-                        className={isImageValue(row[column], column) ? 'image-cell' : ''}
-                      >
-                        {formatValue(row[column], column)}
-                      </td>
-                    ))}
-                </tr>
-              ))}
-            </tbody>
+            {renderTableHeader()}
+            {renderTableBody()}
           </table>
         </div>
       )}
@@ -1359,6 +1271,7 @@ FlatDataTable.propTypes = {
   initialColumnVisibility: PropTypes.object,
   initialColumnWidths: PropTypes.object,
   initialColumnOrder: PropTypes.array,
+  initialLockedColumns: PropTypes.array,
   onStateChange: PropTypes.func,
   showColumnSelection: PropTypes.bool,
   allowTextWrapping: PropTypes.bool,
