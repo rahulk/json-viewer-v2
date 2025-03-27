@@ -1,4 +1,4 @@
-import React, { useEffect, useRef } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 import { HtmlContentView } from './HtmlContentView';
 import { DataTableTab } from './DataTableTab';
 import config from '../config';
@@ -21,6 +21,14 @@ export const TabContent = ({
 }) => {
   // Track previous tab selection for debugging
   const prevSelectedTabRef = useRef(selectedTab);
+  
+  // Store selected files for each tab to preserve selection across tab switches
+  const [parsedTabSelectedFile, setParsedTabSelectedFile] = useState('');
+  const [enhancedTabSelectedFile, setEnhancedTabSelectedFile] = useState('');
+  
+  // Track last processed files to avoid re-processing
+  const [parsedTabLastProcessed, setParsedTabLastProcessed] = useState('');
+  const [enhancedTabLastProcessed, setEnhancedTabLastProcessed] = useState('');
   
   // Debug logging for tab changes
   useEffect(() => {
@@ -59,6 +67,24 @@ export const TabContent = ({
     }
   }, [selectedTab, tab4State, tab5State]);
 
+  // Handlers for updating selected files for each tab
+  const handleParsedFileSelect = (filename) => {
+    setParsedTabSelectedFile(filename);
+  };
+
+  const handleEnhancedFileSelect = (filename) => {
+    setEnhancedTabSelectedFile(filename);
+  };
+  
+  // Handlers for tracking last processed files
+  const handleParsedProcessedFile = (filename) => {
+    setParsedTabLastProcessed(filename);
+  };
+  
+  const handleEnhancedProcessedFile = (filename) => {
+    setEnhancedTabLastProcessed(filename);
+  };
+
   // Render appropriate content based on selected tab
   switch (selectedTab) {
     case config.TABS.INDICES.BASIC_HTML:
@@ -90,6 +116,10 @@ export const TabContent = ({
           pdfFilename={pdfFilename}
           processFiles={processFiles}
           showColorHighlighting={config.UI.FEATURES.ENABLE_COLOR_HIGHLIGHTING_FOR_PARSED}
+          savedSelectedFile={parsedTabSelectedFile}
+          onFileSelect={handleParsedFileSelect}
+          lastProcessedFile={parsedTabLastProcessed}
+          onFileProcessed={handleParsedProcessedFile}
         />
       );
     case config.TABS.INDICES.ENHANCED_JSON:
@@ -103,6 +133,10 @@ export const TabContent = ({
           pdfFilename={pdfFilename}
           processFiles={processFiles}
           showColorHighlighting={config.UI.FEATURES.ENABLE_COLOR_HIGHLIGHTING_FOR_ENHANCED}
+          savedSelectedFile={enhancedTabSelectedFile}
+          onFileSelect={handleEnhancedFileSelect}
+          lastProcessedFile={enhancedTabLastProcessed}
+          onFileProcessed={handleEnhancedProcessedFile}
         />
       );
     default:
