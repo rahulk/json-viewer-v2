@@ -50,7 +50,7 @@ export const FlatDataTable = React.forwardRef(({
   const [jsonExpanded, setJsonExpanded] = useState(true);
   const [currentSearchResultIndex, setCurrentSearchResultIndex] = useState(0);
   const jsonViewerRef = useRef(null);
-  const isInitialized = useRef(false);
+  const isInitialized = useRef(false); // Tracks if the component has been initialized with preferences for the current data structure
   const previousStateRef = useRef(null);
   const previousSectionCode = useRef(sectionCode);
   const mountedRef = useRef(false);
@@ -63,6 +63,28 @@ export const FlatDataTable = React.forwardRef(({
   const [dragOverColumn, setDragOverColumn] = useState(null);
   const [recentlyHiddenColumns, setRecentlyHiddenColumns] = useState([]);
 
+  // Track data changes and prevent duplicate initializations
+  const previousDataRef = useRef(null);
+  
+  // Process data and get keys first - move this before the effects that use it
+  const processedData = useMemo(() => {
+    if (!data || data.length === 0) {
+      return { flattenedRows: [], fieldOrder: [], keys: [] };
+    }
+
+    const flattenedData = flattenNestedData(data);
+    const allKeys = new Set([...flattenedData.fieldOrder]);
+    flattenedData.rows.forEach(item => {
+      Object.keys(item).forEach(key => allKeys.add(key));
+    });
+
+    return {
+      flattenedRows: flattenedData.rows,
+      fieldOrder: flattenedData.fieldOrder,
+      keys: Array.from(allKeys)
+    };
+  }, [data]);
+  
   // Prevent resetting state on component remount due to tab change
   useEffect(() => {
     // If this is the first mount, set the mounted flag
@@ -98,30 +120,49 @@ export const FlatDataTable = React.forwardRef(({
       // Reset initialized flag to trigger reinitialization
       isInitialized.current = false;
       preferenceLoadedRef.current = false;
+      previousDataRef.current = null;
       
       // Update the reference
       previousSectionCode.current = sectionCode;
     }
   }, [sectionCode]);
 
-  // Process data and get keys
-  const processedData = useMemo(() => {
-    if (!data || data.length === 0) {
-      return { flattenedRows: [], fieldOrder: [], keys: [] };
+  // Track when data changes
+  useEffect(() => {
+    // If it's the first data assignment or data is empty, just update the ref
+    if (previousDataRef.current === null || !data || data.length === 0) {
+      previousDataRef.current = data;
+      return;
     }
-
-    const flattenedData = flattenNestedData(data);
-    const allKeys = new Set([...flattenedData.fieldOrder]);
-    flattenedData.rows.forEach(item => {
-      Object.keys(item).forEach(key => allKeys.add(key));
-    });
-
-    return {
-      flattenedRows: flattenedData.rows,
-      fieldOrder: flattenedData.fieldOrder,
-      keys: Array.from(allKeys)
-    };
-  }, [data]);
+    
+    // Check if the data structure has changed by comparing available keys
+    const currentKeys = processedData.keys;
+    const previousKeys = previousDataRef.current ? 
+      flattenNestedData(previousDataRef.current).fieldOrder : [];
+    
+    // Compare current and previous data structure
+    const keysChanged = 
+      currentKeys.length !== previousKeys.length || 
+      JSON.stringify(currentKeys.sort()) !== JSON.stringify(previousKeys.sort());
+      
+    if (keysChanged) {
+      console.log('Data structure changed (different columns) for the same section code, reinitializing preferences');
+      // Reset preference flags to trigger reinitialization with the new data structure
+      preferenceLoadedRef.current = false;
+      isInitialized.current = false;
+    } else {
+      // Check if the data content actually changed
+      const prevDataStr = JSON.stringify(previousDataRef.current);
+      const currentDataStr = JSON.stringify(data);
+      
+      if (prevDataStr !== currentDataStr) {
+        console.log('Data content changed but structure remains the same, preserving preferences');
+      }
+    }
+    
+    // Update the reference
+    previousDataRef.current = data;
+  }, [data, processedData.keys]);
 
   // Move initializeWithDefaults before loadPreferences to avoid circular dependency
   const initializeWithDefaults = useCallback(() => {
@@ -134,32 +175,47 @@ export const FlatDataTable = React.forwardRef(({
       ? { ...initialColumnVisibility }
       : Object.fromEntries(processedData.keys.map(key => [key, true]));
     
-    // Filter to only include valid columns
+    // Filter to only include valid columns that exist in the current dataset
     const validVisibility = {};
     processedData.keys.forEach(key => {
+      // Default new columns to visible
       validVisibility[key] = initVisibility[key] !== undefined ? initVisibility[key] : true;
     });
     
     // Set column visibility
     setSelectedColumns(validVisibility);
     
-    // Use initialColumnWidths if provided
+    // Use initialColumnWidths if provided, but only for columns that exist in this dataset
     if (Object.keys(initialColumnWidths).length > 0) {
       const validWidths = {};
+      // Only keep widths for columns that exist in the current dataset
       Object.keys(initialColumnWidths).forEach(key => {
         if (processedData.keys.includes(key)) {
           validWidths[key] = initialColumnWidths[key];
         }
       });
+      
+      // Add default widths for any new columns not in saved preferences
+      processedData.keys.forEach(key => {
+        if (!validWidths[key]) {
+          validWidths[key] = 200; // Default width
+        }
+      });
+      
       setColumnWidths(validWidths);
+    } else {
+      // No saved widths, set defaults for all columns
+      setColumnWidths(Object.fromEntries(processedData.keys.map(key => [key, 200])));
     }
     
     // Use initialColumnOrder if provided, otherwise use keys order
     if (initialColumnOrder.length > 0) {
+      // Filter out columns from the saved order that don't exist in the current dataset
       const validOrder = initialColumnOrder.filter(col => 
         processedData.keys.includes(col)
       );
       
+      // Create a new order with valid columns from saved preferences, then add any new columns
       const newOrder = [...validOrder];
       processedData.keys.forEach(key => {
         if (!newOrder.includes(key)) {
@@ -172,100 +228,33 @@ export const FlatDataTable = React.forwardRef(({
       setColumnOrder([...processedData.keys]);
     }
     
+    console.log('Initialized component with', processedData.keys.length, 'columns from current dataset');
     preferenceLoadedRef.current = true;
     isInitialized.current = true;
   }, [processedData.keys, initialColumnVisibility, initialColumnWidths, initialColumnOrder]);
 
-  // Define loadPreferences after initializeWithDefaults
-  const loadPreferences = useCallback(async () => {
-    if (!sectionCode || !processedData.keys.length) {
-      console.log('Skipping preference load - missing section code or data keys');
-      return;
-    }
-
-    // Don't load preferences more than once for the same section code and data
-    if (preferenceLoadedRef.current) {
-      console.log('Preferences already loaded for this section code and data');
-      return;
-    }
-
-    console.log('Loading preferences for section:', sectionCode);
-    try {
-      // Create query params matching the format used in TabContent.js
-      const params = new URLSearchParams({
-        sectionCode,
-        tabType: componentId.includes('enhanced') ? 'enhanced' : 'parsed'
-      });
-
-      // Use the correct endpoint format with query parameters
-      const response = await fetch(`http://localhost:3001/api/display-preferences?${params}`);
-
-      if (response.ok) {
-        const prefs = await response.json();
-        console.log('Loaded preferences:', prefs);
-        
-        if (Object.keys(prefs).length > 0) {
-          // Apply column visibility
-          if (prefs.selectedColumns) {
-            const columnsForCurrentData = {};
-            Object.keys(prefs.selectedColumns).forEach(key => {
-              if (processedData.keys.includes(key)) {
-                columnsForCurrentData[key] = prefs.selectedColumns[key];
-              }
-            });
-            setSelectedColumns(columnsForCurrentData);
-          }
-          
-          // Apply column widths
-          if (prefs.columnWidths) {
-            const widthsForCurrentData = {};
-            Object.keys(prefs.columnWidths).forEach(key => {
-              if (processedData.keys.includes(key)) {
-                widthsForCurrentData[key] = prefs.columnWidths[key];
-              }
-            });
-            setColumnWidths(widthsForCurrentData);
-          }
-          
-          // Apply column order
-          if (prefs.columnOrder && prefs.columnOrder.length > 0) {
-            const validOrder = prefs.columnOrder.filter(col => 
-              processedData.keys.includes(col)
-            );
-            
-            const newOrder = [...validOrder];
-            processedData.keys.forEach(key => {
-              if (!newOrder.includes(key)) {
-                newOrder.push(key);
-              }
-            });
-            
-            setColumnOrder(newOrder);
-          }
-          
-          preferenceLoadedRef.current = true;
-          isInitialized.current = true;
-          return;
-        }
-      }
-      
-      // If no preferences found or response not ok, initialize with defaults
-      console.log('No saved preferences found or error. Initializing with defaults.');
-      initializeWithDefaults();
-      
-    } catch (error) {
-      console.error('Error loading preferences:', error);
-      initializeWithDefaults();
-    }
-  }, [sectionCode, processedData.keys, initializeWithDefaults, componentId]);
-
   // Main initialization effect
   useEffect(() => {
     if (!isInitialized.current && processedData.keys.length > 0 && sectionCode) {
-      console.log('Data is available, triggering initialization');
-      loadPreferences();
+      console.log(`Initializing FlatDataTable for section ${sectionCode} with ${processedData.keys.length} columns`);
+      
+      // Check if we're using saved preferences or defaults
+      if (Object.keys(initialColumnVisibility).length > 0) {
+        console.log('Using preferences from props:', {
+          visibleColumns: Object.keys(initialColumnVisibility).length,
+          columnWidths: Object.keys(initialColumnWidths).length,
+          orderColumns: initialColumnOrder.length
+        });
+      } else {
+        console.log('No saved preferences provided, using defaults');
+      }
+      
+      // Initialize the component with the provided or default preferences
+      initializeWithDefaults();
+      isInitialized.current = true;
+      preferenceLoadedRef.current = true;
     }
-  }, [sectionCode, processedData.keys, loadPreferences]);
+  }, [sectionCode, processedData.keys, initializeWithDefaults, initialColumnVisibility, initialColumnWidths, initialColumnOrder]);
 
   // NEW EFFECT: Add sticky header functionality
   useEffect(() => {
@@ -470,7 +459,7 @@ export const FlatDataTable = React.forwardRef(({
           margin-right: 5px !important;
           user-select: none !important;
         }
-        
+
         /* Highlight JSON search results */
         .json-search-highlight {
           background-color: yellow !important;
@@ -598,26 +587,6 @@ export const FlatDataTable = React.forwardRef(({
       stickyStyleRef.current = null;
     };
   }, [processedData.flattenedRows, componentId]);
-
-  // Detect data changes
-  useEffect(() => {
-    // Only log if data changed from something to something else (both non-empty)
-    if (data && data.length > 0) {
-      console.log(`Data updated for FlatDataTable ${componentId}, rows:`, data.length);
-      
-      // Reset initialization flags when data changes
-      if (isInitialized.current) {
-        console.log('Data changed after initialization, resetting preference flags');
-        preferenceLoadedRef.current = false;
-        
-        // Don't reset isInitialized here to avoid flickering
-        // But do trigger loadPreferences again to ensure we're showing the right columns
-        if (sectionCode && processedData.keys.length > 0) {
-          loadPreferences();
-        }
-      }
-    }
-  }, [data, componentId, sectionCode, processedData.keys, loadPreferences]);
 
   // Handle JSON search and navigation
   useEffect(() => {
@@ -786,7 +755,26 @@ export const FlatDataTable = React.forwardRef(({
     
     // Update columnOrder if it changed
     if (JSON.stringify(validOrder) !== JSON.stringify(currentOrder)) {
+      console.log('Column order updated to include all available columns in the dataset');
       setColumnOrder(validOrder);
+    }
+    
+    // Ensure selectedColumns contains all current keys
+    const currentSelectedColumns = {...selectedColumns};
+    let hasChanges = false;
+    
+    // Add any new columns to selectedColumns
+    processedData.keys.forEach(key => {
+      if (currentSelectedColumns[key] === undefined) {
+        currentSelectedColumns[key] = true; // Default new columns to visible
+        hasChanges = true;
+      }
+    });
+    
+    // Update selectedColumns if needed
+    if (hasChanges) {
+      console.log('Updating column visibility to include new columns in the dataset');
+      setSelectedColumns(currentSelectedColumns);
     }
     
     // Return only visible columns in the correct order
