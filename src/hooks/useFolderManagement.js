@@ -1,5 +1,6 @@
 import { useState, useEffect, useCallback } from 'react';
 import { apiService } from '../services/apiService';
+import config from '../config';
 
 export const useFolderManagement = () => {
   const [folders, setFolders] = useState([]);
@@ -17,7 +18,7 @@ export const useFolderManagement = () => {
   const updatePdfUrl = (folderPath, pdfFilename) => {
     if (folderPath && pdfFilename) {
       const encodedPath = encodeURIComponent(`${folderPath}/${pdfFilename}`);
-      setSelectedPdfUrl(`http://localhost:3001/api/pdf?path=${encodedPath}`);
+      setSelectedPdfUrl(`${config.API.BASE_URL}${config.API.ENDPOINTS.PDF}?path=${encodedPath}`);
     } else {
       setSelectedPdfUrl(null);
     }
@@ -28,7 +29,7 @@ export const useFolderManagement = () => {
     setFoldersError(null);
     
     try {
-      const folderList = await apiService.getFolders('/documents/output');
+      const folderList = await apiService.getFolders(config.PATHS.DOCUMENTS_OUTPUT);
       setFolders(folderList);
       
       if (activeFolder === null && folderList.length > 0) {
@@ -51,11 +52,11 @@ export const useFolderManagement = () => {
     
     try {
       const encodedFolder = encodeURIComponent(selectedFolder);
-      const folderPath = `/documents/output/${encodedFolder}/${encodedFolder}`;
+      const folderPath = `${config.PATHS.DOCUMENTS_OUTPUT}/${encodedFolder}/${encodedFolder}`;
       
       const filesList = await apiService.getFiles(folderPath);
       const pdfFilesList = filesList.filter(file => 
-        file.toLowerCase().endsWith('.pdf')
+        file.toLowerCase().endsWith(config.PATHS.FILE_EXTENSIONS.PDF)
       );
       
       setPdfFiles(pdfFilesList);
@@ -84,7 +85,7 @@ export const useFolderManagement = () => {
       try {
         // Fetch basic HTML content
         const htmlResponse = await fetch(
-          `http://localhost:3001/api/basic-html?folderPath=${encodeURIComponent(folderPath)}&filename=${encodeURIComponent(pdfFilename)}`
+          `${config.API.BASE_URL}${config.API.ENDPOINTS.BASIC_HTML}?folderPath=${encodeURIComponent(folderPath)}&filename=${encodeURIComponent(pdfFilename)}`
         );
         
         if (htmlResponse.ok) {
@@ -97,7 +98,7 @@ export const useFolderManagement = () => {
 
         // Fetch parsed JSONs
         const parsedResponse = await fetch(
-          `http://localhost:3001/api/parsed-jsons?folderPath=${encodeURIComponent(folderPath)}&pdfFilename=${encodeURIComponent(pdfFilename)}`
+          `${config.API.BASE_URL}${config.API.ENDPOINTS.PARSED_JSONS}?folderPath=${encodeURIComponent(folderPath)}&pdfFilename=${encodeURIComponent(pdfFilename)}`
         );
         
         if (!parsedResponse.ok) {
@@ -112,7 +113,7 @@ export const useFolderManagement = () => {
 
         // Fetch enhanced JSONs
         const enhancedResponse = await fetch(
-          `http://localhost:3001/api/enhanced-jsons?folderPath=${encodeURIComponent(folderPath)}&pdfFilename=${encodeURIComponent(pdfFilename)}`
+          `${config.API.BASE_URL}${config.API.ENDPOINTS.ENHANCED_JSONS}?folderPath=${encodeURIComponent(folderPath)}&pdfFilename=${encodeURIComponent(pdfFilename)}`
         );
         
         if (!enhancedResponse.ok) {

@@ -7,9 +7,10 @@ import { TabContent } from './components/TabContent';
 import { useFolderManagement } from './hooks/useFolderManagement';
 import { useJsonProcessing } from './hooks/useJsonProcessing';
 import { Nav } from 'react-bootstrap';
+import config from './config';
 
 function App() {
-  const [selectedTab, setSelectedTab] = useState(0);
+  const [selectedTab, setSelectedTab] = useState(config.TABS.DEFAULT_SELECTED);
   const [enhancedHtmlContent, setEnhancedHtmlContent] = useState('');
   const [modifiedHtmlContent, setModifiedHtmlContent] = useState('');
   
@@ -75,9 +76,9 @@ function App() {
     }
     
     try {
-      const baseFileName = pdfFileName.replace('.pdf', '');
-      const htmlType = type === 'enhanced' ? 'enhanced_html' : 'modified_html';
-      const suffix = type === 'enhanced' ? '_enhanced.html' : '_modified.html';
+      const baseFileName = pdfFileName.replace(config.PATHS.FILE_EXTENSIONS.PDF, '');
+      const htmlType = type === 'enhanced' ? config.PATHS.SUBFOLDERS.ENHANCED_HTML : config.PATHS.SUBFOLDERS.MODIFIED_HTML;
+      const suffix = type === 'enhanced' ? config.PATHS.FILE_EXTENSIONS.ENHANCED_HTML_SUFFIX : config.PATHS.FILE_EXTENSIONS.MODIFIED_HTML_SUFFIX;
       
       console.log(`🔍 Loading ${type} HTML for:`, {
         baseFileName,
@@ -87,7 +88,7 @@ function App() {
       });
       
       // Build the URL
-      const url = `${process.env.REACT_APP_API_URL || 'http://localhost:3001'}/api/html?folder=${encodeURIComponent(folderName)}&subFolder=${encodeURIComponent(htmlType)}&file=${encodeURIComponent(baseFileName + suffix)}`;
+      const url = `${config.API.BASE_URL}${config.API.ENDPOINTS.HTML}?folder=${encodeURIComponent(folderName)}&subFolder=${encodeURIComponent(htmlType)}&file=${encodeURIComponent(baseFileName + suffix)}`;
       
       console.log(`📡 Requesting URL:`, url);
       
@@ -140,16 +141,16 @@ function App() {
       
       // Load appropriate content based on tab index
       switch (index) {
-        case 1: // Enhanced HTML (Tab 2)
+        case config.TABS.INDICES.ENHANCED_HTML: // Enhanced HTML
           loadHtmlContent('enhanced');
           break;
-        case 2: // Modified HTML (Tab 3)
+        case config.TABS.INDICES.MODIFIED_HTML: // Modified HTML
           loadHtmlContent('modified');
           break;
-        case 3: // If switching to Parsed JSONs tab, ensure state is fresh
+        case config.TABS.INDICES.PARSED_JSON: // Parsed JSONs tab
           // No need to reset selectedParsedFile as that's handled by the TabContent component
           break;
-        case 4: // If switching to Enhanced JSONs tab, ensure state is fresh
+        case config.TABS.INDICES.ENHANCED_JSON: // Enhanced JSONs tab
           // No need to reset selectedEnhancedFile as that's handled by the TabContent component
           break;
         default:
@@ -170,9 +171,9 @@ function App() {
         pdfFileName: pdfFiles[activePdfFile]
       });
       
-      if (selectedTab === 1) {
+      if (selectedTab === config.TABS.INDICES.ENHANCED_HTML) {
         loadHtmlContent('enhanced');
-      } else if (selectedTab === 2) {
+      } else if (selectedTab === config.TABS.INDICES.MODIFIED_HTML) {
         loadHtmlContent('modified');
       }
     } else {

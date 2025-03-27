@@ -2,11 +2,11 @@ import React from 'react';
 import PropTypes from 'prop-types';
 
 export const JsonFileSelector = ({
-  jsonFiles,
-  selectedFile,
+  jsonFiles = [],
+  selectedFile = '',
   onFileSelect,
   onProcessFile,
-  isLoading
+  isLoading = false
 }) => {
   return (
     <div className="d-flex align-items-center gap-3 mb-3">

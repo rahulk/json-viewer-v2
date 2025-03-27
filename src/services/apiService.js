@@ -1,7 +1,9 @@
 /**
  * Service for handling API requests to the backend
  */
-const API_BASE_URL = 'http://localhost:3001/api';
+import config from '../config';
+
+const API_BASE_URL = `${config.API.BASE_URL}/api`;
 
 export const apiService = {
   /**
@@ -9,7 +11,7 @@ export const apiService = {
    * @param {string} directoryPath - The directory path to fetch folders from
    * @returns {Promise<Array<string>>} - Array of folder names
    */
-  async getFolders(directoryPath = '/documents/output') {
+  async getFolders(directoryPath = config.PATHS.DOCUMENTS_OUTPUT) {
     try {
       const encodedPath = encodeURIComponent(directoryPath);
       const response = await fetch(`${API_BASE_URL}/folders?path=${encodedPath}`);

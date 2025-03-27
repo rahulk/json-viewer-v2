@@ -3,10 +3,10 @@ import PropTypes from 'prop-types';
 
 export const JsonFileSelector = ({
   jsonFiles = [],
-  selectedFile,
+  selectedFile = '',
   onFileSelect,
   onProcessFile,
-  isLoading
+  isLoading = false
 }) => {
   return (
     <div className="d-flex align-items-center" style={{ gap: '8px' }}>
@@ -53,10 +53,4 @@ JsonFileSelector.propTypes = {
   onFileSelect: PropTypes.func.isRequired,
   onProcessFile: PropTypes.func.isRequired,
   isLoading: PropTypes.bool
-};
-
-JsonFileSelector.defaultProps = {
-  jsonFiles: [],
-  selectedFile: '',
-  isLoading: false
 };
