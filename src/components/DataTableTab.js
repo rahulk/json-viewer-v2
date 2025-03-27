@@ -215,14 +215,6 @@ export const DataTableTab = ({
             <JsonFileSelector {...jsonFileSelectorProps} />
           </div>
           <button
-            className="btn btn-primary btn-sm"
-            onClick={handleProcessFile}
-            disabled={!selectedFile || (selectedFile === lastProcessedFileRef.current && tabState.data && tabState.data.length > 0)}
-            style={{ whiteSpace: 'nowrap' }}
-          >
-            Load Data
-          </button>
-          <button
             className="btn btn-outline-primary btn-sm"
             onClick={handleSavePreferences}
             disabled={!selectedFile || !tabState.data || tabState.data.length === 0}
