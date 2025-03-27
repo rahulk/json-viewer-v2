@@ -154,6 +154,7 @@ export const DataTableTab = ({
       initialColumnVisibility={tabState.columnVisibility}
       initialColumnWidths={tabState.columnWidths}
       initialColumnOrder={tabState.columnOrder}
+      initialLockedColumns={tabState.lockedColumns}
       onStateChange={handleTabStateChange}
       title=""
     />
@@ -162,7 +163,8 @@ export const DataTableTab = ({
     tabState.data, 
     tabState.columnVisibility, 
     tabState.columnWidths, 
-    tabState.columnOrder, 
+    tabState.columnOrder,
+    tabState.lockedColumns,
     handleTabStateChange, 
     showColorHighlighting,
     sectionCode,

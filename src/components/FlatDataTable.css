@@ -954,3 +954,35 @@
   translate: none !important;
   opacity: 1 !important;
 }
+
+.table-search {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  position: relative;
+}
+
+.table-search-input {
+  padding: 4px 8px;
+  border: 1px solid #ddd;
+  border-radius: 4px;
+  font-size: 0.9rem;
+  min-width: 200px;
+  height: 28px;
+}
+
+.table-search-input:focus {
+  outline: none;
+  border-color: #2196F3;
+  box-shadow: 0 0 0 2px rgba(33, 150, 243, 0.1);
+}
+
+.table-search .clear-search {
+  padding: 2px 6px;
+  font-size: 12px;
+  height: 24px;
+  line-height: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}

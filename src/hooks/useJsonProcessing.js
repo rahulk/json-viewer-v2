@@ -157,13 +157,19 @@ export const useJsonProcessing = () => {
         };
       }
       
+      // Handle locked columns array
+      if (newState.lockedColumns) {
+        newStateObj.lockedColumns = [...newState.lockedColumns];
+      }
+      
       // Handle other flat properties
       return {
         ...newStateObj,
         ...newState,
         // Restore the properly merged deep objects to override the shallow merge above
         ...(newState.columnVisibility ? { columnVisibility: newStateObj.columnVisibility } : {}),
-        ...(newState.filters ? { filters: newStateObj.filters } : {})
+        ...(newState.filters ? { filters: newStateObj.filters } : {}),
+        ...(newState.lockedColumns ? { lockedColumns: newStateObj.lockedColumns } : {})
       };
     });
   }, []);
@@ -198,13 +204,19 @@ export const useJsonProcessing = () => {
         };
       }
       
+      // Handle locked columns array
+      if (newState.lockedColumns) {
+        newStateObj.lockedColumns = [...newState.lockedColumns];
+      }
+      
       // Handle other flat properties
       return {
         ...newStateObj,
         ...newState,
         // Restore the properly merged deep objects to override the shallow merge above
         ...(newState.columnVisibility ? { columnVisibility: newStateObj.columnVisibility } : {}),
-        ...(newState.filters ? { filters: newStateObj.filters } : {})
+        ...(newState.filters ? { filters: newStateObj.filters } : {}),
+        ...(newState.lockedColumns ? { lockedColumns: newStateObj.lockedColumns } : {})
       };
     });
   }, []);
@@ -220,7 +232,8 @@ export const useJsonProcessing = () => {
       wrapText: false,
       filterColoredText: false,
       columnWidths: {},
-      columnOrder: []
+      columnOrder: [],
+      lockedColumns: []
     };
     
     setTab4State(initialState);

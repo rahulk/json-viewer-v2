@@ -22,7 +22,7 @@
   "columnWidths": {
     "section_code": 352,
     "title": 128,
-    "routes": 200,
+    "routes": 260,
     "routes.routes": 200,
     "routes.routes_html": 200,
     "routes.topnotes": 200,
@@ -58,5 +58,9 @@
     "routes.general_remarks_html",
     "metadata",
     "metadata.processing_timestamp"
+  ],
+  "lockedColumns": [
+    "section_code",
+    "title"
   ]
 }

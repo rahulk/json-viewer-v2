@@ -23,6 +23,7 @@ export const usePreferences = (pdfFilename) => {
       const selectedColumns = ref.current?.getSelectedColumns();
       const columnWidths = ref.current?.getColumnWidths();
       const columnOrder = ref.current?.getColumnOrder();
+      const lockedColumns = ref.current?.getLockedColumns();
 
       if (!selectedColumns || !columnWidths) {
         showNotification('❌ Cannot save preferences: Missing table state', true);
@@ -40,7 +41,8 @@ export const usePreferences = (pdfFilename) => {
           tabType,
           selectedColumns,
           columnWidths,
-          columnOrder
+          columnOrder,
+          lockedColumns
         }),
       });
 

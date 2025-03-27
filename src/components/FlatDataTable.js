@@ -1,4 +1,4 @@
-import React, { useState, useMemo, useEffect, useRef, useCallback } from 'react';
+import React, { useState, useMemo, useEffect, useRef, useCallback, useImperativeHandle } from 'react';
 import { flattenNestedData } from '../utils/dataUtils';
 import PropTypes from 'prop-types';
 import { searchJsonForText, CustomJsonView } from '../utils/jsonUtils';
@@ -51,6 +51,7 @@ export const FlatDataTable = React.forwardRef(({
   const [jsonExpanded, setJsonExpanded] = useState(true);
   const [currentSearchResultIndex, setCurrentSearchResultIndex] = useState(0);
   const [lockedColumns, setLockedColumns] = useState(initialLockedColumns);
+  const [tableSearchTerm, setTableSearchTerm] = useState('');
   const jsonViewerRef = useRef(null);
   const isInitialized = useRef(false);
   const previousStateRef = useRef(null);
@@ -232,22 +233,28 @@ export const FlatDataTable = React.forwardRef(({
     }
 
     // Initialize locked columns from saved preferences
-    if (initialLockedColumns.length > 0) {
+    if (initialLockedColumns && initialLockedColumns.length > 0) {
+      console.log('Initializing locked columns from preferences:', initialLockedColumns);
       // Filter out any locked columns that don't exist in the current dataset
       const validLockedColumns = initialLockedColumns.filter(col => 
         processedData.keys.includes(col)
       );
+      console.log('Valid locked columns after filtering:', validLockedColumns);
       setLockedColumns(validLockedColumns);
+    } else {
+      console.log('No locked columns in preferences, initializing empty array');
+      setLockedColumns([]);
     }
     
     console.log('Initialized component with', {
       columns: processedData.keys.length,
-      lockedColumns: initialLockedColumns.length
+      lockedColumns: initialLockedColumns?.length || 0,
+      validLockedColumns: lockedColumns.length
     });
     
     preferenceLoadedRef.current = true;
     isInitialized.current = true;
-  }, [processedData.keys, initialColumnVisibility, initialColumnWidths, initialColumnOrder, initialLockedColumns]);
+  }, [processedData.keys, initialColumnVisibility, initialColumnWidths, initialColumnOrder, initialLockedColumns, lockedColumns.length]);
 
   // Main initialization effect
   useEffect(() => {
@@ -550,8 +557,20 @@ export const FlatDataTable = React.forwardRef(({
     return () => window.removeEventListener('keydown', handleKeyDown);
   }, [showRawJson, jsonSearchTerm, navigateSearchResults]);
 
-  // Expose methods to parent component through ref
-  React.useImperativeHandle(ref, () => ({
+  // Expose current display preferences to parent
+  useEffect(() => {
+    if (window.displayPreferences) {
+      window.displayPreferences.current = {
+        selectedColumns,
+        columnWidths,
+        columnOrder,
+        lockedColumns
+      };
+    }
+  }, [selectedColumns, columnWidths, columnOrder, lockedColumns]);
+
+  // Expose methods through ref
+  useImperativeHandle(ref, () => ({
     getSelectedColumns: () => selectedColumns,
     getColumnWidths: () => columnWidths,
     getColumnOrder: () => columnOrder,
@@ -675,6 +694,20 @@ export const FlatDataTable = React.forwardRef(({
       })
     );
   }, [processedData.flattenedRows, visibleColumns, filterColoredText]);
+
+  // Add this after the flattenedRows useMemo
+  const filteredRows = useMemo(() => {
+    if (!tableSearchTerm) return flattenedRows;
+    
+    const searchLower = tableSearchTerm.toLowerCase();
+    return flattenedRows.filter(row => 
+      visibleColumns.some(column => {
+        const value = row[column];
+        if (value === null || value === undefined) return false;
+        return String(value).toLowerCase().includes(searchLower);
+      })
+    );
+  }, [flattenedRows, visibleColumns, tableSearchTerm]);
 
   // Helper function to check if a string is an image URL or base64
   const isImageValue = useCallback((value, key) => {
@@ -891,18 +924,6 @@ export const FlatDataTable = React.forwardRef(({
     document.body.classList.remove('column-dragging');
   }, []);
 
-  // Expose current display preferences to parent
-  useEffect(() => {
-    if (window.displayPreferences) {
-      window.displayPreferences.current = {
-        selectedColumns,
-        columnWidths,
-        columnOrder,
-        lockedColumns
-      };
-    }
-  }, [selectedColumns, columnWidths, columnOrder, lockedColumns]);
-
   // Filter columns based on search term
   const filteredKeys = useMemo(() => 
     searchTerm 
@@ -1009,10 +1030,10 @@ export const FlatDataTable = React.forwardRef(({
     </thead>
   );
 
-  // Modify the table body rendering to include data-column attribute
+  // Modify the table body rendering to use filteredRows instead of flattenedRows
   const renderTableBody = () => (
     <tbody>
-      {flattenedRows.map((row, rowIndex) => (
+      {filteredRows.map((row, rowIndex) => (
         <tr key={rowIndex}>
           {visibleColumns
             .filter((column) => selectedColumns[column])
@@ -1047,7 +1068,24 @@ export const FlatDataTable = React.forwardRef(({
     }}>
       <div className="table-controls">
         <div className="left-controls">
-          <h3>{title || 'Flat Data View'} ({flattenedRows.length} rows)</h3>
+          <h3>{title || 'Flat Data View'} ({filteredRows.length} rows)</h3>
+          <div className="table-search">
+            <input
+              type="text"
+              placeholder="Search in visible columns..."
+              value={tableSearchTerm}
+              onChange={(e) => setTableSearchTerm(e.target.value)}
+              className="table-search-input"
+            />
+            {tableSearchTerm && (
+              <button
+                className="btn btn-sm btn-outline-secondary clear-search"
+                onClick={() => setTableSearchTerm('')}
+              >
+                ✕
+              </button>
+            )}
+          </div>
           {showColorHighlighting && (
             <label className="color-filter">
               <input

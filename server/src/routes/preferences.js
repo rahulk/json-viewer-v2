@@ -42,7 +42,9 @@ router.post('/save-display-preferences', async (req, res) => {
     // Log the preferences being saved
     console.log('🔍 Preferences content:', {
       selectedColumns: preferences.selectedColumns?.length || 0,
-      columnWidths: Object.keys(preferences.columnWidths || {}).length || 0
+      columnWidths: Object.keys(preferences.columnWidths || {}).length || 0,
+      columnOrder: (preferences.columnOrder || []).length || 0,
+      lockedColumns: (preferences.lockedColumns || []).length || 0
     });
     
     await fs.writeFile(filePath, JSON.stringify(preferences, null, 2));
