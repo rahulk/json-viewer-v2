@@ -123,12 +123,12 @@ export const DataTableTab = ({
         flexDirection: 'column',
         gap: '8px'
       }}>
-        <div style={{ display: 'flex', alignItems: 'center', flexGrow: 1, maxWidth: '100%' }}>
-          <div style={{ flexGrow: 1, maxWidth: '300px' }}>
+        <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', width: '100%' }}>
+          <div style={{ maxWidth: '300px' }}>
             <JsonFileSelector {...jsonFileSelectorProps} />
           </div>
           <button
-            className="btn btn-outline-secondary ms-2"
+            className="btn btn-primary btn-sm"
             onClick={handleSavePreferences}
             disabled={!selectedFile || !tabState.data || tabState.data.length === 0}
             style={{ whiteSpace: 'nowrap' }}
