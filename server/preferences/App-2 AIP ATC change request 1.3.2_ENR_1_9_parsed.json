@@ -21,8 +21,8 @@
   },
   "columnWidths": {},
   "columnOrder": [
-    "section_code",
     "routes.routes_html",
+    "section_code",
     "title",
     "routes",
     "metadata",
