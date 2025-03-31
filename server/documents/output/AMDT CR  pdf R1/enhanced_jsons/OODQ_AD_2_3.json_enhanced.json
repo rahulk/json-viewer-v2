@@ -1,15 +1,83 @@
 {
   "section_code": "AD 2.3",
-  "title": "Generic Table Data",
+  "title": "OPERATIONAL HOURS",
   "items": [
     {
-      "ad_2.3": "12 Remarks",
-      "id": "12 Remarks"
+      "row": 1,
+      "field": "AD Administration",
+      "value": "",
+      "value_html": "<p></p>"
+    },
+    {
+      "row": 2,
+      "field": "Customs and immigration",
+      "value": "",
+      "value_html": "<p></p>"
+    },
+    {
+      "row": 3,
+      "field": "Health and sanitation",
+      "value": "",
+      "value_html": "<p></p>"
+    },
+    {
+      "row": 4,
+      "field": "AIS Briefing Office",
+      "value": "",
+      "value_html": "<p></p>"
+    },
+    {
+      "row": 5,
+      "field": "ATS Reporting Office ( ARO )",
+      "value": "",
+      "value_html": "<p></p>"
+    },
+    {
+      "row": 6,
+      "field": "MET Briefing Office",
+      "value": "",
+      "value_html": "<p></p>"
+    },
+    {
+      "row": 7,
+      "field": "ATS",
+      "value": "",
+      "value_html": "<p></p>"
+    },
+    {
+      "row": 8,
+      "field": "Fueling",
+      "value": "",
+      "value_html": "<p></p>"
+    },
+    {
+      "row": 9,
+      "field": "Handling",
+      "value": "",
+      "value_html": "<p></p>"
+    },
+    {
+      "row": 10,
+      "field": "Security",
+      "value": "",
+      "value_html": "<p></p>"
+    },
+    {
+      "row": 11,
+      "field": "De-icing",
+      "value": "",
+      "value_html": "<p></p>"
+    },
+    {
+      "row": 12,
+      "field": "Remarks",
+      "value": "",
+      "value_html": "<p></p>"
     }
   ],
   "general_remarks": "",
   "metadata": {
-    "source": "OODQ",
-    "processing_timestamp": "2025-03-22T18:16:56.520410"
+    "source": "temp_AD_2_3",
+    "processing_timestamp": "2025-03-30T15:54:19.002066"
   }
 }

@@ -7,7 +7,7 @@
       "enr_3.1": "ENR 3.1",
       "routedesignator(rcp)(navspecification/rsp)name_ofsignificantpointscoordinates": "RouteDesignator(RCP)(NAVspecification/RSP)Name ofsignificantpointsCoordinates",
       "track(mag)vorrdlgeodesicdistance(nm)changeoverpoints": "Track(MAG)VORRDLGeodesicdistance(NM)changeoverpoints",
-      "upperlimitslowerlimits/_minimumen-route_altitudes_airspace_classification": "UpperlimitsLowerlimits/ minimumen-route altitudes Airspace classification",
+      "upperlimitslowerlimits/_minimumen_route_altitudes_airspace_classification": "UpperlimitsLowerlimits/ minimumen-route altitudes Airspace classification",
       "laterallimitsandminimum_obstacle_clearance_altitudes": "laterallimitsandminimum obstacle clearance altitudes",
       "directionofcruisinglevels": "Odd",
       "remarks": "Even"
@@ -17,7 +17,7 @@
       "enr_3.1": "ENR 3.1",
       "routedesignator(rcp)(navspecification/rsp)name_ofsignificantpointscoordinates": "1",
       "track(mag)vorrdlgeodesicdistance(nm)changeoverpoints": "2",
-      "upperlimitslowerlimits/_minimumen-route_altitudes_airspace_classification": "3",
+      "upperlimitslowerlimits/_minimumen_route_altitudes_airspace_classification": "3",
       "laterallimitsandminimum_obstacle_clearance_altitudes": "4",
       "directionofcruisinglevels": "5",
       "remarks": "6"
@@ -27,7 +27,7 @@
       "enr_3.1": "ENR 3.1",
       "routedesignator(rcp)(navspecification/rsp)name_ofsignificantpointscoordinates": "",
       "track(mag)vorrdlgeodesicdistance(nm)changeoverpoints": "",
-      "upperlimitslowerlimits/_minimumen-route_altitudes_airspace_classification": "",
+      "upperlimitslowerlimits/_minimumen_route_altitudes_airspace_classification": "",
       "laterallimitsandminimum_obstacle_clearance_altitudes": "",
       "directionofcruisinglevels": "",
       "remarks": ""
@@ -36,6 +36,6 @@
   "general_remarks": "",
   "metadata": {
     "source": "App-2 AIP ATC change request 1.3.2",
-    "processing_timestamp": "2025-03-22T18:17:19.848463"
+    "processing_timestamp": "2025-03-30T15:55:51.304968"
   }
 }

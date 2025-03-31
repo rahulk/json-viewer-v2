@@ -1,0 +1,53 @@
+{
+  "section_code": "AD 2.2",
+  "title": "AERODROME GEOGRAPHICAL AND ADMINISTRATIVE DATA",
+  "items": [
+    {
+      "row": 1,
+      "field": "ARP coordinates and site at AD",
+      "value": "",
+      "value_html": "<p></p>"
+    },
+    {
+      "row": 2,
+      "field": "Direction and distance from ( city )",
+      "value": "",
+      "value_html": "<p></p>"
+    },
+    {
+      "row": 3,
+      "field": "Elevation / Reference temperature",
+      "value": "",
+      "value_html": "<p></p>"
+    },
+    {
+      "row": 4,
+      "field": "MAG VAR / Annual change",
+      "value": "",
+      "value_html": "<p></p>"
+    },
+    {
+      "row": 5,
+      "field": "AD Administration, address, telephone, telefax, telex, AFS",
+      "value": "Airport Manager Tel: 92599223 Airport Manager Tel: 99266222",
+      "value_html": "<p><span style=\"font-size: 11.0pt; color: #2D74B5\">Airport</span><span style=\"font-size: 11.0pt; color: #2D74B5\"> </span><span style=\"font-size: 11.0pt; color: #2D74B5\">Manager</span><span style=\"font-size: 11.0pt; color: #2D74B5\"> </span><span style=\"font-size: 11.0pt; color: #2D74B5\">Tel:</span><span style=\"font-size: 11.0pt; color: #2D74B5\"> </span><span style=\"font-size: 11.0pt; color: #2D74B5\">92599223 </span><span style=\"font-size: 11.0pt; color: #FF0000\">Airport</span><span style=\"font-size: 11.0pt; color: #FF0000\"> </span><span style=\"font-size: 11.0pt; color: #FF0000\">Manager</span><span style=\"font-size: 11.0pt; color: #FF0000\"> </span><span style=\"font-size: 11.0pt; color: #FF0000\">Tel:</span><span style=\"font-size: 11.0pt; color: #FF0000\"> </span><span style=\"font-size: 11.0pt; color: #FF0000\">99266222</span></p>"
+    },
+    {
+      "row": 6,
+      "field": "Types of traffic permitted (IFR/VFR)",
+      "value": "",
+      "value_html": "<p></p>"
+    },
+    {
+      "row": 7,
+      "field": "Remarks",
+      "value": "",
+      "value_html": "<p></p>"
+    }
+  ],
+  "general_remarks": "",
+  "metadata": {
+    "source": "temp_AD_2_2",
+    "processing_timestamp": "2025-03-30T15:59:44.842423"
+  }
+}

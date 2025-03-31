@@ -1,0 +1,35 @@
+{
+  "section_code": "AD 2.6",
+  "title": " RESCUE AND FIRE FIGHTING SERVICES",
+  "items": [
+    {
+      "row": 1,
+      "field": "AD category for fire fighting",
+      "value": "",
+      "value_html": "<p></p>"
+    },
+    {
+      "row": 2,
+      "field": "Rescue equipment",
+      "value": "",
+      "value_html": "<p></p>"
+    },
+    {
+      "row": 3,
+      "field": "Capability for removal of disabled aircraft",
+      "value": "",
+      "value_html": "<p></p>"
+    },
+    {
+      "row": 4,
+      "field": "Remarks",
+      "value": "",
+      "value_html": "<p></p>"
+    }
+  ],
+  "general_remarks": "",
+  "metadata": {
+    "source": "temp_AD_2_6",
+    "processing_timestamp": "2025-03-30T15:54:40.826963"
+  }
+}

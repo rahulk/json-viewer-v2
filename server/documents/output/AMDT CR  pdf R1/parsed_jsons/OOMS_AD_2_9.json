@@ -1,15 +1,35 @@
 {
   "section_code": "AD 2.9",
-  "title": "Generic Table Data",
+  "title": "URFACE MOVEMENT GUIDANCE AND CONTROL SYSTEM AND MARKINGS",
   "items": [
     {
-      "ad_2.9": "4 Remarks TWYsC1,C2,C3,C4,C7,C8,andC9andC10- uptocodeF,uptoA380andB748TWYsC5andC6-upto codeCACFTS",
-      "id": "4 Remarks TWYsC1,C2,C3,C4,C7,C8,andC9andC10- uptocodeF,uptoA380andB748TWYsC5andC6-upto codeCACFTS"
+      "row": 1,
+      "field": "Use of aircraft stand ID signs, TWY guide lines and parking guidance system of aircraft stands",
+      "value": "",
+      "value_html": "<p></p>"
+    },
+    {
+      "row": 2,
+      "field": "RWY and TWY markings and LGT",
+      "value": "Intermediate holding positions on TWY A (AP1, AP2, AR1, AR2, AR3, AR4, AS1, AS2, AS3, C1, C2, C3, C4, C5 C6, C7, C8, C9, C10).",
+      "value_html": "<p><span style=\"font-size: 11.0pt; color: #000000\">Intermediate holding positions on TWY A (AP1, AP2,</span><span style=\"font-size: 11.0pt; color: #000000\"> </span><span style=\"font-size: 11.0pt; color: #000000\">AR1,</span><span style=\"font-size: 11.0pt; color: #000000\"> </span><span style=\"font-size: 11.0pt; color: #000000\">AR2,</span><span style=\"font-size: 11.0pt; color: #000000\"> </span><span style=\"font-size: 11.0pt; color: #000000\">AR3,</span><span style=\"font-size: 11.0pt; color: #000000\"> </span><span style=\"font-size: 11.0pt; color: #000000\">AR4,</span><span style=\"font-size: 11.0pt; color: #000000\"> </span><span style=\"font-size: 11.0pt; color: #000000\">AS1,</span><span style=\"font-size: 11.0pt; color: #000000\"> </span><span style=\"font-size: 11.0pt; color: #000000\">AS2,</span><span style=\"font-size: 11.0pt; color: #000000\"> </span><span style=\"font-size: 11.0pt; color: #000000\">AS3,</span><span style=\"font-size: 11.0pt; color: #000000\"> </span><span style=\"font-size: 11.0pt; color: #000000\">C1, C2, C3, C4, </span><span style=\"font-size: 11.0pt; color: #2D74B5\">C5 C6</span><span style=\"font-size: 11.0pt; color: #000000\">, C7, C8, C9, </span><span style=\"font-size: 11.0pt; color: #2D74B5\">C10</span><span style=\"font-size: 11.0pt; color: #000000\">).</span></p>"
+    },
+    {
+      "row": 3,
+      "field": "Stop bars",
+      "value": "D1, D2, D3, D5, D6, D7, D9, E1, E2, E3, E4, E5,",
+      "value_html": "<p><span style=\"font-size: 11.0pt; color: #000000\">D1,</span><span style=\"font-size: 11.0pt; color: #000000\"> </span><span style=\"font-size: 11.0pt; color: #000000\">D2,</span><span style=\"font-size: 11.0pt; color: #000000\"> </span><span style=\"font-size: 11.0pt; color: #000000\">D3,</span><span style=\"font-size: 11.0pt; color: #000000\"> </span><span style=\"font-size: 11.0pt; color: #000000\">D5,</span><span style=\"font-size: 11.0pt; color: #000000\"> </span><span style=\"font-size: 11.0pt; color: #000000\">D6,</span><span style=\"font-size: 11.0pt; color: #000000\"> </span><span style=\"font-size: 11.0pt; color: #000000\">D7,</span><span style=\"font-size: 11.0pt; color: #000000\"> </span><span style=\"font-size: 11.0pt; color: #000000\">D9,</span><span style=\"font-size: 11.0pt; color: #000000\"> </span><span style=\"font-size: 11.0pt; color: #000000\">E1,</span><span style=\"font-size: 11.0pt; color: #000000\"> </span><span style=\"font-size: 11.0pt; color: #000000\">E2,</span><span style=\"font-size: 11.0pt; color: #000000\"> </span><span style=\"font-size: 11.0pt; color: #000000\">E3,</span><span style=\"font-size: 11.0pt; color: #000000\"> </span><span style=\"font-size: 11.0pt; color: #000000\">E4,</span><span style=\"font-size: 11.0pt; color: #000000\"> </span><span style=\"font-size: 11.0pt; color: #000000\">E5,</span></p>"
+    },
+    {
+      "row": 4,
+      "field": "Remarks",
+      "value": "TWYs C1, C2, C3, C4, C7, C8, and C9 and C10- up to code F, up to A380 and B748TWYs C5 and C6-up to code C ACFTS",
+      "value_html": "<p><span style=\"font-size: 11.0pt; color: #000000\">TWYs</span><span style=\"font-size: 11.0pt; color: #000000\"> </span><span style=\"font-size: 11.0pt; color: #000000\">C1,</span><span style=\"font-size: 11.0pt; color: #000000\"> </span><span style=\"font-size: 11.0pt; color: #000000\">C2,</span><span style=\"font-size: 11.0pt; color: #000000\"> </span><span style=\"font-size: 11.0pt; color: #000000\">C3,</span><span style=\"font-size: 11.0pt; color: #000000\"> </span><span style=\"font-size: 11.0pt; color: #000000\">C4,</span><span style=\"font-size: 11.0pt; color: #000000\"> </span><span style=\"font-size: 11.0pt; color: #000000\">C7,</span><span style=\"font-size: 11.0pt; color: #000000\"> </span><span style=\"font-size: 11.0pt; color: #000000\">C8,</span><span style=\"font-size: 11.0pt; color: #000000\"> </span><span style=\"font-size: 11.0pt; color: #FF0000\">and</span><span style=\"font-size: 11.0pt; color: #FF0000\"> </span><span style=\"font-size: 11.0pt; color: #000000\">C9</span><span style=\"font-size: 11.0pt; color: #000000\"> </span><span style=\"font-size: 11.0pt; color: #2D74B5\">and</span><span style=\"font-size: 11.0pt; color: #2D74B5\"> </span><span style=\"font-size: 11.0pt; color: #2D74B5\">C10</span></p><p><span style=\"font-size: 11.0pt; color: #000000\">- up</span><span style=\"font-size: 11.0pt; color: #000000\"> </span><span style=\"font-size: 11.0pt; color: #000000\">to</span><span style=\"font-size: 11.0pt; color: #000000\"> </span><span style=\"font-size: 11.0pt; color: #000000\">code</span><span style=\"font-size: 11.0pt; color: #000000\"> </span><span style=\"font-size: 11.0pt; color: #000000\">F,</span><span style=\"font-size: 11.0pt; color: #000000\"> </span><span style=\"font-size: 11.0pt; color: #000000\">up</span><span style=\"font-size: 11.0pt; color: #000000\"> </span><span style=\"font-size: 11.0pt; color: #000000\">to</span><span style=\"font-size: 11.0pt; color: #000000\"> </span><span style=\"font-size: 11.0pt; color: #000000\">A380</span><span style=\"font-size: 11.0pt; color: #000000\"> </span><span style=\"font-size: 11.0pt; color: #000000\">and</span><span style=\"font-size: 11.0pt; color: #000000\"> </span><span style=\"font-size: 11.0pt; color: #000000\">B748</span></p><p><span style=\"font-size: 11.0pt; color: #4471C4\">TWYs</span><span style=\"font-size: 11.0pt; color: #4471C4\"> </span><span style=\"font-size: 11.0pt; color: #4471C4\">C5</span><span style=\"font-size: 11.0pt; color: #4471C4\"> </span><span style=\"font-size: 11.0pt; color: #4471C4\">and</span><span style=\"font-size: 11.0pt; color: #4471C4\"> </span><span style=\"font-size: 11.0pt; color: #4471C4\">C6-up</span><span style=\"font-size: 11.0pt; color: #4471C4\"> </span><span style=\"font-size: 11.0pt; color: #4471C4\">to code</span><span style=\"font-size: 11.0pt; color: #4471C4\"> </span><span style=\"font-size: 11.0pt; color: #4471C4\">C</span><span style=\"font-size: 11.0pt; color: #4471C4\"> </span><span style=\"font-size: 11.0pt; color: #4471C4\">ACFTS</span></p>"
     }
   ],
   "general_remarks": "",
   "metadata": {
-    "source": "OOMS",
-    "processing_timestamp": "2025-03-22T18:16:59.147897"
+    "source": "temp_AD_2_9",
+    "processing_timestamp": "2025-03-30T15:54:40.872991"
   }
 }

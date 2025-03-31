@@ -1,15 +1,29 @@
 {
   "section_code": "AD 2.8",
-  "title": "Generic Table Data",
+  "title": "APRON AND TAXIWAY DETAILS",
   "items": [
     {
-      "ad_2.8": "3 Remarks",
-      "id": "3 Remarks"
+      "row": 1,
+      "field": "Apron surface and strength",
+      "value": "",
+      "value_html": "<p></p>"
+    },
+    {
+      "row": 2,
+      "field": "Taxiway width, surface and strength",
+      "value": "",
+      "value_html": "<p></p>"
+    },
+    {
+      "row": 3,
+      "field": "Remarks",
+      "value": "",
+      "value_html": "<p></p>"
     }
   ],
   "general_remarks": "",
   "metadata": {
-    "source": "OOFD",
-    "processing_timestamp": "2025-03-22T18:17:43.007523"
+    "source": "temp_AD_2_8",
+    "processing_timestamp": "2025-03-30T15:56:50.772492"
   }
 }

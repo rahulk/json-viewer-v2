@@ -1,15 +1,41 @@
 {
   "section_code": "AD 2.15",
-  "title": "Generic Table Data",
+  "title": "OTHER LIGHTING, SECONDARY POWER SUPPLY",
   "items": [
     {
-      "ad_2.15": "5 Remarks",
-      "id": "5 Remarks"
+      "row": 1,
+      "field": "ABN location, characteristics and hours of operation",
+      "value": "",
+      "value_html": "<p></p>"
+    },
+    {
+      "row": 2,
+      "field": "LDI location and LGTAnemometer location and LGT",
+      "value": "",
+      "value_html": "<p></p>"
+    },
+    {
+      "row": 3,
+      "field": "TWY edge and centre line lighting",
+      "value": "",
+      "value_html": "<p></p>"
+    },
+    {
+      "row": 4,
+      "field": "Secondary power supply/switch- over time",
+      "value": "",
+      "value_html": "<p></p>"
+    },
+    {
+      "row": 5,
+      "field": "Remarks",
+      "value": "",
+      "value_html": "<p></p>"
     }
   ],
   "general_remarks": "",
   "metadata": {
-    "source": "OOMS",
-    "processing_timestamp": "2025-03-22T18:16:59.245567"
+    "source": "temp_AD_2_15",
+    "processing_timestamp": "2025-03-30T15:54:40.927310"
   }
 }

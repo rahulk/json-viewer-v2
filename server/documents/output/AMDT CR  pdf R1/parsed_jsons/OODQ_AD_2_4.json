@@ -1,15 +1,53 @@
 {
   "section_code": "AD 2.4",
-  "title": "Generic Table Data",
+  "title": "HANDLING SERVICES AND FACILITIES",
   "items": [
     {
-      "ad_2.4": "7 Remarks",
-      "id": "7 Remarks"
+      "row": 1,
+      "field": "Cargo - handling facilities",
+      "value": "",
+      "value_html": "<p></p>"
+    },
+    {
+      "row": 2,
+      "field": "Fuel / oil types",
+      "value": "",
+      "value_html": "<p></p>"
+    },
+    {
+      "row": 3,
+      "field": "Fueling facilities/capacity",
+      "value": "140000 LTRS+60000 LTRS",
+      "value_html": "<p><span style=\"font-size: 11.0pt; color: #2D74B5\">140000</span><span style=\"font-size: 11.0pt; color: #2D74B5\"> </span><span style=\"font-size: 11.0pt; color: #2D74B5\">LTRS</span></p><p><span style=\"font-size: 11.0pt; color: #FF0000\">+60000</span><span style=\"font-size: 11.0pt; color: #FF0000\"> </span><span style=\"font-size: 11.0pt; color: #FF0000\">LTRS</span></p>"
+    },
+    {
+      "row": 4,
+      "field": "De-icing facilities",
+      "value": "",
+      "value_html": "<p></p>"
+    },
+    {
+      "row": 5,
+      "field": "Hanger space for visiting aircraft",
+      "value": "",
+      "value_html": "<p></p>"
+    },
+    {
+      "row": 6,
+      "field": "Repair facilities for visiting aircraft",
+      "value": "",
+      "value_html": "<p></p>"
+    },
+    {
+      "row": 7,
+      "field": "Remarks",
+      "value": "",
+      "value_html": "<p></p>"
     }
   ],
   "general_remarks": "",
   "metadata": {
-    "source": "OODQ",
-    "processing_timestamp": "2025-03-22T18:16:56.538729"
+    "source": "temp_AD_2_4",
+    "processing_timestamp": "2025-03-30T15:54:19.014867"
   }
 }

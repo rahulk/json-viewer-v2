@@ -1,61 +1,55 @@
 {
   "section_code": "AD 2.5",
-  "title": "Generic Table Data",
+  "title": "PASSENGER FACILITIES",
   "items": [
     {
-      "id": "AD 2.5",
-      "ad_2.5": "AD 2.5",
-      "1": "2",
-      "hotels": "Restaurants",
-      "thereisaccommodationavailableatthepdofahudcampandcontractor\u2019smotel(pac).accommodationisavailableonlybypriorarrangement.fahudhotelavailable.its5.5kmawayfromtheairport_and_its_located_in_fahud_area,_for_reservation_contact:92132401": ""
+      "row": 1,
+      "field": "Hotels",
+      "value": "There is accommodation available at the PDO Fahudcamp and contractor\u2019s motel (PAC). Accommodation isavailable only by prior arrangement.Fahud Hotel available. Its 5.5 Km away from the airport and its located in Fahud area, for reservation contact: 92132401",
+      "value_html": "<p><span style=\"font-size: 11.0pt; color: #000000\">There</span><span style=\"font-size: 11.0pt; color: #000000\"> </span><span style=\"font-size: 11.0pt; color: #000000\">is</span><span style=\"font-size: 11.0pt; color: #000000\"> </span><span style=\"font-size: 11.0pt; color: #000000\">accommodation</span><span style=\"font-size: 11.0pt; color: #000000\"> </span><span style=\"font-size: 11.0pt; color: #000000\">available</span><span style=\"font-size: 11.0pt; color: #000000\"> </span><span style=\"font-size: 11.0pt; color: #000000\">at</span><span style=\"font-size: 11.0pt; color: #000000\"> </span><span style=\"font-size: 11.0pt; color: #000000\">the</span><span style=\"font-size: 11.0pt; color: #000000\"> </span><span style=\"font-size: 11.0pt; color: #000000\">PDO</span><span style=\"font-size: 11.0pt; color: #000000\"> </span><span style=\"font-size: 11.0pt; color: #000000\">Fahud</span></p><p><span style=\"font-size: 11.0pt; color: #000000\">camp</span><span style=\"font-size: 11.0pt; color: #000000\"> </span><span style=\"font-size: 11.0pt; color: #000000\">and</span><span style=\"font-size: 11.0pt; color: #000000\"> </span><span style=\"font-size: 11.0pt; color: #000000\">contractor\u2019s</span><span style=\"font-size: 11.0pt; color: #000000\"> </span><span style=\"font-size: 11.0pt; color: #000000\">motel</span><span style=\"font-size: 11.0pt; color: #000000\"> </span><span style=\"font-size: 11.0pt; color: #000000\">(PAC).</span><span style=\"font-size: 11.0pt; color: #000000\"> </span><span style=\"font-size: 11.0pt; color: #000000\">Accommodation</span><span style=\"font-size: 11.0pt; color: #000000\"> </span><span style=\"font-size: 11.0pt; color: #000000\">is</span></p><p><span style=\"font-size: 11.0pt; color: #000000\">available</span><span style=\"font-size: 11.0pt; color: #000000\"> </span><span style=\"font-size: 11.0pt; color: #000000\">only</span><span style=\"font-size: 11.0pt; color: #000000\"> </span><span style=\"font-size: 11.0pt; color: #000000\">by</span><span style=\"font-size: 11.0pt; color: #000000\"> </span><span style=\"font-size: 11.0pt; color: #000000\">prior</span><span style=\"font-size: 11.0pt; color: #000000\"> arrangement.</span></p><p><span style=\"font-size: 11.0pt; color: #FF0000\">Fahud</span><span style=\"font-size: 11.0pt; color: #FF0000\"> </span><span style=\"font-size: 11.0pt; color: #FF0000\">Hotel</span><span style=\"font-size: 11.0pt; color: #FF0000\"> </span><span style=\"font-size: 11.0pt; color: #FF0000\">available.</span><span style=\"font-size: 11.0pt; color: #FF0000\"> </span><span style=\"font-size: 11.0pt; color: #FF0000\">Its</span><span style=\"font-size: 11.0pt; color: #FF0000\"> </span><span style=\"font-size: 11.0pt; color: #FF0000\">5.5</span><span style=\"font-size: 11.0pt; color: #FF0000\"> </span><span style=\"font-size: 11.0pt; color: #FF0000\">Km</span><span style=\"font-size: 11.0pt; color: #FF0000\"> </span><span style=\"font-size: 11.0pt; color: #FF0000\">away</span><span style=\"font-size: 11.0pt; color: #FF0000\"> </span><span style=\"font-size: 11.0pt; color: #FF0000\">from</span><span style=\"font-size: 11.0pt; color: #FF0000\"> </span><span style=\"font-size: 11.0pt; color: #FF0000\">the</span><span style=\"font-size: 11.0pt; color: #FF0000\"> </span><span style=\"font-size: 11.0pt; color: #FF0000\">airport and its located in Fahud area, for reservation contact: </span><span style=\"font-size: 11.0pt; color: #FF0000\">92132401</span></p>",
+      "value_red_html": "<span style=\"font-size: 11.0pt; color: #000000\">There</span><span style=\"font-size: 11.0pt; color: #000000\"> </span><span style=\"font-size: 11.0pt; color: #000000\">is</span><span style=\"font-size: 11.0pt; color: #000000\"> </span><span style=\"font-size: 11.0pt; color: #000000\">accommodation</span><span style=\"font-size: 11.0pt; color: #000000\"> </span><span style=\"font-size: 11.0pt; color: #000000\">available</span><span style=\"font-size: 11.0pt; color: #000000\"> </span><span style=\"font-size: 11.0pt; color: #000000\">at</span><span style=\"font-size: 11.0pt; color: #000000\"> </span><span style=\"font-size: 11.0pt; color: #000000\">the</span><span style=\"font-size: 11.0pt; color: #000000\"> </span><span style=\"font-size: 11.0pt; color: #000000\">PDO</span><span style=\"font-size: 11.0pt; color: #000000\"> </span><span style=\"font-size: 11.0pt; color: #000000\">Fahud</span><span style=\"font-size: 11.0pt; color: #000000\">camp</span><span style=\"font-size: 11.0pt; color: #000000\"> </span><span style=\"font-size: 11.0pt; color: #000000\">and</span><span style=\"font-size: 11.0pt; color: #000000\"> </span><span style=\"font-size: 11.0pt; color: #000000\">contractor\u2019s</span><span style=\"font-size: 11.0pt; color: #000000\"> </span><span style=\"font-size: 11.0pt; color: #000000\">motel</span><span style=\"font-size: 11.0pt; color: #000000\"> </span><span style=\"font-size: 11.0pt; color: #000000\">(PAC).</span><span style=\"font-size: 11.0pt; color: #000000\"> </span><span style=\"font-size: 11.0pt; color: #000000\">Accommodation</span><span style=\"font-size: 11.0pt; color: #000000\"> </span><span style=\"font-size: 11.0pt; color: #000000\">is</span><span style=\"font-size: 11.0pt; color: #000000\">available</span><span style=\"font-size: 11.0pt; color: #000000\"> </span><span style=\"font-size: 11.0pt; color: #000000\">only</span><span style=\"font-size: 11.0pt; color: #000000\"> </span><span style=\"font-size: 11.0pt; color: #000000\">by</span><span style=\"font-size: 11.0pt; color: #000000\"> </span><span style=\"font-size: 11.0pt; color: #000000\">prior</span><span style=\"font-size: 11.0pt; color: #000000\"> arrangement.</span><span style=\"font-size: 11.0pt; color: #FF0000\">Fahud</span><span style=\"font-size: 11.0pt; color: #FF0000\"> </span><span style=\"font-size: 11.0pt; color: #FF0000\">Hotel</span><span style=\"font-size: 11.0pt; color: #FF0000\"> </span><span style=\"font-size: 11.0pt; color: #FF0000\">available.</span><span style=\"font-size: 11.0pt; color: #FF0000\"> </span><span style=\"font-size: 11.0pt; color: #FF0000\">Its</span><span style=\"font-size: 11.0pt; color: #FF0000\"> </span><span style=\"font-size: 11.0pt; color: #FF0000\">5.5</span><span style=\"font-size: 11.0pt; color: #FF0000\"> </span><span style=\"font-size: 11.0pt; color: #FF0000\">Km</span><span style=\"font-size: 11.0pt; color: #FF0000\"> </span><span style=\"font-size: 11.0pt; color: #FF0000\">away</span><span style=\"font-size: 11.0pt; color: #FF0000\"> </span><span style=\"font-size: 11.0pt; color: #FF0000\">from</span><span style=\"font-size: 11.0pt; color: #FF0000\"> </span><span style=\"font-size: 11.0pt; color: #FF0000\">the</span><span style=\"font-size: 11.0pt; color: #FF0000\"> </span><span style=\"font-size: 11.0pt; color: #FF0000\">airport and its located in Fahud area, for reservation contact: </span><span style=\"font-size: 11.0pt; color: #FF0000\">92132401</span>",
+      "value_red": "There is accommodation available at the PDO Fahudcamp and contractor\u2019s motel (PAC). Accommodation isavailable only by prior arrangement.Fahud Hotel available. Its 5.5 Km away from the airport and its located in Fahud area, for reservation contact: 92132401"
     },
     {
-      "id": "AD 2.5",
-      "ad_2.5": "AD 2.5",
-      "1": "3",
-      "hotels": "Transportation",
-      "thereisaccommodationavailableatthepdofahudcampandcontractor\u2019smotel(pac).accommodationisavailableonlybypriorarrangement.fahudhotelavailable.its5.5kmawayfromtheairport_and_its_located_in_fahud_area,_for_reservation_contact:92132401": ""
+      "row": 2,
+      "field": "Restaurants",
+      "value": "",
+      "value_html": "<p></p>"
     },
     {
-      "id": "AD 2.5",
-      "ad_2.5": "AD 2.5",
-      "1": "4",
-      "hotels": "Medicalfacilities",
-      "thereisaccommodationavailableatthepdofahudcampandcontractor\u2019smotel(pac).accommodationisavailableonlybypriorarrangement.fahudhotelavailable.its5.5kmawayfromtheairport_and_its_located_in_fahud_area,_for_reservation_contact:92132401": ""
+      "row": 3,
+      "field": "Transportation",
+      "value": "",
+      "value_html": "<p></p>"
     },
     {
-      "id": "AD 2.5",
-      "ad_2.5": "AD 2.5",
-      "1": "5",
-      "hotels": "BankandPostOffice",
-      "thereisaccommodationavailableatthepdofahudcampandcontractor\u2019smotel(pac).accommodationisavailableonlybypriorarrangement.fahudhotelavailable.its5.5kmawayfromtheairport_and_its_located_in_fahud_area,_for_reservation_contact:92132401": ""
+      "row": 4,
+      "field": "Medical facilities",
+      "value": "",
+      "value_html": "<p></p>"
     },
     {
-      "id": "AD 2.5",
-      "ad_2.5": "AD 2.5",
-      "1": "6",
-      "hotels": "TouristOffice",
-      "thereisaccommodationavailableatthepdofahudcampandcontractor\u2019smotel(pac).accommodationisavailableonlybypriorarrangement.fahudhotelavailable.its5.5kmawayfromtheairport_and_its_located_in_fahud_area,_for_reservation_contact:92132401": ""
+      "row": 5,
+      "field": "Bank and Post Office",
+      "value": "",
+      "value_html": "<p></p>"
     },
     {
-      "id": "AD 2.5",
-      "ad_2.5": "AD 2.5",
-      "1": "7",
-      "hotels": "Remarks",
-      "thereisaccommodationavailableatthepdofahudcampandcontractor\u2019smotel(pac).accommodationisavailableonlybypriorarrangement.fahudhotelavailable.its5.5kmawayfromtheairport_and_its_located_in_fahud_area,_for_reservation_contact:92132401": ""
+      "row": 6,
+      "field": "Tourist Office",
+      "value": "",
+      "value_html": "<p></p>"
     },
     {
-      "ad_2.5": "4 Remarks",
-      "id": "4 Remarks"
-    },
-    {
-      "ad_2.5": "3 Remarks",
-      "id": "3 Remarks"
+      "row": 7,
+      "field": "Remarks",
+      "value": "",
+      "value_html": "<p></p>"
     }
   ],
   "general_remarks": "",
   "metadata": {
-    "source": "OOFD",
-    "processing_timestamp": "2025-03-22T18:17:42.995969"
+    "source": "temp_AD_2_5",
+    "processing_timestamp": "2025-03-30T15:56:50.737119"
   }
 }

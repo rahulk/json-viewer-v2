@@ -1,0 +1,29 @@
+{
+  "section_code": "AD 2.7",
+  "title": "SEASONAL AVAILABILITY \u2013 CLEARING",
+  "items": [
+    {
+      "row": 1,
+      "field": "Types of clearing equipment",
+      "value": "",
+      "value_html": "<p></p>"
+    },
+    {
+      "row": 2,
+      "field": "Clearance priorities",
+      "value": "",
+      "value_html": "<p></p>"
+    },
+    {
+      "row": 3,
+      "field": "Remarks",
+      "value": "",
+      "value_html": "<p></p>"
+    }
+  ],
+  "general_remarks": "",
+  "metadata": {
+    "source": "temp_AD_2_7",
+    "processing_timestamp": "2025-03-30T15:59:44.902789"
+  }
+}

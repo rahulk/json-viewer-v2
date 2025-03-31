@@ -1,53 +1,53 @@
 {
   "section_code": "AD 2.4",
-  "title": "Generic Table Data",
+  "title": "HANDLING SERVICES AND FACILITIES",
   "items": [
     {
-      "id": "AD 2.4",
-      "ad_2.4": "AD 2.4",
-      "1": "2",
-      "cargo-handlingfacilities": "Fuel/oiltypes",
-      "highloader35tonsavailablenil": ""
+      "row": 1,
+      "field": "Cargo - handling facilities",
+      "value": "High loader 35 tons availableNIL",
+      "value_html": "<p><span style=\"font-size: 11.0pt; color: #2D74B5\">High</span><span style=\"font-size: 11.0pt; color: #2D74B5\"> </span><span style=\"font-size: 11.0pt; color: #2D74B5\">loader</span><span style=\"font-size: 11.0pt; color: #2D74B5\"> </span><span style=\"font-size: 11.0pt; color: #2D74B5\">35</span><span style=\"font-size: 11.0pt; color: #2D74B5\"> </span><span style=\"font-size: 11.0pt; color: #2D74B5\">tons</span><span style=\"font-size: 11.0pt; color: #2D74B5\"> </span><span style=\"font-size: 11.0pt; color: #2D74B5\">available</span></p><p><span style=\"font-size: 11.0pt; color: #FF0000\">NIL</span></p>"
     },
     {
-      "id": "AD 2.4",
-      "ad_2.4": "AD 2.4",
-      "1": "3",
-      "cargo-handlingfacilities": "Fuelingfacilities/capacity",
-      "highloader35tonsavailablenil": ""
+      "row": 2,
+      "field": "Fuel / oil types",
+      "value": "",
+      "value_html": "<p></p>"
     },
     {
-      "id": "AD 2.4",
-      "ad_2.4": "AD 2.4",
-      "1": "4",
-      "cargo-handlingfacilities": "De-icingfacilities",
-      "highloader35tonsavailablenil": ""
+      "row": 3,
+      "field": "Fueling facilities/capacity",
+      "value": "",
+      "value_html": "<p></p>"
     },
     {
-      "id": "AD 2.4",
-      "ad_2.4": "AD 2.4",
-      "1": "5",
-      "cargo-handlingfacilities": "Hangerspaceforvisitingaircraft",
-      "highloader35tonsavailablenil": ""
+      "row": 4,
+      "field": "De-icing facilities",
+      "value": "",
+      "value_html": "<p></p>"
     },
     {
-      "id": "AD 2.4",
-      "ad_2.4": "AD 2.4",
-      "1": "6",
-      "cargo-handlingfacilities": "Repairfacilitiesforvisitingaircraft",
-      "highloader35tonsavailablenil": ""
+      "row": 5,
+      "field": "Hanger space for visiting aircraft",
+      "value": "",
+      "value_html": "<p></p>"
     },
     {
-      "id": "AD 2.4",
-      "ad_2.4": "AD 2.4",
-      "1": "7",
-      "cargo-handlingfacilities": "Remarks",
-      "highloader35tonsavailablenil": ""
+      "row": 6,
+      "field": "Repair facilities for visiting aircraft",
+      "value": "",
+      "value_html": "<p></p>"
+    },
+    {
+      "row": 7,
+      "field": "Remarks",
+      "value": "",
+      "value_html": "<p></p>"
     }
   ],
   "general_remarks": "",
   "metadata": {
-    "source": "OOSH",
-    "processing_timestamp": "2025-03-22T18:17:00.701250"
+    "source": "temp_AD_2_4",
+    "processing_timestamp": "2025-03-30T15:54:52.933133"
   }
 }

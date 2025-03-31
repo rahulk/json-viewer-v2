@@ -1,9 +1,9 @@
 {
   "metadata": {
     "parser_status": "fallback_extraction",
-    "processing_time_seconds": 0.023263,
-    "content_length": 38339,
-    "timestamp": "2025-03-22T18:15:59.364802"
+    "processing_time_seconds": 0.0239,
+    "content_length": 38234,
+    "timestamp": "2025-03-30T15:50:55.130873"
   },
   "sections": [],
   "error": "No parser available or extraction failed"

@@ -1,23 +1,53 @@
 {
   "section_code": "AD 2.5",
-  "title": "Generic Table Data",
+  "title": "PASSENGER FACILITIES",
   "items": [
     {
-      "ad_2.5": "7 Remarks",
-      "id": "7 Remarks"
+      "row": 1,
+      "field": "Hotels",
+      "value": "",
+      "value_html": "<p></p>"
     },
     {
-      "ad_2.5": "4 Remarks",
-      "id": "4 Remarks"
+      "row": 2,
+      "field": "Restaurants",
+      "value": "",
+      "value_html": "<p></p>"
     },
     {
-      "ad_2.5": "3 Remarks",
-      "id": "3 Remarks"
+      "row": 3,
+      "field": "Transportation",
+      "value": "",
+      "value_html": "<p></p>"
+    },
+    {
+      "row": 4,
+      "field": "Medical facilities",
+      "value": "",
+      "value_html": "<p></p>"
+    },
+    {
+      "row": 5,
+      "field": "Bank and Post Office",
+      "value": "",
+      "value_html": "<p></p>"
+    },
+    {
+      "row": 6,
+      "field": "Tourist Office",
+      "value": "",
+      "value_html": "<p></p>"
+    },
+    {
+      "row": 7,
+      "field": "Remarks",
+      "value": "",
+      "value_html": "<p></p>"
     }
   ],
   "general_remarks": "",
   "metadata": {
-    "source": "OOMS",
-    "processing_timestamp": "2025-03-22T18:17:44.976235"
+    "source": "temp_AD_2_5",
+    "processing_timestamp": "2025-03-30T15:57:10.021991"
   }
 }

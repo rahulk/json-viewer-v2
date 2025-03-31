@@ -1,0 +1,39 @@
+{
+  "section_code": "AD 2.6",
+  "title": " RESCUE AND FIRE FIGHTING SERVICES",
+  "items": [
+    {
+      "row": 1,
+      "field": "AD category for fire fighting",
+      "value": "",
+      "value_html": "<p></p>"
+    },
+    {
+      "row": 2,
+      "field": "Rescue equipment",
+      "value": "4 fire trucksThree 6x6 with water capacity 12500 LTRSOne Water Supply Tanker Capacity 25000 LTRS",
+      "value_html": "<p><span style=\"font-size: 11.0pt; color: #4471C4\">4 fire</span><span style=\"font-size: 11.0pt; color: #4471C4\"> trucks</span></p><p><span style=\"font-size: 11.0pt; color: #FF0000\">Three</span><span style=\"font-size: 11.0pt; color: #FF0000\"> </span><span style=\"font-size: 11.0pt; color: #FF0000\">6x6</span><span style=\"font-size: 11.0pt; color: #FF0000\"> </span><span style=\"font-size: 11.0pt; color: #FF0000\">with</span><span style=\"font-size: 11.0pt; color: #FF0000\"> </span><span style=\"font-size: 11.0pt; color: #FF0000\">water</span><span style=\"font-size: 11.0pt; color: #FF0000\"> </span><span style=\"font-size: 11.0pt; color: #FF0000\">capacity</span><span style=\"font-size: 11.0pt; color: #FF0000\"> </span><span style=\"font-size: 11.0pt; color: #FF0000\">12500</span><span style=\"font-size: 11.0pt; color: #FF0000\"> </span><span style=\"font-size: 11.0pt; color: #FF0000\">LTRS</span></p><p><span style=\"font-size: 11.0pt; color: #FF0000\">One</span><span style=\"font-size: 11.0pt; color: #FF0000\"> </span><span style=\"font-size: 11.0pt; color: #FF0000\">Water</span><span style=\"font-size: 11.0pt; color: #FF0000\"> </span><span style=\"font-size: 11.0pt; color: #FF0000\">Supply</span><span style=\"font-size: 11.0pt; color: #FF0000\"> </span><span style=\"font-size: 11.0pt; color: #FF0000\">Tanker</span><span style=\"font-size: 11.0pt; color: #FF0000\"> </span><span style=\"font-size: 11.0pt; color: #FF0000\">Capacity</span><span style=\"font-size: 11.0pt; color: #FF0000\"> </span><span style=\"font-size: 11.0pt; color: #FF0000\">25000 </span><span style=\"font-size: 11.0pt; color: #FF0000\">LTRS</span></p>",
+      "value_blue_html": "<span style=\"font-size: 11.0pt; color: #4471C4\">4 fire</span><span style=\"font-size: 11.0pt; color: #4471C4\"> trucks</span>",
+      "value_blue": "4 fire trucks",
+      "value_red_html": "<span style=\"font-size: 11.0pt; color: #FF0000\">Three</span><span style=\"font-size: 11.0pt; color: #FF0000\"> </span><span style=\"font-size: 11.0pt; color: #FF0000\">6x6</span><span style=\"font-size: 11.0pt; color: #FF0000\"> </span><span style=\"font-size: 11.0pt; color: #FF0000\">with</span><span style=\"font-size: 11.0pt; color: #FF0000\"> </span><span style=\"font-size: 11.0pt; color: #FF0000\">water</span><span style=\"font-size: 11.0pt; color: #FF0000\"> </span><span style=\"font-size: 11.0pt; color: #FF0000\">capacity</span><span style=\"font-size: 11.0pt; color: #FF0000\"> </span><span style=\"font-size: 11.0pt; color: #FF0000\">12500</span><span style=\"font-size: 11.0pt; color: #FF0000\"> </span><span style=\"font-size: 11.0pt; color: #FF0000\">LTRS</span><span style=\"font-size: 11.0pt; color: #FF0000\">One</span><span style=\"font-size: 11.0pt; color: #FF0000\"> </span><span style=\"font-size: 11.0pt; color: #FF0000\">Water</span><span style=\"font-size: 11.0pt; color: #FF0000\"> </span><span style=\"font-size: 11.0pt; color: #FF0000\">Supply</span><span style=\"font-size: 11.0pt; color: #FF0000\"> </span><span style=\"font-size: 11.0pt; color: #FF0000\">Tanker</span><span style=\"font-size: 11.0pt; color: #FF0000\"> </span><span style=\"font-size: 11.0pt; color: #FF0000\">Capacity</span><span style=\"font-size: 11.0pt; color: #FF0000\"> </span><span style=\"font-size: 11.0pt; color: #FF0000\">25000 </span><span style=\"font-size: 11.0pt; color: #FF0000\">LTRS</span>",
+      "value_red": "Three 6x6 with water capacity 12500 LTRSOne Water Supply Tanker Capacity 25000 LTRS"
+    },
+    {
+      "row": 3,
+      "field": "Capability for removal of disabled aircraft",
+      "value": "",
+      "value_html": "<p></p>"
+    },
+    {
+      "row": 4,
+      "field": "Remarks",
+      "value": "",
+      "value_html": "<p></p>"
+    }
+  ],
+  "general_remarks": "",
+  "metadata": {
+    "source": "temp_AD_2_6",
+    "processing_timestamp": "2025-03-30T15:56:37.715780"
+  }
+}

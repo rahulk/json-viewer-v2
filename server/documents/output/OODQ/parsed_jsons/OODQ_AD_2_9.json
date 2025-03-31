@@ -1,0 +1,35 @@
+{
+  "section_code": "AD 2.9",
+  "title": "URFACE MOVEMENT GUIDANCE AND CONTROL SYSTEM AND MARKINGS",
+  "items": [
+    {
+      "row": 1,
+      "field": "Use of aircraft stand ID signs, TWY guide lines and parking guidance system of aircraft stands",
+      "value": "",
+      "value_html": "<p></p>"
+    },
+    {
+      "row": 2,
+      "field": "RWY and TWY markings and LGT",
+      "value": "",
+      "value_html": "<p></p>"
+    },
+    {
+      "row": 3,
+      "field": "Stop bars",
+      "value": "",
+      "value_html": "<p></p>"
+    },
+    {
+      "row": 4,
+      "field": "Remarks",
+      "value": "Follow me service is provided for unscheduled trafficsFollow Me Service is Provided Upon Request",
+      "value_html": "<p><span style=\"font-size: 11.0pt; color: #2D74B5\">Follow</span><span style=\"font-size: 11.0pt; color: #2D74B5\"> </span><span style=\"font-size: 11.0pt; color: #2D74B5\">me</span><span style=\"font-size: 11.0pt; color: #2D74B5\"> </span><span style=\"font-size: 11.0pt; color: #2D74B5\">service</span><span style=\"font-size: 11.0pt; color: #2D74B5\"> </span><span style=\"font-size: 11.0pt; color: #2D74B5\">is</span><span style=\"font-size: 11.0pt; color: #2D74B5\"> </span><span style=\"font-size: 11.0pt; color: #2D74B5\">provided</span><span style=\"font-size: 11.0pt; color: #2D74B5\"> </span><span style=\"font-size: 11.0pt; color: #2D74B5\">for</span><span style=\"font-size: 11.0pt; color: #2D74B5\"> </span><span style=\"font-size: 11.0pt; color: #2D74B5\">unscheduled </span><span style=\"font-size: 11.0pt; color: #2D74B5\">traffics</span></p><p><span style=\"font-size: 11.0pt; color: #FF0000\">Follow</span><span style=\"font-size: 11.0pt; color: #FF0000\"> </span><span style=\"font-size: 11.0pt; color: #FF0000\">Me</span><span style=\"font-size: 11.0pt; color: #FF0000\"> </span><span style=\"font-size: 11.0pt; color: #FF0000\">Service</span><span style=\"font-size: 11.0pt; color: #FF0000\"> </span><span style=\"font-size: 11.0pt; color: #FF0000\">is</span><span style=\"font-size: 11.0pt; color: #FF0000\"> </span><span style=\"font-size: 11.0pt; color: #FF0000\">Provided</span><span style=\"font-size: 11.0pt; color: #FF0000\"> </span><span style=\"font-size: 11.0pt; color: #FF0000\">Upon</span><span style=\"font-size: 11.0pt; color: #FF0000\"> </span><span style=\"font-size: 11.0pt; color: #FF0000\">Request</span></p>"
+    }
+  ],
+  "general_remarks": "",
+  "metadata": {
+    "source": "temp_AD_2_9",
+    "processing_timestamp": "2025-03-30T15:59:44.923878"
+  }
+}
